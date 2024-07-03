@@ -1,11 +1,15 @@
 ---
-import Header from "@/components/Header.astro";
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
+import { SignedIn, SignedOut } from "astro-clerk-auth/components/control";
+import { UserButton, SignIn } from "astro-clerk-auth/components/interactive";
 ---
 
-<Layout title="Welcome to Astro!">
-  <main>
-    <Header />
-    <nav></nav>
-  </main>
+<Layout title="Welcome to Astro + Clerk">
+  <SignedIn>
+    <UserButton />
+  </SignedIn>
+
+  <SignedOut>
+    <SignIn routing="hash" />
+  </SignedOut>
 </Layout>

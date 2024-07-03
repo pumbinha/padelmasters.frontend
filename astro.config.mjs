@@ -1,12 +1,15 @@
 import { defineConfig } from "astro/config";
-import preact from "@astrojs/preact";
 import vercel from "@astrojs/vercel/serverless";
-
+import clerk from 'astro-clerk-auth'
 import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [preact(), tailwind()],
+  integrations: [clerk(), tailwind()],
   output: "server",
-  adapter: vercel()
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  }),
 });
