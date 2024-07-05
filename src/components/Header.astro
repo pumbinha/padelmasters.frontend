@@ -1,14 +1,35 @@
 ---
+import { UserButton } from "astro-clerk-auth/components/interactive";
 
+import { SignedIn, SignedOut } from "astro-clerk-auth/components/control";
+
+const user = await Astro.locals.currentUser();
 ---
 
-<header class="py-8 px-4 mx-auto max-w-xl lg:py-16">
-  <div class="mx-auto text-center mb-8 lg:mb-16">
-    <h2 class="mb-4 text-5xl tracking-tight font-extrabold text-white">
-      Padel Masters
-    </h2>
-    <p class="font-light text-gray-500 sm:text-xl dark:text-gray-400">
-      All the information about the tournament
-    </p>
+<header
+  class="bg-primary text-primary-foreground py-4 px-6 flex items-center justify-between"
+>
+  <div class="flex items-center gap-4">
+    <h1 class="text-2xl font-bold">Padel Masters</h1>
   </div>
+  <nav class="hidden md:flex items-center gap-6">
+    <div>
+      <SignedOut>
+        <a href="/sign-in" class="sign-in-button">Sign In</a>
+      </SignedOut>
+      <SignedIn>
+        <a href="/championships" class="font-medium hover:underline">
+          Championships
+        </a>
+        <a href="/teams" class="font-medium hover:underline"> Teams</a>
+        <a href="/matches" class="font-medium hover:underline"> Matches </a>
+        <UserButton />
+      </SignedIn>
+    </div>
+  </nav>
+  <button
+    class="md:hidden px-4 py-2 rounded-md border border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary transition-colors"
+  >
+    <span class="sr-only">Toggle menu</span>
+  </button>
 </header>

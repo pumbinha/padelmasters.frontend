@@ -1,0 +1,19 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import { SignUp as SignUpComponent } from "astro-clerk-auth/components/interactive"
+---
+
+<Layout title="Welcome to Padel Masters">
+	<div>
+		<SignUpComponent fallbackRedirectUrl="/welcome" />
+	</div>
+</Layout>
+
+<style>
+	div {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
