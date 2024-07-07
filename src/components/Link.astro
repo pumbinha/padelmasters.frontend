@@ -1,0 +1,49 @@
+---
+const { className = "", disabled, href, isExternal, title } = Astro.props
+const anchorProps = isExternal ? { target: "_blank", rel: "noopener" } : {}
+---
+
+<a
+	class={`
+	${className}
+	${disabled ? "text-white" : "text-primary"}
+	group relative py-3 font-extrabold text-md transition hover:text-white xl:text-lg`}
+	href={disabled ? "#" : href}
+	{...anchorProps}
+>
+	{
+		disabled ? (
+			<span class="absolute -top-2 left-0 right-0 m-auto w-full rounded-full py-1 text-xs font-semibold text-primary opacity-0 transition-opacity duration-500 group-hover:opacity-100 xl:text-base">
+				Próximamente
+			</span>
+		) : (
+			""
+		)
+	}
+	<span class={disabled ? "opacity-70" : ""}>{title}</span>
+</a>
+
+<style>
+	a::before,
+	a::after {
+		content: "";
+		font-weight: 400;
+		position: absolute;
+		color: #ffd200;
+		opacity: 0;
+		left: -15px;
+		content: "{";
+		transition: opacity 0.5s ease;
+	}
+
+	a::after {
+		left: unset;
+		right: -15px;
+		content: "}";
+	}
+
+	a:hover::before,
+	a:hover::after {
+		opacity: 1;
+	}
+</style>

@@ -1,0 +1,156 @@
+<!-- ---
+import { Icons } from "@components/Icons"
+import MenuIcon from "@icons/Menu.astro"
+import Link from "./Link.astro"
+
+const NAVIGATION_LINKS = [
+	// {
+	// 	title: 'Patrocinadores',
+	// 	href: '#sponsors'
+	// },
+	{
+		title: "Speakers",
+		href: "#speakers",
+	},
+	{
+		title: "Agenda",
+		href: "#agenda",
+	},
+	// {
+	// 	title: 'Tickets',
+	// 	href: '#ticket'
+	// },
+	{
+		title: "Código de conducta",
+		href: "#coc",
+	},
+]
+---
+
+<header
+	class="z-10 flex flex-row items-center justify-center gap-x-10 bg-black/80 px-4 text-primary backdrop-blur-lg xl:sticky xl:top-0 xl:justify-center"
+>
+	<a href="/#">
+		<Icons.logo class="animate-zoomIn mx-auto h-full w-72 lg:w-80 xl:w-36" />
+	</a>
+
+	<input type="checkbox" id="menu" hidden class="peer" />
+	<label
+		for="menu"
+		class="fixed bottom-4 right-4 z-50 hidden h-14 w-14 cursor-pointer items-center justify-center rounded-full border border-zinc-500 bg-zinc-800 transition hover:scale-125 hover:border-white xl:relative xl:hidden peer-checked:[&>.first]:hidden peer-checked:[&>.last]:block"
+	>
+		<MenuIcon />
+	</label>
+
+	<nav
+		id="navbar"
+		class="last pointer-events-none sticky left-0 right-0 top-0 z-40 hidden min-h-screen flex-col justify-center px-8 py-12 text-center opacity-0 transition-opacity peer-checked:pointer-events-auto peer-checked:opacity-100 xl:pointer-events-auto xl:relative xl:mt-1 xl:flex xl:min-h-0 xl:px-0 xl:opacity-100 xl:transition-all"
+	>
+		<ul class="flex flex-col gap-8 md:flex-row">
+			{
+				NAVIGATION_LINKS.map(({ title, href }) => (
+					<li>
+						<Link href={href} title={title} />
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</header>
+
+<script type="module">
+	const sections = document.querySelectorAll("main > section")
+	const links = document.querySelectorAll("#navbar a")
+
+	let direction = "up"
+	let prevYPosition = 0
+
+	const setScrollDirection = () => {
+		direction = document.documentElement.scrollTop > prevYPosition ? "down" : "up"
+
+		prevYPosition = document.documentElement.scrollTop
+	}
+
+	const options = {
+		root: null,
+		threshold: 0,
+		rootMargin: "0px",
+	}
+
+	const getTargetSection = (entry) => {
+		const index = sections.findIndex((section) => section === entry.target)
+
+		if (index >= sections.length - 1) {
+			return entry.target
+		}
+
+		return sections[index + 1]
+	}
+
+	const updateLink = (target) => {
+		console.log("updateLink", target)
+	}
+
+	const onIntersect = (entries) => {
+		entries.forEach((entry) => {
+			direction = document.documentElement.scrollTop > prevYPosition ? "down" : "up"
+
+			prevYPosition = document.documentElement.scrollTop
+
+			const target = direction === "down" ? getTargetSection(entry) : entry.target
+
+			if (shouldUpdate(entry)) {
+				updateLink(target)
+			}
+		})
+	}
+
+	const shouldUpdate = (entry) => {
+		if (direction === "down" && !entry.isIntersecting) {
+			return true
+		}
+
+		if (direction === "up" && entry.isIntersecting) {
+			return true
+		}
+
+		return false
+	}
+
+	const observer = new IntersectionObserver(onIntersect, options)
+
+	sections.forEach((section) => {
+		observer.observe(section)
+	})
+</script>
+
+<script type="module">
+	const menuCheckbox = document.getElementById("menu")
+	const mediaQuery = window.matchMedia("(min-width: 1024px)") // Breakpoint lg
+
+	const $navbar = document.querySelector("#navbar")
+	$navbar.querySelectorAll("a").forEach((anchor) => {
+		anchor.addEventListener("click", (_event) => {
+			menuCheckbox.checked = false
+			if (document.body.style.overflowY === "hidden") {
+				hideOverFlow(false)
+			}
+		})
+	})
+
+	/** @param {boolean} value */
+	function hideOverFlow(value) {
+		document.body.style.overflowY = value ? "hidden" : "auto"
+	}
+
+	menuCheckbox.addEventListener("change", (e) =>
+		e.target.checked ? hideOverFlow(true) : hideOverFlow(false)
+	)
+
+	mediaQuery.addEventListener("change", (e) => {
+		if (e.matches) {
+			hideOverFlow(false)
+			menuCheckbox.checked = false
+		}
+	})
+</script> -->
