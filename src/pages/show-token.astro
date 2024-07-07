@@ -1,0 +1,13 @@
+---
+import Layout from "@/layouts/Layout.astro"
+const user = Astro.locals.auth()
+console.log(user)
+---
+
+<Layout title="Welcome to Padel Masters">
+	<div>
+		<h1 class="mb-4 text-2xl font-bold">Authentication testing</h1>
+		<p>This is the user: {user.userId}</p>
+		<p>This is the token: {user.getToken()}</p>
+	</div>
+</Layout>
