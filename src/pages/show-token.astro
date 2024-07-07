@@ -1,6 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro"
 const user = Astro.locals.auth()
+
+const template = "template"
 console.log(user)
 ---
 
@@ -8,6 +10,6 @@ console.log(user)
 	<div>
 		<h1 class="mb-4 text-2xl font-bold">Authentication testing</h1>
 		<p>This is the user: {user.userId}</p>
-		<p>This is the token: {user.getToken()}</p>
+		<p>This is the token: {user.getToken({ template })}</p>
 	</div>
 </Layout>
