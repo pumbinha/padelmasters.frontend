@@ -1,2 +1,10 @@
 /// <reference types="astro/client" />
-/// <reference types="astro-clerk-auth/env" />
+interface ImportMetaEnv {
+	readonly KEYCLOAK_ID: string
+	readonly KEYCLOAK_SECRET: string
+	readonly KEYCLOAK_ISSUER: string
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv
+}

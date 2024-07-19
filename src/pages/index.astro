@@ -1,33 +1,66 @@
 ---
 import Layout from "@/layouts/Layout.astro"
-import { SignedIn, SignedOut } from "astro-clerk-auth/components/control"
+import { getSession } from "auth-astro/server"
+import { getLangFromUrl, useTranslations } from "../i18n/utils"
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
 
-const user = Astro.locals.auth()
-console.log(user)
+const session = await getSession(Astro.request)
+
+console.log(session?.roles)
 ---
 
 <Layout title="Padel Masters League">
 	<section>
-		<SignedOut>
-			<h2 class="text-3xl font-bold">Welcome to Padel Aces League</h2>
-			<p class="text-muted-foreground">
-				Padel Aces League is a premier padel tournament that brings together the best players from
-				around the world. Join us to compete, network, and enjoy the sport of padel.
+		<!-- <SignedOut> -->
+		<h2 class="text-3xl font-bold">Welcome to Padel Aces League</h2>
+		<p class="text-muted-foreground">
+			Padel Aces League is a premier padel tournament that brings together the best players from
+			around the world. Join us to compete, network, and enjoy the sport of padel.
+		</p>
+		<p>{t("nav.home")}</p>
+		<!-- <div class="flex justify-center gap-4">
+			<a
+				href="/sign-in"
+				class="rounded-md bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
+			>
+				Join Now
+			</a>
+			<button
+				class="rounded-md border border-primary px-6 py-3 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+			>
+				Learn More
+			</button>
+		</div> -->
+		<div class="flex justify-center gap-4">
+			<button
+				id="login"
+				class="rounded-md bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
+				>Login</button
+			>
+			<button
+				id="logout"
+				class="rounded-md border border-primary px-6 py-3 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+				>Logout</button
+			>
+		</div>
+		<div
+			class="mx-auto h-auto max-w-sm items-center space-x-4 overflow-x-auto rounded-xl bg-white p-6 shadow-lg"
+		>
+			<p>
+				Id: {session?.user?.id}
 			</p>
-			<div class="flex justify-center gap-4">
-				<a
-					href="/sign-in"
-					class="rounded-md bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
-				>
-					Join Now
-				</a>
-				<button
-					class="rounded-md border border-primary px-6 py-3 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-				>
-					Learn More
-				</button>
-			</div>
-		</SignedOut>
-		<SignedIn>Let's go to around! </SignedIn>
+			<p>Name: {session?.user?.name}</p>
+			<p class="text-wrap">access token: {session?.access_token}</p>
+			<p class="text-wrap">Roles: {session?.roles}</p>
+		</div>
+		<script>
+			const { signIn, signOut } = await import("auth-astro/client")
+
+			document.querySelector("#login").onclick = () => signIn("keycloak")
+			document.querySelector("#logout").onclick = () => signOut()
+		</script>
+		<!-- </SignedOut> -->
+		<!-- <SignedIn>Let's go to around! </SignedIn> -->
 	</section>
 </Layout>

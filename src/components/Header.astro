@@ -1,27 +1,22 @@
 ---
-import { UserButton } from "astro-clerk-auth/components/interactive"
-
-import { SignedIn, SignedOut } from "astro-clerk-auth/components/control"
-
-const user = await Astro.locals.currentUser()
+// const user = await Astro.locals.currentUser()
 ---
 
 <header class="flex items-center justify-between bg-primary px-6 py-4 text-primary-foreground">
 	<div class="flex items-center gap-4">
-		<h1 class="text-2xl font-bold">Padel Masters</h1>
+		<a href="/" class="logo text-2xl font-bold">Padel Masters</a>
 	</div>
 	<nav class="hidden items-center gap-6 md:flex">
 		<div>
-			<SignedOut>
-				<a href="/sign-in" class="sign-in-button">Sign In</a>
-			</SignedOut>
-			<SignedIn>
-				<a href="/championships" class="font-medium hover:underline"> Championships </a>
-				<a href="/teams" class="font-medium hover:underline"> Teams</a>
-				<a href="/matches" class="font-medium hover:underline"> Matches </a>
-				<a href="/show-token" class="font-medium hover:underline"> Token </a>
-				<UserButton />
-			</SignedIn>
+			<!-- <SignedOut> -->
+			<a href="/sign-in" class="sign-in-button">Sign In</a>
+			<!-- </SignedOut> -->
+			<!-- <SignedIn> -->
+			<a href="/championships" class="font-medium hover:underline"> Championships </a>
+			<a href="/teams" class="font-medium hover:underline"> Teams</a>
+			<a href="/matches" class="font-medium hover:underline"> Matches </a>
+			<!-- <UserButton /> -->
+			<!-- </SignedIn> -->
 		</div>
 	</nav>
 	<button
