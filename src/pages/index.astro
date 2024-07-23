@@ -1,13 +1,30 @@
 ---
 import Layout from "@/layouts/Layout.astro"
 import { getSession } from "auth-astro/server"
+import { Api, type ApiConfig } from "../api/schema2.d.ts/Api"
 import { getLangFromUrl, useTranslations } from "../i18n/utils"
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
 const session = await getSession(Astro.request)
 
-console.log(session?.roles)
+const apiConfig: ApiConfig = {
+	baseUrl: "https://test.api.padelmasters.net",
+	// headers: {
+	// 	"Content-Type": "application/json",
+	// 	Authorization: `Bearer ${session?.access_token}`,
+	// },
+}
+
+const api = new Api(apiConfig)
+api.api
+	.padelmastersApiDomainDemoAnonymousGetAnonymousHelloWorld()
+	.then((response) => {
+		console.log(response.data)
+	})
+	.catch((error) => {
+		console.error(error)
+	})
 ---
 
 <Layout title="Padel Masters League">
@@ -57,8 +74,14 @@ console.log(session?.roles)
 		<script>
 			const { signIn, signOut } = await import("auth-astro/client")
 
-			document.querySelector("#login").onclick = () => signIn("keycloak")
-			document.querySelector("#logout").onclick = () => signOut()
+			const loginButton = document.querySelector("#login") as HTMLButtonElement
+			if (loginButton) {
+				loginButton.onclick = () => signIn("keycloak")
+			}
+			const logoutButton = document.querySelector("#login") as HTMLButtonElement
+			if (logoutButton) {
+				logoutButton.onclick = () => signOut()
+			}
 		</script>
 		<!-- </SignedOut> -->
 		<!-- <SignedIn>Let's go to around! </SignedIn> -->

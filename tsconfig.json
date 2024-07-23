@@ -1,32 +1,24 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-     "verbatimModuleSyntax": true,
-    "baseUrl": ".",
-    "plugins": [
-      {
-        "name": "@astrojs/ts-plugin"
-      }
-    ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/components/*": [
-        "src/components/*"
-      ],
-      "@/layouts/*": [
-        "src/layouts/*"
-      ]
-    },
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
-  },
-  "include": [
-    "src",
-    "types.d.ts"
-  ],
-  "exclude": [
-    "public"
-  ]
+	"extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"verbatimModuleSyntax": true,
+		"baseUrl": ".",
+		"plugins": [
+			{
+				"name": "@astrojs/ts-plugin"
+			}
+		],
+		"paths": {
+			"@/*": ["./src/*"],
+			"@/components/*": ["src/components/*"],
+			"@/layouts/*": ["src/layouts/*"]
+		},
+		"jsx": "react-jsx",
+		"jsxImportSource": "react",
+		"module": "ESNext", // or "NodeNext"
+		"moduleResolution": "Bundler", // or "NodeNext"
+		"noUncheckedIndexedAccess": true
+	},
+	"include": ["src", "types.d.ts"],
+	"exclude": ["public"]
 }
