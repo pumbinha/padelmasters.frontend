@@ -1,0 +1,40 @@
+---
+import { TranslationKey } from "@/i18n/ui"
+import { getLangFromUrl, useTranslations } from "@/i18n/utils"
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+---
+
+<section class="w-full pt-12 md:pt-24 lg:pt-32">
+	<div class="container space-y-10 xl:space-y-16">
+		<div class="grid gap-4 px-10 md:grid-cols-2 md:gap-16">
+			<div>
+				<img
+					src="/placeholder.svg"
+					width="800"
+					height="600"
+					alt="Padel League"
+					class="mx-auto aspect-[4/3] overflow-hidden rounded-xl object-cover"
+				/>
+			</div>
+			<div class="flex flex-col items-start space-y-4">
+				<h1
+					class="lg:leading-tighter text-4xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[1.4rem] 2xl:text-[1.75rem]"
+				>
+					Join the Padel League
+				</h1>
+				<p class="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
+					Compete against other players in our exciting padel league. Beat Carlos and win a free
+					padel racket!
+				</p>
+				<a
+					href="/sign-in"
+					class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+				>
+					{t(TranslationKey.WelcomeJoin)}
+				</a>
+			</div>
+		</div>
+	</div>
+</section>

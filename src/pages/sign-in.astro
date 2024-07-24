@@ -1,19 +1,27 @@
 ---
+import SignInComponent from "@/components/SignIn"
+import { TranslationKey } from "@/i18n/ui"
+import { getSession } from "auth-astro/server"
+import { getLangFromUrl, useTranslations } from "../i18n/utils"
 import Layout from "../layouts/Layout.astro"
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
+const session = await getSession(Astro.request)
 ---
 
 <Layout title="Welcome to Padel Masters - Sign in">
-	<div>
-		<p>this is not showing up, is it?</p>
+	<div class="flex min-h-screen flex-col items-center justify-center bg-background">
+		<div class="w-full max-w-md rounded-lg bg-card px-6 py-8 shadow-lg">
+			<div class="flex flex-col items-center space-y-6">
+				<div class="text-center">
+					<h1 class="text-2xl font-bold text-foreground">{t(TranslationKey.SignInTitle)}</h1>
+				</div>
+
+				<div class="flex items-center space-x-4">
+					<SignInComponent client:load>{t(TranslationKey.SignIn)}</SignInComponent>
+				</div>
+			</div>
+		</div>
 	</div>
 </Layout>
-
-<style>
-	div {
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
-	}
-</style>

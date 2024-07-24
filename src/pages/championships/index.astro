@@ -1,7 +1,114 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import { TranslationKey } from "@/i18n/ui"
+import { getLangFromUrl, useTranslations } from "@/i18n/utils"
+import Layout from "@/layouts/Layout.astro"
+import {
+	type ApiConfig,
+	type ChampionshipResponse,
+	type RequestParams,
+	Api,
+	ChampionshipStatus,
+} from "@/services/api"
+import { getSession } from "auth-astro/server"
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
+const session = await getSession(Astro.request)
+
+if (!session) {
+	Astro.redirect("/sign-in")
+}
+
+// TODO: Move this to a service
+// TODO: use environment variables
+const apiConfig: ApiConfig = {
+	baseUrl: "https://test.api.padelmasters.net",
+}
+
+const api = new Api(apiConfig)
+
+api.setSecurityData({
+	token: session?.access_token,
+})
+
+let championships: ChampionshipResponse[] = []
+
+try {
+	const params: RequestParams = {
+		headers: {
+			Authorization: `Bearer ${session?.access_token}`, // Explicitly include the bearer token
+		},
+	}
+	const championshipResponse =
+		await api.api.padelmastersApiDomainChampionshipsGetChampionships(params)
+	if (championshipResponse.ok) {
+		championships = championshipResponse.data
+	} else {
+		console.error("championshipResponse")
+	}
+} catch (e) {
+	console.error(e)
+}
+
+const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
+	switch (status) {
+		case ChampionshipStatus.Created:
+			return "bg-gray-200 text-gray-800"
+		case ChampionshipStatus.Open:
+			return "bg-blue-200 text-blue-800"
+		case ChampionshipStatus.Started:
+			return "bg-yellow-200 text-yellow-800"
+		case ChampionshipStatus.Cancelled:
+			return "bg-red-200 text-red-800"
+		case ChampionshipStatus.Finished:
+			return "bg-green-200 text-green-800"
+		default:
+			return ""
+	}
+}
 ---
 
 <Layout title="Padel Masters - Championships">
-  <div>This is a list of championships</div>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="w-full rounded-lg bg-background p-6 shadow-lg">
+			<div class="mb-6 flex items-center justify-between">
+				<h1 class="text-2xl font-bold text-foreground">{t(TranslationKey.ChampionshipsTitle)}</h1>
+				<div class="flex items-center gap-2"></div>
+			</div>
+			<table class="w-full table-auto">
+				<thead>
+					<tr class="bg-muted text-muted-foreground">
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsName)}</th>
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsDescription)}</th>
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsStartDate)}</th>
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsEndDate)}</th>
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsStatus)}</th>
+						<th class="px-4 py-2 text-left">{t(TranslationKey.ChampionshipsType)}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						championships.map((championship) => {
+							return (
+								<tr class="border-b border-muted/50">
+									<td class="px-4 py-2">{championship.name}</td>
+									<td class="px-4 py-2">{championship.description}</td>
+									<td class="px-4 py-2">{championship.startDate}</td>
+									<td class="px-4 py-2">{championship.endDate}</td>
+									<td class="px-4 py-2">
+										<div
+											class={`rounded-md bg-green-500 px-2 py-1 text-green-50 ${getStatusClass(championship.status)}`}
+										>
+											{championship.status}
+										</div>
+									</td>
+									<td class="px-4 py-2">{championship.type}</td>
+								</tr>
+							)
+						})
+					}
+				</tbody>
+			</table>
+		</div>
+	</section>
 </Layout>

@@ -9,9 +9,34 @@
  * ---------------------------------------------------------------
  */
 
+export interface ChampionshipResponse {
+  /** @format uuid */
+  id?: string;
+  name?: NameValueObject;
+  description?: DescriptionValueObject;
+  /** @format date-time */
+  startDate?: string;
+  /** @format date-time */
+  endDate?: string;
+  status?: ChampionshipStatus | null;
+  type?: ChampionshipType | null;
+}
+
+export enum ChampionshipStatus {
+  Created = "Created",
+  Open = "Open",
+  Started = "Started",
+  Cancelled = "Cancelled",
+  Finished = "Finished",
+}
+
+export enum ChampionshipType {
+  AmericanoLeague = "AmericanoLeague",
+}
+
 export interface CreateChampionshipRequest {
-  name?: Name;
-  description?: Description;
+  name?: NameValueObject;
+  description?: DescriptionValueObject;
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
@@ -23,11 +48,11 @@ export interface DefaultCreatedResponse {
   id?: string;
 }
 
-export interface Description {
+export interface DescriptionValueObject {
   value?: string | null;
 }
 
-export interface Name {
+export interface NameValueObject {
   value?: string | null;
 }
 
@@ -276,24 +301,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
-  };
-  championships = {
+
     /**
      * No description
      *
      * @tags Padelmasters.Api
      * @name PadelmastersApiDomainChampionshipsCreateChampionship
-     * @request POST:/championships
+     * @request POST:/api/championships
      */
     padelmastersApiDomainChampionshipsCreateChampionship: (
       data: CreateChampionshipRequest,
       params: RequestParams = {},
     ) =>
       this.request<DefaultCreatedResponse, void>({
-        path: `/championships`,
+        path: `/api/championships`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Padelmasters.Api
+     * @name PadelmastersApiDomainChampionshipsGetChampionships
+     * @request GET:/api/championships
+     */
+    padelmastersApiDomainChampionshipsGetChampionships: (params: RequestParams = {}) =>
+      this.request<ChampionshipResponse[], void>({
+        path: `/api/championships`,
+        method: "GET",
         format: "json",
         ...params,
       }),

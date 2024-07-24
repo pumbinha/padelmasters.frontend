@@ -1,18 +1,46 @@
-export const languages = {
-  en: 'English',
-  fr: 'Français',
-};
+export enum TranslationKey {
+	SignIn = "acc.signin",
+	Home = "nav.home",
+	About = "nav.about",
+	Twitter = "nav.twitter",
+	WelcomeTitle = "Welcome.Title",
+	SignInTitle = "SignIn.Title",
+	WelcomeJoin = "Welcome.Join",
+	ChampionshipsTitle = "Championships.Title",
+	ChampionshipsName = "ChampionshipsName",
+	ChampionshipsDescription = "Championships.Description",
+	ChampionshipsStartDate = "Championships.StartDate",
+	ChampionshipsEndDate = "Championships.EndDate",
+	ChampionshipsStatus = "Championships.Status",
+	ChampionshipsType = "Championships.Type",
+}
 
-export const defaultLang = 'en';
+export type SupportedLanguages = "en" // | "es"
+export const defaultLang: SupportedLanguages = "en"
 
-export const ui = {
-  en: {
-    'nav.home': 'Home',
-    'nav.about': 'About',
-    'nav.twitter': 'Twitter',
-  },
-  gr: {
-    'nav.home': 'Accueil',
-    'nav.about': 'À propos',
-  },
-} as const;
+type Translations = {
+	[key in TranslationKey]: string
+}
+
+type UI = {
+	[lang in SupportedLanguages]: Translations
+}
+
+export const ui: UI = {
+	en: {
+		[TranslationKey.SignIn]: "Sign in",
+		[TranslationKey.Home]: "Home",
+		[TranslationKey.About]: "About",
+		[TranslationKey.Twitter]: "Twitter",
+		[TranslationKey.WelcomeTitle]: "Welcome to Padel Master",
+		[TranslationKey.SignInTitle]: "Sign in to your account",
+		[TranslationKey.WelcomeJoin]: "Join the League",
+		[TranslationKey.ChampionshipsTitle]: "Championships",
+		[TranslationKey.ChampionshipsName]: "Name",
+		[TranslationKey.ChampionshipsDescription]: "Description",
+		[TranslationKey.ChampionshipsStartDate]: "Start Date",
+		[TranslationKey.ChampionshipsEndDate]: "End Date",
+		[TranslationKey.ChampionshipsStatus]: "Status",
+		[TranslationKey.ChampionshipsType]: "Type",
+	},
+}
