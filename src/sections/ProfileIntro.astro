@@ -35,7 +35,7 @@ const session = await getSession(Astro.request)
 				</div>
 			</div>
 			<div class="flex items-center space-x-4">
-				<SignOutComponent>Sign Out</SignOutComponent>
+				<SignOutComponent client:load>Sign Out</SignOutComponent>
 			</div>
 		</div>
 	</div>

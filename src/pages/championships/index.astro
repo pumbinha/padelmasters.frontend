@@ -1,6 +1,6 @@
 ---
 import { TranslationKey } from "@/i18n/ui"
-import { getLangFromUrl, useTranslations } from "@/i18n/utils"
+import { useTranslations } from "@/i18n/utils"
 import Layout from "@/layouts/Layout.astro"
 import {
 	type ApiConfig,
@@ -10,8 +10,7 @@ import {
 	ChampionshipStatus,
 } from "@/services/api"
 import { getSession } from "auth-astro/server"
-const lang = getLangFromUrl(Astro.url)
-const t = useTranslations(lang)
+const t = useTranslations(Astro.url)
 
 const session = await getSession(Astro.request)
 

@@ -2,12 +2,15 @@
 import SignInComponent from "@/components/SignIn"
 import { TranslationKey } from "@/i18n/ui"
 import { getSession } from "auth-astro/server"
-import { getLangFromUrl, useTranslations } from "../i18n/utils"
+import { useTranslations } from "../i18n/utils"
 import Layout from "../layouts/Layout.astro"
-const lang = getLangFromUrl(Astro.url)
-const t = useTranslations(lang)
+const t = useTranslations(Astro.url)
 
 const session = await getSession(Astro.request)
+
+if (session) {
+	Astro.redirect("/")
+}
 ---
 
 <Layout title="Welcome to Padel Masters - Sign in">
