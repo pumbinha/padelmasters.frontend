@@ -4,7 +4,7 @@ const SignOut = ({children}) => {
    
 
   const handle = () => {
-    signOut();
+    signOut({ callbackUrl: '/' });
   };
 
   return (
