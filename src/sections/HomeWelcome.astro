@@ -1,9 +1,8 @@
 ---
 import { TranslationKey } from "@/i18n/ui"
-import { getLangFromUrl, useTranslations } from "@/i18n/utils"
+import { useTranslations } from "@/i18n/utils"
 
-const lang = getLangFromUrl(Astro.url)
-const t = useTranslations(lang)
+const t = useTranslations(Astro.url)
 ---
 
 <section class="w-full pt-12 md:pt-24 lg:pt-32">

@@ -37,7 +37,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return next()
 	}
 
-	console.log(`I'm in ${context.url}`)
+	// console.log(`I'm in ${context.url}`)
 
 	const session = getSession(context.request)
 
