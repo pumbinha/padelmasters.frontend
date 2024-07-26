@@ -37,11 +37,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return next()
 	}
 
-	// console.log(`I'm in ${context.url}`)
+	const session = await getSession(context.request)
 
-	const session = getSession(context.request)
-
-	if (!session)
+	if (!session?.user?.id)
 		if (context.url.pathname.startsWith("/api/")) {
 			return new Response(JSON.stringify({ message: "Unauthorized" }), {
 				status: 401,
@@ -52,8 +50,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			}
 		}
 
-	// some restricted areas?
-
-	// all good
+	// user has a session! let's continue
 	return next()
 })
