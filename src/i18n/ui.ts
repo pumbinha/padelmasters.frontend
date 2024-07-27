@@ -13,8 +13,12 @@ export enum TranslationKey {
 	ChampionshipsEndDate = "Championships.EndDate",
 	ChampionshipsStatus = "Championships.Status",
 	ChampionshipsType = "Championships.Type",
+	ChampionshipsAdd = "Championships.Add",
+	ChampionshipsNoChampionshipsDescription = "Championships.NoChampionshipsDescription",
+	ChampionshipsNoChampionshipstitle = "Championships.NoChampionshipstitle",
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
 export type SupportedLanguages = "en" // | "es"
 export const defaultLang: SupportedLanguages = "en"
 
@@ -42,5 +46,8 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsEndDate]: "End Date",
 		[TranslationKey.ChampionshipsStatus]: "Status",
 		[TranslationKey.ChampionshipsType]: "Type",
+		[TranslationKey.ChampionshipsAdd]: "Add championship",
+		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "How about creating one?",
+		[TranslationKey.ChampionshipsNoChampionshipstitle]: "There are no championships created!",
 	},
 }

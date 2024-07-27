@@ -4,8 +4,7 @@ const SignInComponent = ({children}) => {
    
 
   const handleLogin = () => {
-    signIn("keycloak",  { callbackUrl: '/profile' });
-    console.log("Done")
+    signIn("keycloak",  { callbackUrl: '/profile' });    
   };
 
   return (
