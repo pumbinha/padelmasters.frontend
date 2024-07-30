@@ -1,6 +1,8 @@
 ---
+import homeNet from "@/assets/home-net.jpg"
 import { TranslationKey } from "@/i18n/ui"
 import { useTranslations } from "@/i18n/utils"
+import { Image } from "astro:assets"
 
 const t = useTranslations(Astro.url)
 ---
@@ -9,12 +11,20 @@ const t = useTranslations(Astro.url)
 	<div class="container space-y-10 xl:space-y-16">
 		<div class="grid gap-4 px-10 md:grid-cols-2 md:gap-16">
 			<div>
-				<img
-					src="/placeholder.svg"
+				<!-- <img
+					src="/assets/home-net.jpg"
 					width="800"
 					height="600"
 					alt="Padel League"
 					class="mx-auto aspect-[4/3] overflow-hidden rounded-xl object-cover"
+				/> -->
+				<Image
+					src={homeNet}
+					alt="Welcome to Padel Masters"
+					width="800"
+					height="600"
+					widths={[240, 540, 720, homeNet.width]}
+					sizes={`(max-width: 360px) 240px, (max-width: 720px) 540px, (max-width: 1600px) 720px, ${homeNet.width}px`}
 				/>
 			</div>
 			<div class="flex flex-col items-start space-y-4">

@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config"
+import { defineConfig, squooshImageService } from "astro/config"
 import vercel from "@astrojs/vercel/serverless"
 import tailwind from "@astrojs/tailwind"
 import auth from "auth-astro"
@@ -11,6 +11,9 @@ export default defineConfig({
 	},
 	devToolbar: {
 		enabled: false,
+	},
+	image: {
+		service: squooshImageService(),
 	},
 	integrations: [auth(), react(), tailwind()],
 	output: "server",

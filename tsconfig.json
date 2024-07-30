@@ -12,7 +12,8 @@
 			"@/*": ["./src/*"],
 			"@/components/*": ["src/components/*"],
 			"@/layouts/*": ["src/layouts/*"],
-			"@/services/*": ["src/services/*"]
+			"@/services/*": ["src/services/*"],
+			"@/assets/*": ["src/assets/*"]
 		},
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
