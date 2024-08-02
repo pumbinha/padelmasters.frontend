@@ -1,9 +1,11 @@
 ---
+import { isUserLoggedIn } from "@/services/utils"
+
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
 
-const isLogged = session?.user?.name ? true : false
+const isLogged = await isUserLoggedIn(session)
 ---
 
 <header class="flex items-center justify-between bg-primary px-6 py-4 text-primary-foreground">

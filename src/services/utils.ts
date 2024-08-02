@@ -1,5 +1,6 @@
 import type { Session } from "@auth/core/types"
 import { Api, type ApiConfig } from "./api"
+import { verifyAuth } from "@/middleware"
 
 export const getApi = (): Api<unknown> => {
 	const apiConfig: ApiConfig = {
@@ -23,4 +24,9 @@ export const getFormattedDate = (date?: string) => {
 
 	// TODO: what we can do with the locale?
 	return new Date(date).toLocaleDateString("en-GB").toString()
+}
+
+export const isUserLoggedIn = async (session: Session | null) => {
+	const validationResult = await verifyAuth(session)
+	return validationResult.status === "authorized"
 }

@@ -1,55 +1,75 @@
+import type { Session } from "@auth/core/types"
 import { PUBLIC_ROUTES, TOKEN } from "./constant"
 import { defineMiddleware } from "astro/middleware"
 import { getSession } from "auth-astro/server"
-import { errors, jwtVerify } from "jose"
+import { errors } from "jose"
 
-const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY)
+export const verifyAuth = async (session?: Session | null) => {
+	if (!session) {
+		return {
+			status: "unauthorized",
+			msg: "NO session available",
+		} as const
+	}
 
-// const verifyAuth = async (token?: string) => {
-// 	if (!token) {
-// 		return {
-// 			status: "unauthorized",
-// 			msg: "please pass a request token",
-// 		} as const
-// 	}
+	if (!session.access_token) {
+		return {
+			status: "unauthorized",
+			msg: "NO token available",
+		} as const
+	}
 
-// 	try {
-// 		const jwtVerifyResult = await jwtVerify(token, secret)
+	try {
+		const now = new Date().toISOString()
 
-// 		return {
-// 			status: "authorized",
-// 			payload: jwtVerifyResult.payload,
-// 			msg: "successfully verified auth token",
-// 		} as const
-// 	} catch (err) {
-// 		if (err instanceof errors.JOSEError) {
-// 			return { status: "error", msg: err.message } as const
-// 		}
+		if (session.access_token_expires < now) {
+			return {
+				status: "unauthorized",
+				msg: "Session has expired",
+			} as const
+		}
 
-// 		console.debug(err)
-// 		return { status: "error", msg: "could not validate auth token" } as const
-// 	}
-// }
+		return {
+			status: "authorized",
+			msg: "successfully authenticated",
+		} as const
+	} catch (err) {
+		if (err instanceof errors.JOSEError) {
+			return { status: "error", msg: err.message } as const
+		}
+
+		console.debug(err)
+		return { status: "error", msg: "could not validate auth token" } as const
+	}
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
-	// Ignore auth validation for public routes
+	// no check for public routes
 	if (PUBLIC_ROUTES.includes(context.url.pathname)) {
 		return next()
 	}
 
 	const session = await getSession(context.request)
 
-	if (!session?.user?.id)
-		if (context.url.pathname.startsWith("/api/")) {
-			return new Response(JSON.stringify({ message: "Unauthorized" }), {
-				status: 401,
-			})
-		} else {
-			{
+	const validationResult = await verifyAuth(session)
+
+	switch (validationResult.status) {
+		case "authorized":
+			return next()
+
+		case "error":
+		case "unauthorized":
+			if (context.url.pathname.startsWith("/api/")) {
+				return new Response(JSON.stringify({ message: "Unauthorized" }), {
+					status: 401,
+				})
+			}
+			// otherwise, redirect to the root page for the user to login
+			else {
 				return Response.redirect(new URL("/", context.url))
 			}
-		}
 
-	// user has a session! let's continue
-	return next()
+		default:
+			return Response.redirect(new URL("/", context.url))
+	}
 })
