@@ -1,0 +1,20 @@
+---
+import Card from "@/components/Card.astro"
+import Layout from "@/layouts/Layout.astro"
+---
+
+<Layout title="Padel Masters League">
+	<section>
+		<div>GROUP A</div>
+
+		<h2 class="mb-4 text-xl font-bold">Calendar</h2>
+		<h2 class="mb-4 text-xl font-bold">League Standings</h2>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1">
+			<Card name="Person 1" points={14} />
+			<Card name="Person 2" points={12} />
+			<Card name="Person 4" points={10} />
+			<Card name="Person AAA" points={5} />
+			<Card name="Person NO-ONE" points={1} />
+		</div>
+	</section>
+</Layout>

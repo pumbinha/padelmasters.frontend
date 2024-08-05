@@ -1,0 +1,109 @@
+---
+import { TranslationKey } from "@/i18n/ui"
+import { useTranslations } from "@/i18n/utils"
+import Layout from "@/layouts/Layout.astro"
+import { ChampionshipStatus, type ChampionshipResponse } from "@/services/api"
+import { getApi, getFormattedDate, getRequestParams } from "@/services/utils"
+import { getSession } from "auth-astro/server"
+const t = useTranslations(Astro.url)
+
+const { id } = Astro.params
+
+const session = await getSession(Astro.request)
+
+const api = getApi()
+
+let championship: ChampionshipResponse = {}
+
+try {
+	const championshipResponse = await api.api.padelmastersApiDomainChampionshipsGetChampionships(
+		getRequestParams(session)
+	)
+	if (championshipResponse.ok) {
+		// patch! meanwhile we don't have a way to get a single championship
+		const mC = championshipResponse.data ? championshipResponse.data.find((c) => c.id === id) : {}
+		if (mC && mC !== undefined) {
+			championship = mC
+		}
+
+		if (!championship.id) {
+			console.log("championship not found")
+			Astro.redirect("/championships/not-found")
+		}
+	} else {
+		console.error("championshipResponse")
+	}
+} catch (e) {
+	console.error(e)
+}
+
+const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
+	switch (status) {
+		case ChampionshipStatus.Created:
+			return "bg-gray-200 text-black-800"
+		case ChampionshipStatus.Open:
+			return "bg-blue-200 text-blue-800"
+		case ChampionshipStatus.Started:
+			return "bg-yellow-200 text-yellow-800"
+		case ChampionshipStatus.Cancelled:
+			return "bg-red-200 text-red-800"
+		case ChampionshipStatus.Finished:
+			return "bg-green-200 text-green-800"
+		default:
+			return ""
+	}
+}
+---
+
+<Layout title="Padel Masters - Championship">
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="overflow-hidden rounded-lg bg-background shadow-md">
+			<div class="p-4">
+				<h2 class="mb-2 text-xl font-bold">
+					{championship.name}
+				</h2>
+				<p class="mb-4 text-muted-foreground">{championship.description}</p>
+				<div class="mb-4 flex items-center justify-between">
+					<div>
+						<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>{" "}
+						{getFormattedDate(championship.startDate)}
+					</div>
+					<div>
+						<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>{" "}
+						{getFormattedDate(championship.endDate)}
+					</div>
+				</div>
+				<div class="flex items-center justify-between">
+					<span
+						class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.status)}`}
+					>
+						{championship.status}
+					</span>
+				</div>
+			</div>
+			<!-- <div class="w-full rounded-lg bg-background p-6 shadow-lg">
+				<div class="mb-6 flex items-center justify-between">
+					<h2>{championship.name}</h2>
+				</div>
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+					<div class="">
+						<h3>Group A</h3>
+						<li>Pts</li>
+						<li>Pts</li>
+					</div>
+					<div class="">
+						<h3>Group B</h3>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+						<li>Karl</li>
+					</div>
+				</div>
+			</div> -->
+		</div>
+	</section>
+</Layout>

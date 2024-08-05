@@ -14,7 +14,6 @@ const isLogged = await isUserLoggedIn(session)
 	</div>
 	<nav class="hidden items-center gap-6 md:flex">
 		<div>
-			<!-- <SignedOut> -->
 			{
 				!isLogged ? (
 					<a href="/sign-in" class="sign-in-button">
@@ -28,13 +27,8 @@ const isLogged = await isUserLoggedIn(session)
 						<a href="/championships" class="font-medium hover:underline">
 							Championships
 						</a>
-						<a href="/teams" class="font-medium hover:underline">
-							{" "}
-							Teams
-						</a>
-						<a href="/matches" class="font-medium hover:underline">
-							{" "}
-							Matches{" "}
+						<a href="/matches/mine" class="font-medium hover:underline">
+							Matches
 						</a>
 					</>
 				)

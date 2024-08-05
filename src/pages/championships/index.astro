@@ -49,13 +49,6 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 		<div class="w-full rounded-lg bg-background p-6 shadow-lg">
 			<div class="mb-6 flex items-center justify-between">
 				<h1 class="text-2xl font-bold text-foreground">{t(TranslationKey.ChampionshipsTitle)}</h1>
-				<div class="flex items-center space-x-4">
-					<a
-						href="/championships/add"
-						class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-						>{t(TranslationKey.ChampionshipsAdd)}</a
-					>
-				</div>
 			</div>
 			{
 				championships.length === 0 && (
@@ -76,7 +69,9 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 						return (
 							<div class="overflow-hidden rounded-lg bg-background shadow-md">
 								<div class="p-4">
-									<h2 class="mb-2 text-xl font-bold">{championship.name}</h2>
+									<h2 class="mb-2 text-xl font-bold">
+										<a href={`/championships/${championship.id}`}>{championship.name}</a>
+									</h2>
 									<p class="mb-4 text-muted-foreground">{championship.description}</p>
 									<div class="mb-4 flex items-center justify-between">
 										<div>

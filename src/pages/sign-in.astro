@@ -7,9 +7,12 @@ const t = useTranslations(Astro.url)
 ---
 
 <Layout title="Welcome to Padel Masters - Sign in">
-	<div class="flex min-h-screen flex-col items-center justify-center bg-background">
-		<div class="w-full max-w-md rounded-lg bg-card px-6 py-8 shadow-lg">
-			<div class="flex flex-col items-center space-y-6">
+	<div
+		class="flex h-auto flex-col items-center justify-center self-auto bg-background"
+		id="thefather"
+	>
+		<div class="w-full max-w-md self-auto rounded-lg bg-card px-6 py-8 shadow-lg">
+			<div class="flex flex-col place-content-center items-center space-y-6">
 				<div class="text-center">
 					<h1 class="text-2xl font-bold text-foreground">{t(TranslationKey.SignInTitle)}</h1>
 				</div>
