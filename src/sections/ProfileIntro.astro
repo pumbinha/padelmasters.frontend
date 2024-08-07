@@ -14,7 +14,9 @@ const session = await getSession(Astro.request)
             <AvatarFallback>CN</AvatarFallback>
           </Avatar> -->
 			<div class="text-center">
-				<h1 class="text-2xl font-bold text-foreground">Welcome, {session?.user?.name}!</h1>
+				<h1 class="bg-primary text-2xl font-bold text-foreground">
+					Welcome, {session?.user?.name}!
+				</h1>
 			</div>
 
 			<div class="flex items-center space-x-4">
@@ -35,7 +37,7 @@ const session = await getSession(Astro.request)
 				</div>
 			</div>
 			<div class="flex items-center space-x-4">
-				<SignOutComponent client:load>Sign Out</SignOutComponent>
+				<SignOutComponent client:load text={"Sign Out"} />
 			</div>
 		</div>
 	</div>

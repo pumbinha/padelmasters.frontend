@@ -2,7 +2,6 @@ export enum TranslationKey {
 	SignIn = "acc.signin",
 	Home = "nav.home",
 	About = "nav.about",
-	Twitter = "nav.twitter",
 	WelcomeTitle = "Welcome.Title",
 	SignInTitle = "SignIn.Title",
 	WelcomeJoin = "Welcome.Join",
@@ -19,7 +18,7 @@ export enum TranslationKey {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
-export type SupportedLanguages = "en" // | "es"
+export type SupportedLanguages = "en" | "es"
 export const defaultLang: SupportedLanguages = "en"
 
 type Translations = {
@@ -35,7 +34,6 @@ export const ui: UI = {
 		[TranslationKey.SignIn]: "Sign in",
 		[TranslationKey.Home]: "Home",
 		[TranslationKey.About]: "About",
-		[TranslationKey.Twitter]: "Twitter",
 		[TranslationKey.WelcomeTitle]: "Welcome to Padel Master",
 		[TranslationKey.SignInTitle]: "Sign in to your account",
 		[TranslationKey.WelcomeJoin]: "Join the League",
@@ -49,5 +47,23 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsAdd]: "Add championship",
 		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "How about creating one?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "There are no championships created!",
+	},
+	es: {
+		[TranslationKey.SignIn]: "Entrar",
+		[TranslationKey.Home]: "Casa",
+		[TranslationKey.About]: "Acerca de",
+		[TranslationKey.WelcomeTitle]: "Bienvenido a Padel Master",
+		[TranslationKey.SignInTitle]: "Entrar",
+		[TranslationKey.WelcomeJoin]: "Apúntate a la Liga",
+		[TranslationKey.ChampionshipsTitle]: "Campeonatos",
+		[TranslationKey.ChampionshipsName]: "Nombre",
+		[TranslationKey.ChampionshipsDescription]: "Descripción",
+		[TranslationKey.ChampionshipsStartDate]: "Fecha de inicio",
+		[TranslationKey.ChampionshipsEndDate]: "Fecha de fin",
+		[TranslationKey.ChampionshipsStatus]: "Estado",
+		[TranslationKey.ChampionshipsType]: "Tipo",
+		[TranslationKey.ChampionshipsAdd]: "Añadir campeonato",
+		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "¿Qué tal si creas uno?",
+		[TranslationKey.ChampionshipsNoChampionshipstitle]: "¡No hay campeonatos creados!",
 	},
 }

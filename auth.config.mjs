@@ -16,6 +16,7 @@ export default defineConfig({
 			if (user) {
 				token.id = user.id
 				token.access_token = account.access_token
+				token.refresh_token = account.refresh_token
 
 				// default to 1hr from now
 				const now = new Date()
@@ -35,14 +36,41 @@ export default defineConfig({
 		async session({ session, token }) {
 			session.user.id = token.id
 			session.access_token = token.access_token
-			session.encrypted_access_token = token.access_token
+			session.refresh_token = token.refresh_token
 
 			const jwtToken = jose.decodeJwt(token.access_token)
 
 			session.roles = jwtToken.realm_access.roles
 			session.access_token_expires = token.access_token_expires
+			session.locale = jwtToken.locale
 
 			return { ...session }
+		},
+	},
+	events: {
+		async signOut({ token }) {
+			const issuerUrl = import.meta.env.KEYCLOAK_ISSUER
+			const clientId = import.meta.env.KEYCLOAK_ID
+			const clientSecret = import.meta.env.KEYCLOAK_SECRET
+
+			const logOutUrl = `${issuerUrl}/protocol/openid-connect/logout`
+
+			try {
+				await fetch(`${logOutUrl}`, {
+					method: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": `Bearer ${token.access_token}`,
+					},
+					body: new URLSearchParams({
+						refresh_token: token.refresh_token,
+						client_id: clientId,
+						client_secret: clientSecret,
+					}),
+				})
+			} catch (e) {
+				console.log(e)
+			}
 		},
 	},
 })

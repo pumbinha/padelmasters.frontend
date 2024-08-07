@@ -18,7 +18,12 @@ try {
 		getRequestParams(session)
 	)
 	if (championshipResponse.ok) {
-		championships = championshipResponse.data
+		championships = championshipResponse.data.sort((a, b) => {
+			return (
+				(a.endDate ? new Date(a.endDate).getTime() : 0) -
+				(b.endDate ? new Date(b.endDate).getTime() : 0)
+			)
+		})
 	} else {
 		console.error("championshipResponse")
 	}

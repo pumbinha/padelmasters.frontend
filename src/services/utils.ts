@@ -2,9 +2,12 @@ import type { Session } from "@auth/core/types"
 import { Api, type ApiConfig } from "./api"
 import { verifyAuth } from "@/middleware"
 
+const apiURL = import.meta.env.API_BASE_URL
+const authURL = import.meta.env.KEYCLOAK_ISSUER
+
 export const getApi = (): Api<unknown> => {
 	const apiConfig: ApiConfig = {
-		baseUrl: "https://test.api.padelmasters.net",
+		baseUrl: apiURL,
 	}
 
 	const api = new Api(apiConfig)

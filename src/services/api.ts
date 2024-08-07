@@ -12,8 +12,8 @@
 export interface ChampionshipResponse {
   /** @format uuid */
   id?: string;
-  name?: NameValueObject;
-  description?: DescriptionValueObject;
+  name?: Name;
+  description?: Description;
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
@@ -35,12 +35,13 @@ export enum ChampionshipType {
 }
 
 export interface CreateChampionshipRequest {
-  name?: NameValueObject;
-  description?: DescriptionValueObject;
+  name?: Name;
+  description?: Description;
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
   endDate?: string;
+  championshipType?: ChampionshipType | null;
 }
 
 export interface DefaultCreatedResponse {
@@ -48,13 +49,33 @@ export interface DefaultCreatedResponse {
   id?: string;
 }
 
-export interface DescriptionValueObject {
-  value?: string | null;
+export type Description = object;
+
+export interface EnrollChampionshipRequest {
+  /** @format uuid */
+  championshipId?: string;
+  notes?: Description;
 }
 
-export interface NameValueObject {
-  value?: string | null;
+export interface GetChampionshipRequest {
+  /** @format uuid */
+  championshipId?: string;
 }
+
+export interface GetChampionshipResponse {
+  /** @format uuid */
+  id?: string;
+  name?: Name;
+  description?: Description;
+  /** @format date-time */
+  startDate?: string;
+  /** @format date-time */
+  endDate?: string;
+  status?: ChampionshipStatus | null;
+  type?: ChampionshipType | null;
+}
+
+export type Name = object;
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -276,38 +297,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Padelmasters.Api
-     * @name PadelmastersApiDomainDemoGetHelloWorld
-     * @request GET:/api/demo/hello-world
-     */
-    padelmastersApiDomainDemoGetHelloWorld: (params: RequestParams = {}) =>
-      this.request<any, void>({
-        path: `/api/demo/hello-world`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Padelmasters.Api
-     * @name PadelmastersApiDomainDemoAnonymousGetAnonymousHelloWorld
-     * @request GET:/api/demo/anonymous/hello-world
-     */
-    padelmastersApiDomainDemoAnonymousGetAnonymousHelloWorld: (params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/api/demo/anonymous/hello-world`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Padelmasters.Api
      * @name PadelmastersApiDomainChampionshipsCreateChampionship
      * @request POST:/api/championships
+     * @secure
      */
     padelmastersApiDomainChampionshipsCreateChampionship: (
       data: CreateChampionshipRequest,
@@ -317,6 +309,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/api/championships`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -328,11 +321,59 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Padelmasters.Api
      * @name PadelmastersApiDomainChampionshipsGetChampionships
      * @request GET:/api/championships
+     * @secure
      */
     padelmastersApiDomainChampionshipsGetChampionships: (params: RequestParams = {}) =>
       this.request<ChampionshipResponse[], void>({
         path: `/api/championships`,
         method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Padelmasters.Api
+     * @name PadelmastersApiDomainChampionshipsGetChampionship
+     * @request GET:/api/championships/{ChampionshipId}
+     * @secure
+     */
+    padelmastersApiDomainChampionshipsGetChampionship: (
+      championshipId: string,
+      data: GetChampionshipRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<GetChampionshipResponse, void>({
+        path: `/api/championships/${championshipId}`,
+        method: "GET",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Padelmasters.Api
+     * @name PadelmastersApiDomainChampionshipsEnrollChampionshipCreateChampionship
+     * @request POST:/api/championships/{ChampionshipId}/enroll
+     * @secure
+     */
+    padelmastersApiDomainChampionshipsEnrollChampionshipCreateChampionship: (
+      championshipId: string,
+      data: EnrollChampionshipRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<DefaultCreatedResponse, void>({
+        path: `/api/championships/${championshipId}/enroll`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

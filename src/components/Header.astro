@@ -8,7 +8,7 @@ const session = await getSession(Astro.request)
 const isLogged = await isUserLoggedIn(session)
 ---
 
-<header class="flex items-center justify-between bg-primary px-6 py-4 text-primary-foreground">
+<header class="flex items-center justify-between bg-primary-800 px-6 py-4 text-primary-foreground">
 	<div class="flex items-center gap-4">
 		<a href="/" class="logo text-2xl font-bold">Padel Masters</a>
 	</div>
@@ -27,7 +27,7 @@ const isLogged = await isUserLoggedIn(session)
 						<a href="/championships" class="font-medium hover:underline">
 							Championships
 						</a>
-						<a href="/matches/mine" class="font-medium hover:underline">
+						<a href="/matches/mine" class="bg-neutral-500 font-medium hover:underline">
 							Matches
 						</a>
 					</>
