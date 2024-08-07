@@ -14,7 +14,7 @@ export default defineConfig({
 		enabled: false,
 	},
 	image: {
-		service: passthroughImageService(),
+		//service: passthroughImageService(),
 	},
 	integrations: [
 		auth(),
