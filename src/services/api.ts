@@ -9,17 +9,53 @@
  * ---------------------------------------------------------------
  */
 
+export interface DefaultCreatedResponse {
+  /** @format guid */
+  Id?: string;
+}
+
+export interface CreateChampionshipRequest {
+  Name?: string;
+  Description?: string | null;
+  /** @format date-time */
+  StartDate?: string;
+  /** @format date-time */
+  EndDate?: string;
+  ChampionshipType?: ChampionshipType | null;
+}
+
+export interface EnrollChampionshipRequest {
+  Notes?: string | null;
+}
+
+export interface GetChampionshipResponse {
+  /** @format guid */
+  Id?: string;
+  Name?: string;
+  Description?: string | null;
+  /** @format date-time */
+  StartDate?: string;
+  /** @format date-time */
+  EndDate?: string;
+  Status?: ChampionshipStatus | null;
+  Type?: ChampionshipType | null;
+}
+
 export interface ChampionshipResponse {
-  /** @format uuid */
-  id?: string;
-  name?: Name;
-  description?: Description;
+  /** @format guid */
+  Id?: string;
+  Name?: string;
+  Description?: string | null;
   /** @format date-time */
-  startDate?: string;
+  StartDate?: string;
   /** @format date-time */
-  endDate?: string;
-  status?: ChampionshipStatus | null;
-  type?: ChampionshipType | null;
+  EndDate?: string;
+  Status?: ChampionshipStatus | null;
+  Type?: ChampionshipType | null;
+}
+
+export enum ChampionshipType {
+  AmericanoLeague = "AmericanoLeague",
 }
 
 export enum ChampionshipStatus {
@@ -29,53 +65,6 @@ export enum ChampionshipStatus {
   Cancelled = "Cancelled",
   Finished = "Finished",
 }
-
-export enum ChampionshipType {
-  AmericanoLeague = "AmericanoLeague",
-}
-
-export interface CreateChampionshipRequest {
-  name?: Name;
-  description?: Description;
-  /** @format date-time */
-  startDate?: string;
-  /** @format date-time */
-  endDate?: string;
-  championshipType?: ChampionshipType | null;
-}
-
-export interface DefaultCreatedResponse {
-  /** @format uuid */
-  id?: string;
-}
-
-export type Description = object;
-
-export interface EnrollChampionshipRequest {
-  /** @format uuid */
-  championshipId?: string;
-  notes?: Description;
-}
-
-export interface GetChampionshipRequest {
-  /** @format uuid */
-  championshipId?: string;
-}
-
-export interface GetChampionshipResponse {
-  /** @format uuid */
-  id?: string;
-  name?: Name;
-  description?: Description;
-  /** @format date-time */
-  startDate?: string;
-  /** @format date-time */
-  endDate?: string;
-  status?: ChampionshipStatus | null;
-  type?: ChampionshipType | null;
-}
-
-export type Name = object;
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -123,7 +112,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "";
+  public baseUrl: string = "https://test.api.padelmasters.net";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -289,14 +278,15 @@ export class HttpClient<SecurityDataType = unknown> {
 
 /**
  * @title Padelmasters.Api
- * @version v1
+ * @version 1.0.0
+ * @baseUrl https://test.api.padelmasters.net
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   api = {
     /**
      * No description
      *
-     * @tags Padelmasters.Api
+     * @tags Api
      * @name PadelmastersApiDomainChampionshipsCreateChampionship
      * @request POST:/api/championships
      * @secure
@@ -318,7 +308,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
-     * @tags Padelmasters.Api
+     * @tags Api
      * @name PadelmastersApiDomainChampionshipsGetChampionships
      * @request GET:/api/championships
      * @secure
@@ -335,35 +325,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
-     * @tags Padelmasters.Api
-     * @name PadelmastersApiDomainChampionshipsGetChampionship
-     * @request GET:/api/championships/{ChampionshipId}
+     * @tags Api
+     * @name PadelmastersApiDomainChampionshipsEnrollChampionship
+     * @request POST:/api/championships/{championshipId}/enroll
      * @secure
      */
-    padelmastersApiDomainChampionshipsGetChampionship: (
-      championshipId: string,
-      data: GetChampionshipRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<GetChampionshipResponse, void>({
-        path: `/api/championships/${championshipId}`,
-        method: "GET",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Padelmasters.Api
-     * @name PadelmastersApiDomainChampionshipsEnrollChampionshipCreateChampionship
-     * @request POST:/api/championships/{ChampionshipId}/enroll
-     * @secure
-     */
-    padelmastersApiDomainChampionshipsEnrollChampionshipCreateChampionship: (
+    padelmastersApiDomainChampionshipsEnrollChampionship: (
       championshipId: string,
       data: EnrollChampionshipRequest,
       params: RequestParams = {},
@@ -374,6 +341,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainChampionshipsGetChampionship
+     * @request GET:/api/championships/{championshipId}
+     * @secure
+     */
+    padelmastersApiDomainChampionshipsGetChampionship: (championshipId: string, params: RequestParams = {}) =>
+      this.request<GetChampionshipResponse, void>({
+        path: `/api/championships/${championshipId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainChampionshipsLeaveChampionship
+     * @request POST:/api/championships/{championshipId}/leave
+     * @secure
+     */
+    padelmastersApiDomainChampionshipsLeaveChampionship: (championshipId: string, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/api/championships/${championshipId}/leave`,
+        method: "POST",
+        secure: true,
         format: "json",
         ...params,
       }),

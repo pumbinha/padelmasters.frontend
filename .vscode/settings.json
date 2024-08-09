@@ -3,7 +3,12 @@
 		"Accueil",
 		"astro",
 		"astrojs",
+		"clsx",
+		"headlessui",
+		"lucide",
+		"openapi",
 		"propos",
 		"vercel"
-	]
+	],
+	"cSpell.ignoreWords": ["tailwindcss"]
 }

@@ -20,8 +20,8 @@ try {
 	if (championshipResponse.ok) {
 		championships = championshipResponse.data.sort((a, b) => {
 			return (
-				(a.endDate ? new Date(a.endDate).getTime() : 0) -
-				(b.endDate ? new Date(b.endDate).getTime() : 0)
+				(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
+				(b.EndDate ? new Date(b.EndDate).getTime() : 0)
 			)
 		})
 	} else {
@@ -72,27 +72,28 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 				{
 					championships.map((championship) => {
 						return (
-							<div class="overflow-hidden rounded-lg bg-background shadow-md">
+							<div
+								class="championship-card overflow-hidden rounded-lg bg-background shadow-md"
+								data-url={`/championships/${championship.Id}`}
+							>
 								<div class="p-4">
-									<h2 class="mb-2 text-xl font-bold">
-										<a href={`/championships/${championship.id}`}>{championship.name}</a>
-									</h2>
-									<p class="mb-4 text-muted-foreground">{championship.description}</p>
+									<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
+									<p class="mb-4 text-muted-foreground">{championship.Description}</p>
 									<div class="mb-4 flex items-center justify-between">
 										<div>
 											<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>{" "}
-											{getFormattedDate(championship.startDate)}
+											{getFormattedDate(championship.StartDate)}
 										</div>
 										<div>
 											<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>{" "}
-											{getFormattedDate(championship.endDate)}
+											{getFormattedDate(championship.EndDate)}
 										</div>
 									</div>
 									<div class="flex items-center justify-between">
 										<span
-											class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.status)}`}
+											class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
 										>
-											{championship.status}
+											{championship.Status}
 										</span>
 									</div>
 								</div>
@@ -104,3 +105,22 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 		</div>
 	</section>
 </Layout>
+
+<script>
+	const cards = document.querySelectorAll(".championship-card")
+
+	cards.forEach((card) => {
+		card.addEventListener("click", (event) => {
+			if (!event.currentTarget) {
+				return
+			}
+			const target = event.currentTarget as HTMLElement // Cast to HTMLElement
+			console.log(target)
+			const url = target.getAttribute("data-url")
+
+			if (url) {
+				window.location.href = url
+			}
+		})
+	})
+</script>

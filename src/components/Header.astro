@@ -1,6 +1,7 @@
 ---
+import MobileNav from "@/components/MobileNav.jsx"
+import NavLink from "@/components/NavLink.astro"
 import { isUserLoggedIn } from "@/services/utils"
-
 import { getSession } from "auth-astro/server"
 
 const session = await getSession(Astro.request)
@@ -21,6 +22,8 @@ const isLogged = await isUserLoggedIn(session)
 					</a>
 				) : (
 					<>
+						<NavLink text="Feature" href="/features" />
+						{/* <NavLink text="Feature" href="#features" /> */}
 						<a href="/profile" class="sign-in-button">
 							Profile
 						</a>
@@ -35,9 +38,11 @@ const isLogged = await isUserLoggedIn(session)
 			}
 		</div>
 	</nav>
-	<button
+	<!-- <button
 		class="rounded-md border border-primary-foreground px-4 py-2 text-primary-foreground transition-colors hover:bg-primary-foreground hover:text-primary md:hidden"
 	>
 		<span class="sr-only">Toggle menu</span>
-	</button>
+	</button> -->
+
+	<MobileNav client:load />
 </header>
