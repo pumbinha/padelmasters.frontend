@@ -1,5 +1,6 @@
 export const PUBLIC_ROUTES = [
 	"/",
+	"_image",
 	"/sign-in",
 	"/api/auth/signin/keycloak",
 	"/api/auth/callback/keycloak",
