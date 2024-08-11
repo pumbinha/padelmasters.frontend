@@ -1,6 +1,7 @@
 export const PUBLIC_ROUTES = [
 	"/",
 	"_image",
+	"_vercel",
 	"/sign-in",
 	"/api/auth/signin/keycloak",
 	"/api/auth/callback/keycloak",
