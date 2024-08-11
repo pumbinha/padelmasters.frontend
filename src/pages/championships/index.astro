@@ -73,7 +73,7 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 					championships.map((championship) => {
 						return (
 							<div
-								class="championship-card overflow-hidden rounded-lg bg-background shadow-md"
+								class="championship-card cursor-pointer overflow-hidden rounded-lg bg-background shadow-md"
 								data-url={`/championships/${championship.Id}`}
 							>
 								<div class="p-4">

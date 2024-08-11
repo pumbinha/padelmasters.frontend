@@ -2,14 +2,15 @@
 interface Props {
 	text: string
 	href: string
+	isActive: boolean
 }
 
-const { text, href } = Astro.props
+const { text, href, isActive } = Astro.props
 ---
 
 <a
 	href={href}
-	class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+	class={`rounded-md mx-2 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 hover:text-white  ${isActive ? "bg-primary-900 text-white" : ""}`}
 >
 	{text}
 </a>

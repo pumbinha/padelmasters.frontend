@@ -1,48 +1,71 @@
 ---
-import MobileNav from "@/components/MobileNav.jsx"
+import MobileNav from "@/components/MobileNav.tsx"
 import NavLink from "@/components/NavLink.astro"
+import { TranslationKey } from "@/i18n/ui"
+import { useTranslations } from "@/i18n/utils"
 import { isUserLoggedIn } from "@/services/utils"
-import { getSession } from "auth-astro/server"
 
+import { getSession } from "auth-astro/server"
+import { setLinkActive, type NavigationLink } from "./ui/types"
+
+const t = useTranslations(Astro.url)
 const session = await getSession(Astro.request)
 
 const isLogged = await isUserLoggedIn(session)
+
+let navigationLinks: NavigationLink[] = []
+
+if (isLogged) {
+	navigationLinks = [
+		{
+			group: 1,
+			links: [
+				{ name: "Championships", href: "/championships", isActive: false },
+				{ name: "Players", href: "/players", isActive: false },
+				{ name: "Matches", href: "/matches", isActive: false },
+			],
+		},
+		{
+			group: 2,
+			links: [{ name: t(TranslationKey.NavProfile), href: "/profile", isActive: false }],
+		},
+	]
+} else {
+	navigationLinks = [
+		{
+			group: 1,
+			links: [{ name: t(TranslationKey.SignIn), href: "/sign-in", isActive: false }],
+		},
+	]
+}
+
+const currentPath = Astro.url.pathname
+navigationLinks = navigationLinks.map((group) => ({
+	group: group.group,
+	links: group.links.map((link) => ({
+		...link,
+		isActive: link.href === currentPath,
+	})),
+}))
+
+navigationLinks = setLinkActive(navigationLinks, currentPath)
 ---
 
 <header class="flex items-center justify-between bg-primary-800 px-6 py-4 text-primary-foreground">
 	<div class="flex items-center gap-4">
 		<a href="/" class="logo text-2xl font-bold">Padel Masters</a>
 	</div>
-	<nav class="hidden items-center gap-6 md:flex">
+	<nav class="ml-auto hidden items-center gap-6 md:flex">
 		<div>
 			{
-				!isLogged ? (
-					<a href="/sign-in" class="sign-in-button">
-						Sign In
-					</a>
-				) : (
-					<>
-						<NavLink text="Feature" href="/features" />
-						{/* <NavLink text="Feature" href="#features" /> */}
-						<a href="/profile" class="sign-in-button">
-							Profile
-						</a>
-						<a href="/championships" class="font-medium hover:underline">
-							Championships
-						</a>
-						<a href="/matches/mine" class="bg-neutral-500 font-medium hover:underline">
-							Matches
-						</a>
-					</>
-				)
+				navigationLinks.map((group) => {
+					return group.links.map((element) => {
+						return <NavLink text={element.name} href={element.href} isActive={element.isActive} />
+					})
+				})
 			}
 		</div>
 	</nav>
-	<!-- <button
-		class="rounded-md border border-primary-foreground px-4 py-2 text-primary-foreground transition-colors hover:bg-primary-foreground hover:text-primary md:hidden"
-	>
-		<span class="sr-only">Toggle menu</span>
-	</button> -->
 
-	<MobileNav client:load />
+	<MobileNav client:load {navigationLinks} />
 </header>
