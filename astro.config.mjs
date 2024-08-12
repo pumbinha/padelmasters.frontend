@@ -13,9 +13,7 @@ export default defineConfig({
 	devToolbar: {
 		enabled: false,
 	},
-	image: {
-		service: passthroughImageService(),
-	},
+	image: {},
 	integrations: [
 		auth(),
 		react(),
