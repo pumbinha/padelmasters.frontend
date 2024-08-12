@@ -21,16 +21,16 @@ export enum TranslationKey {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
-export type SupportedLanguages = "en" | "es"
-export const defaultLang: SupportedLanguages = "en"
+export type SupportedLanguages = "en" | "es";
+export const defaultLang: SupportedLanguages = "en";
 
 type Translations = {
-	[key in TranslationKey]: string
-}
+	[key in TranslationKey]: string;
+};
 
 type UI = {
-	[lang in SupportedLanguages]: Translations
-}
+	[lang in SupportedLanguages]: Translations;
+};
 
 export const ui: UI = {
 	en: {
@@ -75,4 +75,4 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "¿Qué tal si creas uno?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "¡No hay campeonatos creados!",
 	},
-}
+};

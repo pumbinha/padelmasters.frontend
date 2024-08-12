@@ -1,23 +1,21 @@
-import { useState } from "react"
-import type { NavigationLink } from "./ui/types"
-import { Dialog, DialogPanel } from "@headlessui/react"
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
+import { useState } from "react";
+import type { NavigationLink } from "./ui/types";
+import { Dialog, DialogPanel } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
 	ArrowPathIcon,
 	ChevronRightIcon,
 	CloudArrowUpIcon,
 	LockClosedIcon,
 	ServerIcon,
-} from "@heroicons/react/20/solid"
+} from "@heroicons/react/20/solid";
 
 type NavigationProps = {
-  navigationLinks: NavigationLink[];
+	navigationLinks: NavigationLink[];
 };
 
-const MobileNav: React.FC<NavigationProps> = ( {navigationLinks} ) => {
-	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-	
+const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	return (
 		<div>
@@ -57,8 +55,7 @@ const MobileNav: React.FC<NavigationProps> = ( {navigationLinks} ) => {
 												<a
 													key={link.href}
 													href={link.href}
-													className={`block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 cursor-pointer
-														${link.isActive ? "border-vivid-700 text-vivid-700 bg-vivid-200" : ""}`}
+													className={`block cursor-pointer border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 ${link.isActive ? "border-vivid-700 bg-vivid-200 text-vivid-700" : ""}`}
 												>
 													{link.name}
 												</a>
@@ -72,7 +69,7 @@ const MobileNav: React.FC<NavigationProps> = ( {navigationLinks} ) => {
 				</DialogPanel>
 			</Dialog>
 		</div>
-	)
-}
+	);
+};
 
-export default MobileNav
+export default MobileNav;

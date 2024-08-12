@@ -1,52 +1,52 @@
 ---
-import { TranslationKey } from "@/i18n/ui"
-import { useTranslations } from "@/i18n/utils"
-import Layout from "@/layouts/Layout.astro"
-import { type ChampionshipResponse, ChampionshipStatus } from "@/services/api"
-import { getApi, getFormattedDate, getRequestParams } from "@/services/utils"
-import { getSession } from "auth-astro/server"
-const t = useTranslations(Astro.url)
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { type ChampionshipResponse, ChampionshipStatus } from "@/services/api";
+import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+import { getSession } from "auth-astro/server";
+const t = useTranslations(Astro.url);
 
-const session = await getSession(Astro.request)
+const session = await getSession(Astro.request);
 
-const api = getApi()
+const api = getApi();
 
-let championships: ChampionshipResponse[] = []
+let championships: ChampionshipResponse[] = [];
 
 try {
 	const championshipResponse = await api.api.padelmastersApiDomainChampionshipsGetChampionships(
 		getRequestParams(session)
-	)
+	);
 	if (championshipResponse.ok) {
 		championships = championshipResponse.data.sort((a, b) => {
 			return (
 				(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
 				(b.EndDate ? new Date(b.EndDate).getTime() : 0)
-			)
-		})
+			);
+		});
 	} else {
-		console.error("championshipResponse")
+		console.error("championshipResponse");
 	}
 } catch (e) {
-	console.error(e)
+	console.error(e);
 }
 
 const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 	switch (status) {
 		case ChampionshipStatus.Created:
-			return "bg-gray-200 text-black-800"
+			return "bg-gray-200 text-black-800";
 		case ChampionshipStatus.Open:
-			return "bg-blue-200 text-blue-800"
+			return "bg-blue-200 text-blue-800";
 		case ChampionshipStatus.Started:
-			return "bg-yellow-200 text-yellow-800"
+			return "bg-yellow-200 text-yellow-800";
 		case ChampionshipStatus.Cancelled:
-			return "bg-red-200 text-red-800"
+			return "bg-red-200 text-red-800";
 		case ChampionshipStatus.Finished:
-			return "bg-green-200 text-green-800"
+			return "bg-green-200 text-green-800";
 		default:
-			return ""
+			return "";
 	}
-}
+};
 ---
 
 <Layout title="Padel Masters - Championships">
@@ -98,7 +98,7 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 									</div>
 								</div>
 							</div>
-						)
+						);
 					})
 				}
 			</div>
@@ -107,20 +107,20 @@ const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 </Layout>
 
 <script>
-	const cards = document.querySelectorAll(".championship-card")
+	const cards = document.querySelectorAll(".championship-card");
 
 	cards.forEach((card) => {
 		card.addEventListener("click", (event) => {
 			if (!event.currentTarget) {
-				return
+				return;
 			}
-			const target = event.currentTarget as HTMLElement // Cast to HTMLElement
-			console.log(target)
-			const url = target.getAttribute("data-url")
+			const target = event.currentTarget as HTMLElement; // Cast to HTMLElement
+			console.log(target);
+			const url = target.getAttribute("data-url");
 
 			if (url) {
-				window.location.href = url
+				window.location.href = url;
 			}
-		})
-	})
+		});
+	});
 </script>

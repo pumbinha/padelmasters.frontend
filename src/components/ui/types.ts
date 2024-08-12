@@ -1,11 +1,11 @@
 export type NavigationLink = {
-	group: number
+	group: number;
 	links: {
-		name: string
-		href: string
-		isActive: boolean
-	}[]
-}
+		name: string;
+		href: string;
+		isActive: boolean;
+	}[];
+};
 
 export const setLinkActive = (
 	navLinks: NavigationLink[],
@@ -17,5 +17,5 @@ export const setLinkActive = (
 			...link,
 			isActive: link.href === currentPath,
 		})),
-	}))
-}
+	}));
+};

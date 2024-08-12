@@ -1,7 +1,7 @@
 /** @type {import("prettier").Config} */
 export default {
-  printWidth: 100,
-	semi: false,
+	printWidth: 100,
+	semi: true,
 	singleQuote: false,
 	jsxSingleQuote: false,
 	quoteProps: "consistent",
@@ -10,17 +10,41 @@ export default {
 	useTabs: true,
 	endOfLine: "lf",
 	arrowParens: "always",
-  plugins: [
+	plugins: [
 		"prettier-plugin-astro",
 		"prettier-plugin-tailwindcss",
 		"prettier-plugin-astro-organize-imports",
 	],
-  overrides: [
-    {
-      files: "*.astro",
-      options: {
-        parser: "astro",
-      },
-    },
-  ],
-};
+	overrides: [
+		{
+			files: "*.astro",
+			options: {
+				parser: "astro",
+			},
+		},
+		{
+			files: "*.ts",
+			options: {
+				parser: "typescript",
+			},
+		},
+		{
+			files: "*.tsx",
+			options: {
+				parser: "typescript",
+			},
+		},
+		{
+			files: "*.jsx",
+			options: {
+				parser: "babel",
+			},
+		},
+		{
+			files: "*.js",
+			options: {
+				parser: "babel",
+			},
+		},
+	],
+}

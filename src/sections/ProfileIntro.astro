@@ -1,7 +1,7 @@
 ---
-import SignOutComponent from "@/components/SignOut"
-import { getSession } from "auth-astro/server"
-const session = await getSession(Astro.request)
+import SignOutComponent from "@/components/SignOut";
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
 ---
 
 <div class="flex min-h-screen flex-col items-center justify-center bg-background">
