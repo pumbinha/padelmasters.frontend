@@ -1,18 +1,35 @@
-// import { signIn } from "auth-astro/client";
+import { signIn } from "auth-astro/client";
 
-// const SignInComponent = ({ children }) => {
-// 	const handleLogin = () => {
-// 		signIn("keycloak", { callbackUrl: "/profile" });
-// 	};
+type EnrollProps = {
+	championshipId: string;
+	text: string
+}
 
-// 	return (
-// 		<button
-// 			onClick={handleLogin}
-// 			className="rounded-md bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
-// 		>
-// 			{children}
-// 		</button>
-// 	);
-// };
 
-// export default SignInComponent;
+const Enroll: React.FC<EnrollProps> = ({ championshipId, text }) => {
+	const handleClick = async () => {
+    const data = { championshipId }; // Replace with your actual data
+
+    const response = await fetch('/api/championships/enroll', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    console.log('Enriched data:', result);
+  };
+
+	return (
+		<button
+			onClick={handleClick}
+			className="rounded-md bg-primary-800 px-6 py-2 text-primary-foreground text-m transition-colors hover:bg-primary-1000 w-full"
+		>
+			{text}
+		</button>
+	);
+};
+
+export default Enroll;

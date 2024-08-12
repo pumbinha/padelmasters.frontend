@@ -2,13 +2,7 @@ import { useState } from "react";
 import type { NavigationLink } from "./ui/types";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import {
-	ArrowPathIcon,
-	ChevronRightIcon,
-	CloudArrowUpIcon,
-	LockClosedIcon,
-	ServerIcon,
-} from "@heroicons/react/20/solid";
+
 
 type NavigationProps = {
 	navigationLinks: NavigationLink[];

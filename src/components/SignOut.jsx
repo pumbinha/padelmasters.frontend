@@ -8,7 +8,7 @@ const SignOut = ({ text }) => {
 	return (
 		<button
 			onClick={handle}
-			className="rounded-md bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
+			className="rounded-md bg-primary-800 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-1000"
 		>
 			{text}
 		</button>
