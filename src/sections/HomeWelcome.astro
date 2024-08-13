@@ -13,6 +13,7 @@ const session = await getSession(Astro.request);
 const isLogged = await isUserLoggedIn(session);
 
 const link = isLogged ? "/championships" : "/sign-in";
+const text = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.WelcomeJoin);
 ---
 
 <section class="w-full pt-12 md:pt-24 lg:pt-32">
@@ -42,7 +43,7 @@ const link = isLogged ? "/championships" : "/sign-in";
 					href={link}
 					class="inline-flex h-9 items-center justify-center rounded-md bg-primary-800 px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
 				>
-					{t(TranslationKey.WelcomeJoin)}
+					{text}
 				</a>
 			</div>
 		</div>
