@@ -1,4 +1,4 @@
-import { signIn } from "auth-astro/client";
+
 
 type LeaveProps = {
 	championshipId: string;
@@ -18,8 +18,15 @@ const Leave: React.FC<LeaveProps> = ({ championshipId, text }) => {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
-    console.log('Enriched data:', result);
+    console.log(response);
+    
+    if(response.ok) {
+      
+      const result = await response.json();
+      window.location.href = `/championships/${championshipId}`;
+    }else{
+      console.error('Failed to process data');  
+    }
   };
 
 	return (

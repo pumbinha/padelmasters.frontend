@@ -3,8 +3,9 @@ import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { type ChampionshipDto } from "@/services/api";
+import { type ChampionshipDto, type ChampionshipUserProfileDto } from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const t = useTranslations(Astro.url);
 
@@ -13,6 +14,7 @@ const session = await getSession(Astro.request);
 const api = getApi();
 
 let championships: ChampionshipDto[] = [];
+let userProfile: ChampionshipUserProfileDto = {};
 
 try {
 	const championshipResponse =
@@ -62,7 +64,15 @@ try {
 								data-url={`/championships/${championship.Id}`}
 							>
 								<div class="p-4">
-									<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
+									<div>
+										<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
+										{userProfile.UserIsRegistered && (
+											<UserIcon
+												aria-hidden="true"
+												className="ml-auto h-6 w-6 text-supporting-cyan-600"
+											/>
+										)}
+									</div>
 									<p class="mb-4 text-muted-foreground">{championship.Description}</p>
 									<div class="mb-4 flex items-center justify-between">
 										<div>

@@ -1,4 +1,4 @@
-import { signIn } from "auth-astro/client";
+
 
 type EnrollProps = {
 	championshipId: string;
@@ -8,7 +8,7 @@ type EnrollProps = {
 
 const Enroll: React.FC<EnrollProps> = ({ championshipId, text }) => {
 	const handleClick = async () => {
-    const data = { championshipId }; // Replace with your actual data
+    const data = { championshipId };
 
     const response = await fetch('/api/championships/enroll', {
       method: 'POST',
@@ -18,8 +18,16 @@ const Enroll: React.FC<EnrollProps> = ({ championshipId, text }) => {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
-    console.log('Enriched data:', result);
+    
+    console.log(response);
+    
+    if(response.ok) {
+      
+      const result = await response.json();
+      window.location.href = `/championships/${championshipId}`;
+    }else{
+      console.error('Failed to process data');  
+    }
   };
 
 	return (

@@ -5,8 +5,9 @@ import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { type ChampionshipDto } from "@/services/api";
+import { type ChampionshipDto, type ChampionshipUserProfileDto } from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const t = useTranslations(Astro.url);
 
@@ -17,6 +18,7 @@ const session = await getSession(Astro.request);
 const api = getApi();
 
 let championship: ChampionshipDto = {};
+let userProfile: ChampionshipUserProfileDto = {};
 
 try {
 	if (!id) {
@@ -30,8 +32,8 @@ try {
 		);
 
 	if (championshipResponse.ok) {
-		console.log(championshipResponse.data);
 		championship = championshipResponse.data.Championship || {};
+		userProfile = championshipResponse.data.UserProfile || {};
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
@@ -41,13 +43,20 @@ try {
 }
 ---
 
-<Layout title="Padel Masters - Championship">
+<Layout title=`Padel Masters - Championship ${championship.Name} `>
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
 		<div class="overflow-hidden rounded-lg bg-background shadow-md">
 			<div class="p-4">
-				<h2 class="mb-2 text-xl font-bold">
-					{championship.Name}
-				</h2>
+				<div class="mb-2 flex items-center">
+					<h2 class="mb-2 text-xl font-bold">
+						{championship.Name}
+					</h2>
+					{
+						userProfile.UserIsRegistered && (
+							<UserIcon aria-hidden="true" className="ml-auto h-6 w-6 text-supporting-cyan-600" />
+						)
+					}
+				</div>
 				<p class="mb-4 text-muted-foreground">{championship.Description}</p>
 				<div class="mb-4 flex items-center justify-between">
 					<div>
@@ -68,8 +77,16 @@ try {
 				</div>
 			</div>
 			<div class="w-full rounded-lg bg-background md:w-auto">
-				<Enroll client:load championshipId={id || ""} , text={t(TranslationKey.ActionEnroll)} />
-				<Leave client:load championshipId={id || ""} , text={t(TranslationKey.ActionLeave)} />
+				{
+					userProfile.UserCanJoin && (
+						<Enroll client:load championshipId={id || ""} text={t(TranslationKey.ActionEnroll)} />
+					)
+				}
+				{
+					userProfile.UserCanLeave && (
+						<Leave client:load championshipId={id || ""} text={t(TranslationKey.ActionLeave)} />
+					)
+				}
 			</div>
 		</div>
 		<div class="p-12">
