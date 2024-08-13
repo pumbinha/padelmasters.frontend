@@ -2,7 +2,7 @@
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { type ChampionshipResponse, ChampionshipStatus } from "@/services/api";
+import { type ChampionshipDto, ChampionshipStatus } from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { getSession } from "auth-astro/server";
 const t = useTranslations(Astro.url);
@@ -11,12 +11,13 @@ const session = await getSession(Astro.request);
 
 const api = getApi();
 
-let championships: ChampionshipResponse[] = [];
+let championships: ChampionshipDto[] = [];
 
 try {
-	const championshipResponse = await api.api.padelmastersApiDomainChampionshipsGetChampionships(
-		getRequestParams(session)
-	);
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionships(
+			getRequestParams(session)
+		);
 	if (championshipResponse.ok) {
 		championships = championshipResponse.data.sort((a, b) => {
 			return (

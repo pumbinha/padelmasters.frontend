@@ -3,7 +3,7 @@ import Enroll from "@/components/Enroll";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { ChampionshipStatus, type ChampionshipResponse } from "@/services/api";
+import { ChampionshipStatus, type ChampionshipDto } from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { getSession } from "auth-astro/server";
 const t = useTranslations(Astro.url);
@@ -14,7 +14,7 @@ const session = await getSession(Astro.request);
 
 const api = getApi();
 
-let championship: ChampionshipResponse = {};
+let championship: ChampionshipDto = {};
 
 try {
 	// my validation
@@ -22,13 +22,15 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 
-	const championshipResponse = await api.api.padelmastersApiDomainChampionshipsGetChampionship(
-		id || "",
-		getRequestParams(session)
-	);
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
+			id || "",
+			getRequestParams(session)
+		);
 
 	if (championshipResponse.ok) {
-		championship = championshipResponse.data;
+		console.log(championshipResponse.data);
+		championship = championshipResponse.data.Championship || {};
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");

@@ -1,5 +1,5 @@
 import type { Session } from "@auth/core/types";
-import { Api, type ApiConfig } from "./api";
+import { Api, type ApiConfig, type RequestParams } from "./api";
 import { verifyAuth } from "@/middleware";
 
 const apiURL = import.meta.env.API_BASE_URL;
@@ -14,7 +14,7 @@ export const getApi = (): Api<unknown> => {
 	return api;
 };
 
-export const getRequestParams = (session: Session | null) => {
+export const getRequestParams = (session: Session | null): RequestParams => {
 	return {
 		headers: {
 			Authorization: `Bearer ${session?.access_token}`, // Explicitly include the bearer token
