@@ -1,12 +1,13 @@
 ---
-import MobileNav from "@/components/MobileNav.tsx";
 import NavLink from "@/components/NavLink.astro";
+import MobileNav from "@/components/ui/MobileNav.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { isUserLoggedIn } from "@/services/utils";
 
+import { type NavigationLink } from "@/components/ui/types.tsx";
+import { setLinkActive } from "@/components/ui/utils.tsx";
 import { getSession } from "auth-astro/server";
-import { setLinkActive, type NavigationLink } from "./ui/types";
 
 const t = useTranslations(Astro.url);
 const session = await getSession(Astro.request);

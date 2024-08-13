@@ -1,6 +1,10 @@
 import { signOut } from "auth-astro/client";
 
-const SignOut = ({ text }) => {
+type SignOutProps = {
+	text: string;
+};
+
+const SignOut: React.FC<SignOutProps> = ({ text }) => {
 	const handle = () => {
 		signOut({ callbackUrl: "/" });
 	};

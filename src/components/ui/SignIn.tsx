@@ -1,6 +1,10 @@
 import { signIn } from "auth-astro/client";
 
-const SignInComponent = ({ children }) => {
+type SignInComponentProps = {
+	children: string;
+}
+
+const SignInComponent: React.FC<SignInComponentProps> = ({ children }) => {
 	const handleLogin = () => {
 		signIn("keycloak", { callbackUrl: "/profile" });
 	};

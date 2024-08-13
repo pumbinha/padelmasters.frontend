@@ -18,6 +18,8 @@ export enum TranslationKey {
 	ChampionshipsAdd = "Championships.Add",
 	ChampionshipsNoChampionshipsDescription = "Championships.NoChampionshipsDescription",
 	ChampionshipsNoChampionshipstitle = "Championships.NoChampionshipstitle",
+	ActionEnroll = "Action.Enroll",
+	ActionLeave = "Action.Leave",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -53,6 +55,8 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsAdd]: "Add championship",
 		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "How about creating one?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "There are no championships created!",
+		[TranslationKey.ActionEnroll]: "Enroll",
+		[TranslationKey.ActionLeave]: "Leave",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -74,5 +78,7 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsAdd]: "Añadir campeonato",
 		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "¿Qué tal si creas uno?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "¡No hay campeonatos creados!",
+		[TranslationKey.ActionEnroll]: "Apuntarse",
+		[TranslationKey.ActionLeave]: "Salir",
 	},
 };
