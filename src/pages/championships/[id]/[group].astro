@@ -1,5 +1,9 @@
 ---
+import BreadCrumb from "@/components/BreadCrumb.astro";
 import Layout from "@/layouts/Layout.astro";
+import type { ChampionshipDto, ChampionshipUserProfileDto } from "@/services/api";
+import { getApi, getRequestParams } from "@/services/utils";
+import { getSession } from "auth-astro/server";
 
 const playerData = [
 	{
@@ -40,14 +44,45 @@ const playerData = [
 ];
 
 const { id, group } = Astro.params;
+
+const session = await getSession(Astro.request);
+
+const api = getApi();
+let championship: ChampionshipDto = {};
+let userProfile: ChampionshipUserProfileDto = {};
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
+			id || "",
+			getRequestParams(session)
+		);
+
+	if (championshipResponse.ok) {
+		championship = championshipResponse.data.Championship || {};
+		userProfile = championshipResponse.data.UserProfile || {};
+	} else {
+		// 404
+		Astro.redirect("/championships/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
 ---
 
 <Layout title="Padel Masters League">
 	<section>
 		<div class="px-4 py-2">
-			<a href={`/championships/${id}`} class="text-neutral-600"> Championship (name)</a> -> GROUP-{
-				group
-			}
+			<BreadCrumb
+				pages={[
+					{ name: "Championships", href: "/championships" },
+					{ name: championship.Name, href: `/championships/${id}` },
+				]}
+			/>
 		</div>
 
 		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">

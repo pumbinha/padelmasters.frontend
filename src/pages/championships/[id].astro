@@ -1,4 +1,5 @@
 ---
+import BreadCrumb from "@/components/BreadCrumb.astro";
 import Enroll from "@/components/ui/Enroll.tsx";
 import Leave from "@/components/ui/Leave.tsx";
 import { getStatusClass } from "@/components/ui/utils.tsx";
@@ -46,6 +47,9 @@ try {
 <Layout title=`Padel Masters - Championship ${championship.Name} `>
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
 		<div class="overflow-hidden rounded-lg bg-background shadow-md">
+			<div class="px-4">
+				<BreadCrumb pages={[{ name: "Championships", href: "/championships" }]} />
+			</div>
 			<div class="p-4">
 				<div class="mb-2 flex items-center">
 					<h2 class="mb-2 text-xl font-bold">

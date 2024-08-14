@@ -8,3 +8,8 @@ export type NavigationLink = {
 		isActive: boolean;
 	}[];
 };
+
+export type BreadCrumbProps = {
+	name: string;
+	href: string;
+}[];
