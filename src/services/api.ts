@@ -9,6 +9,73 @@
  * ---------------------------------------------------------------
  */
 
+export interface GetGroupResponse {
+  Group?: GroupInformationDto;
+}
+
+export interface GroupInformationDto {
+  Group?: GroupDto;
+  GroupDetail?: GroupDetailDto;
+}
+
+export interface GroupDto {
+  /** @format guid */
+  Id?: string;
+  Name?: string;
+  Description?: string | null;
+}
+
+export interface GroupDetailDto {
+  /** @format int32 */
+  NumberPlayers?: number;
+  /** @format int32 */
+  NumberMatches?: number;
+  /** @format int32 */
+  NumberOfPlayedMatches?: number;
+  /** @format int32 */
+  NumberOfPendingMatches?: number;
+}
+
+export interface GroupMatchDto {
+  Team1?: GroupTeamDtoResult;
+  Team2?: GroupTeamDtoResult;
+  /** @format date-time */
+  Date?: string | null;
+  Status?: MatchStatus | null;
+  ResultSet1?: GroupMatchResultDto | null;
+  ResultSet2?: GroupMatchResultDto | null;
+  ResultSet3?: GroupMatchResultDto | null;
+}
+
+export interface GroupTeamDtoResult {
+  Team?: GroupTeamDto;
+  IsWinner?: boolean;
+}
+
+export interface GroupTeamDto {
+  /** @format guid */
+  Id?: string;
+  Name?: string | null;
+  Player1?: GroupPlayer;
+  Player2?: GroupPlayer;
+}
+
+export interface GroupPlayer {
+  /** @format guid */
+  Id?: string;
+  FirstName?: string;
+  LastName?: string;
+}
+
+export interface GroupMatchResultDto {
+  /** @format int32 */
+  MatchSet?: number;
+  /** @format int32 */
+  ResultTeam1?: number;
+  /** @format int32 */
+  ResultTeam2?: number;
+}
+
 export interface DefaultCreatedResponse {
   /** @format guid */
   Id?: string;
@@ -17,6 +84,7 @@ export interface DefaultCreatedResponse {
 export interface CreateChampionshipRequest {
   Name?: string;
   Description?: string | null;
+  Rules?: string;
   /** @format date-time */
   StartDate?: string;
   /** @format date-time */
@@ -35,8 +103,14 @@ export interface EnrollChampionshipRequest {
 }
 
 export interface GetChampionshipResponse {
-  Championship?: ChampionshipDto;
+  Championship?: ChampionshipInformationDto;
   Configurations?: ChampionshipConfigurationDto[];
+  Groups?: GroupDto[];
+}
+
+export interface ChampionshipInformationDto {
+  Championship?: ChampionshipDto;
+  ChampionshipDetail?: ChampionshipDetailDto;
   UserProfile?: ChampionshipUserProfileDto;
 }
 
@@ -53,11 +127,19 @@ export interface ChampionshipDto {
   Type?: ChampionshipType | null;
 }
 
-export interface ChampionshipConfigurationDto {
-  Name?: string;
-  Description?: string;
-  Key?: ChampionshipConfigurationKey | null;
-  Value?: string;
+export interface ChampionshipDetailDto {
+  /** @format int32 */
+  NumberEnrolledPlayers?: number;
+  /** @format int32 */
+  NumberTotalPlayers?: number;
+  /** @format int32 */
+  NumberGroups?: number;
+  /** @format int32 */
+  NumberMatches?: number;
+  /** @format int32 */
+  NumberOfPlayedMatches?: number;
+  /** @format int32 */
+  NumberOfPendingMatches?: number;
 }
 
 export interface ChampionshipUserProfileDto {
@@ -65,6 +147,19 @@ export interface ChampionshipUserProfileDto {
   UserIsOwner?: boolean;
   UserCanJoin?: boolean;
   UserCanLeave?: boolean;
+}
+
+export interface ChampionshipConfigurationDto {
+  Name?: string;
+  Description?: string;
+  Key?: ChampionshipConfigurationKey | null;
+  Value?: string;
+}
+
+export enum MatchStatus {
+  Planned = "Planned",
+  Played = "Played",
+  Cancelled = "Cancelled",
 }
 
 export enum ChampionshipType {
@@ -310,6 +405,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
+     * @name PadelmastersApiDomainEndpointsGroupsGetGroup
+     * @request GET:/api/groups/{groupId}
+     * @secure
+     */
+    padelmastersApiDomainEndpointsGroupsGetGroup: (groupId: string, params: RequestParams = {}) =>
+      this.request<GetGroupResponse, void>({
+        path: `/api/groups/${groupId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsGroupsGetGroupMatches
+     * @request GET:/api/groups/{groupId}/matches
+     * @secure
+     */
+    padelmastersApiDomainEndpointsGroupsGetGroupMatches: (groupId: string, params: RequestParams = {}) =>
+      this.request<GroupMatchDto[], void>({
+        path: `/api/groups/${groupId}/matches`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
      * @name PadelmastersApiDomainEndpointsChampionshipsCreateChampionship
      * @request POST:/api/championships
      * @secure
@@ -337,7 +466,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     padelmastersApiDomainEndpointsChampionshipsGetChampionships: (params: RequestParams = {}) =>
-      this.request<ChampionshipDto[], void>({
+      this.request<ChampionshipInformationDto[], void>({
         path: `/api/championships`,
         method: "GET",
         secure: true,
@@ -416,6 +545,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     padelmastersApiDomainEndpointsChampionshipsOpenChampionship: (championshipId: string, params: RequestParams = {}) =>
       this.request<any, void>({
         path: `/api/championships/${championshipId}/open`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsChampionshipsStartChampionship
+     * @request POST:/api/championships/{championshipId}/start
+     * @secure
+     */
+    padelmastersApiDomainEndpointsChampionshipsStartChampionship: (
+      championshipId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<any, void>({
+        path: `/api/championships/${championshipId}/start`,
         method: "POST",
         secure: true,
         format: "json",

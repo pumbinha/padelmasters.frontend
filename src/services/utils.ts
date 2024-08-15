@@ -1,5 +1,5 @@
 import type { Session } from "@auth/core/types";
-import { Api, type ApiConfig, type RequestParams } from "./api";
+import { Api, type ApiConfig, type ChampionshipDto, type RequestParams } from "@/services/api";
 import { verifyAuth } from "@/middleware";
 
 const apiURL = import.meta.env.API_BASE_URL;
@@ -32,4 +32,11 @@ export const getFormattedDate = (date?: string) => {
 export const isUserLoggedIn = async (session: Session | null) => {
 	const validationResult = await verifyAuth(session);
 	return validationResult.status === "authorized";
+};
+
+export const orderChampionshipDtoByDate = (championships: ChampionshipDto[]): ChampionshipDto[] => {
+	return (
+		(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
+		(b.EndDate ? new Date(b.EndDate).getTime() : 0)
+	);
 };

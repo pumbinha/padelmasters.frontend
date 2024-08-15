@@ -3,7 +3,11 @@ import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { type ChampionshipDto, type ChampionshipUserProfileDto } from "@/services/api";
+import {
+	type ChampionshipDto,
+	type ChampionshipInformationDto,
+	type ChampionshipUserProfileDto,
+} from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
@@ -22,12 +26,14 @@ try {
 			getRequestParams(session)
 		);
 	if (championshipResponse.ok) {
-		championships = championshipResponse.data.sort((a, b) => {
-			return (
-				(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
-				(b.EndDate ? new Date(b.EndDate).getTime() : 0)
-			);
+		const data: ChampionshipInformationDto[] = championshipResponse.data || [];
+		data.flatMap((element: ChampionshipInformationDto) => {
+			if (element.Championship) {
+				championships.push(element.Championship);
+			}
 		});
+
+		//		championships = championshipResponse.data.ChampionshipInformationDto[]?.
 	} else {
 		console.error("championshipResponse");
 	}

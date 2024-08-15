@@ -1,7 +1,12 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Layout from "@/layouts/Layout.astro";
-import type { ChampionshipDto, ChampionshipUserProfileDto } from "@/services/api";
+import type {
+	ChampionshipDetailDto,
+	ChampionshipDto,
+	ChampionshipUserProfileDto,
+	GroupDto,
+} from "@/services/api";
 import { getApi, getRequestParams } from "@/services/utils";
 import { getSession } from "auth-astro/server";
 
@@ -49,7 +54,9 @@ const session = await getSession(Astro.request);
 
 const api = getApi();
 let championship: ChampionshipDto = {};
+let detail: ChampionshipDetailDto = {};
 let userProfile: ChampionshipUserProfileDto = {};
+let groups: GroupDto[] = [];
 
 try {
 	if (!id) {
@@ -63,8 +70,9 @@ try {
 		);
 
 	if (championshipResponse.ok) {
-		championship = championshipResponse.data.Championship || {};
-		userProfile = championshipResponse.data.UserProfile || {};
+		championship = championshipResponse.data.Championship?.Championship || {};
+		detail = championshipResponse.data.Championship?.ChampionshipDetail || {};
+		groups = championshipResponse.data.Groups || [];
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");

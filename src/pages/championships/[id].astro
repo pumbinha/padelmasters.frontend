@@ -33,8 +33,8 @@ try {
 		);
 
 	if (championshipResponse.ok) {
-		championship = championshipResponse.data.Championship || {};
-		userProfile = championshipResponse.data.UserProfile || {};
+		championship = championshipResponse.data.Championship?.Championship || {};
+		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
