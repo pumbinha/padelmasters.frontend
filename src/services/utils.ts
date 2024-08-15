@@ -35,8 +35,10 @@ export const isUserLoggedIn = async (session: Session | null) => {
 };
 
 export const orderChampionshipDtoByDate = (championships: ChampionshipDto[]): ChampionshipDto[] => {
-	return (
-		(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
-		(b.EndDate ? new Date(b.EndDate).getTime() : 0)
-	);
+	return championships.sort((a, b) => {
+		return (
+			(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
+			(b.EndDate ? new Date(b.EndDate).getTime() : 0)
+		);
+	});
 };
