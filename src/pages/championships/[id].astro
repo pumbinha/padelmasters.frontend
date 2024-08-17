@@ -11,6 +11,7 @@ import {
 	type ChampionshipUserProfileDto,
 	type GroupDto,
 } from "@/services/api";
+import { generateGroupDtosMock } from "@/services/mocks";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
@@ -41,6 +42,8 @@ try {
 		championship = championshipResponse.data.Championship?.Championship || {};
 		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 		groups = championshipResponse.data.Groups || [];
+
+		groups.push(...generateGroupDtosMock(15));
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
@@ -99,32 +102,40 @@ try {
 				}
 			</div>
 		</div>
-		<div class="p-12">
-			<a
-				href={`/championships/${id}/A`}
-				class="text-m rounded-md bg-vivid-800 px-6 py-2 text-primary-foreground transition-colors hover:bg-vivid-900"
-			>
-				League Standings (temp)
-			</a>
-		</div>
-		<div class="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4">
-			{
-				groups.map((group) => (
-					<div class="overflow-hidden rounded-lg bg-card shadow-md">
-						<div class="bg-vivid-600 px-4 py-2 text-center text-primary-foreground">
-							<h4 class="text-md">{group.Name}</h4>
-						</div>
-						{/* <div class="p-4 space-y-2">
-                {group.teams.map((team) => (
-                  <div key={team.name} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{team.name}</span>
-                    <span className="text-sm text-muted-foreground">{team.points} pts</span>
-                  </div>
-                ))}
-              </div> */}
-					</div>
-				))
-			}
+		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
+			<ol class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">
+				{
+					groups.map((group) => (
+						<li
+							class="group-card rounded-lg bg-background p-4 shadow-md"
+							data-url={`/championships/${id}/${group.Id}`}
+						>
+							<div class="mb-2 flex items-center justify-between">
+								<div class="font-medium text-neutral-700">{group.Name}</div>
+							</div>
+							<div class="text-sm text-muted-foreground">{group.Description}</div>
+						</li>
+					))
+				}
+			</ol>
 		</div>
 	</section>
 </Layout>
+
+<script>
+	const cards = document.querySelectorAll(".group-card");
+
+	cards.forEach((card) => {
+		card.addEventListener("click", (event) => {
+			if (!event.currentTarget) {
+				return;
+			}
+			const target = event.currentTarget as HTMLElement;
+			const url = target.getAttribute("data-url");
+
+			if (url) {
+				window.location.href = url;
+			}
+		});
+	});
+</script>

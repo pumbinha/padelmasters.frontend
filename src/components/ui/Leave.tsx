@@ -1,5 +1,5 @@
 
-import { HeartIcon, UserMinusIcon } from "@heroicons/react/24/outline";
+import { UserMinusIcon } from "@heroicons/react/24/outline";
 type LeaveProps = {
 	championshipId: string;
 	text: string

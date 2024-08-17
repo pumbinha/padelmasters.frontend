@@ -1,5 +1,11 @@
 import type { Session } from "@auth/core/types";
-import { Api, type ApiConfig, type ChampionshipDto, type RequestParams } from "@/services/api";
+import {
+	Api,
+	type ApiConfig,
+	type ChampionshipDto,
+	type PlayerStandingDto,
+	type RequestParams,
+} from "@/services/api";
 import { verifyAuth } from "@/middleware";
 
 const apiURL = import.meta.env.API_BASE_URL;
@@ -41,4 +47,17 @@ export const orderChampionshipDtoByDate = (championships: ChampionshipDto[]): Ch
 			(b.EndDate ? new Date(b.EndDate).getTime() : 0)
 		);
 	});
+};
+
+export const orderPlayerStandingDtoByPts = (
+	playerStandings: PlayerStandingDto[]
+): PlayerStandingDto[] => {
+	return playerStandings
+		.filter((item) => item.Points !== undefined)
+		.sort(
+			(a, b) =>
+				b.Points! - a.Points! ||
+				(b.PlayedMatches ?? 0) - (a.PlayedMatches ?? 0) ||
+				(a.LostMatches ?? 0) - (a.LostMatches ?? 0)
+		);
 };

@@ -1,0 +1,269 @@
+---
+import BreadCrumb from "@/components/BreadCrumb.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import type { ChampionshipDto, GroupDetailDto, GroupDto, PlayerStandingDto } from "@/services/api";
+import { getApi, getRequestParams, orderPlayerStandingDtoByPts } from "@/services/utils";
+import { StarIcon } from "@heroicons/react/16/solid";
+import { getSession } from "auth-astro/server";
+const t = useTranslations(Astro.url);
+
+const { id, groupId } = Astro.params;
+
+const session = await getSession(Astro.request);
+
+const api = getApi();
+let championship: ChampionshipDto = {};
+let group: GroupDto = {};
+let groupDetail: GroupDetailDto = {};
+let playerStandings: PlayerStandingDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// optimize! get get the champ name in the grops endpoint
+	// ========= get championship
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
+			id || "",
+			getRequestParams(session)
+		);
+
+	if (championshipResponse.ok) {
+		championship = championshipResponse.data.Championship?.Championship || {};
+	} else {
+		// 404
+		Astro.redirect("/championships/not-found");
+	}
+
+	// ========= get groups
+	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
+		groupId || "",
+		getRequestParams(session)
+	);
+
+	if (groupResponse.ok) {
+		group = groupResponse.data.Group?.Group || {};
+		groupDetail = groupResponse.data.Group?.GroupDetail || {};
+	} else {
+		// 404
+		Astro.redirect("/group/not-found");
+	}
+
+	// ========= get standings
+	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+		const standingsResponse =
+			await api.api.padelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint(
+				groupId || "",
+				getRequestParams(session)
+			);
+		if (standingsResponse.ok) {
+			playerStandings = standingsResponse.data.PlayerStandings || [];
+			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
+		} else {
+			// 404
+			Astro.redirect("/group/not-found");
+		}
+	}
+} catch (e) {
+	console.error(e);
+}
+
+// const getStatusClass = (index: number) => {
+// 	switch (index) {
+// 		case 0:
+// 			return "underline decoration-yellow-400 decoration-2 underline-offset-4";
+// 		case 1:
+// 			return "underline decoration-gray-400 decoration-2 underline-offset-4";
+// 		case 2:
+// 			return "underline decoration-orange-700 decoration-2 underline-offset-4";
+
+// 		default:
+// 			return "";
+// 	}
+// };
+---
+
+<Layout title=`Padel Masters - Group ${group.Name} `>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="overflow-hidden rounded-lg bg-background shadow-md">
+			<div class="px-4">
+				<BreadCrumb
+					pages={[
+						{ name: "Championships", href: "/championships" },
+						{ name: championship.Name, href: `/championships/${id}` },
+					]}
+				/>
+			</div>
+
+			<div class="p-4">
+				<div class="mb-2 flex items-center">
+					<h2 class="mb-2 text-xl font-bold">
+						{group.Name}
+					</h2>
+				</div>
+				<p class="mb-4 text-muted-foreground">{group.Description}</p>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-400">{t(TranslationKey.NumberOfPlayers)}</p>
+						<p class="text-sm font-medium text-neutral-600">{groupDetail.NumberPlayers}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-400">
+							{t(TranslationKey.NumberMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-600">{groupDetail.NumberMatches}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-400">
+							{t(TranslationKey.PlayedMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-600">
+							{groupDetail.NumberOfPlayedMatches}
+						</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-400">
+							{t(TranslationKey.PendingMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-600">
+							{groupDetail.NumberOfPendingMatches}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="p-4">
+			<h3 class="mb-6 font-bold">Standings</h3>
+
+			<div class="mt-8 flow-root">
+				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+						<table class="min-w-full divide-y divide-gray-300">
+							<thead>
+								<tr>
+									<th
+										scope="col"
+										class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+									>
+										Name
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										P
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										V
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										L
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										Pts
+									</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-gray-200">
+								{
+									playerStandings.map((player, index) => (
+										<tr>
+											<td class="font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
+												<span class="inline-block">{player.DisplayName}</span>
+												{index === 0 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-yellow-400  inline-block"
+													/>
+												)}
+												{index === 1 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-gray-400 inline-block"
+													/>
+												)}
+
+												{index === 2 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-orange-700 inline-block"
+													/>
+												)}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.PlayedMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.WonMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.LostMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm font-semibold text-gray-500">
+												{player.Points}
+											</td>
+										</tr>
+									))
+								}
+							</tbody>
+							<!-- <tbody class="divide-y divide-gray-200">
+								{
+									playerData.map((player, index) => (
+										<tr>
+											<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+												<span class={`inline-block ${getStatusClass(index)}`}>{player.name}</span>
+												{/* {player.name} */}
+												{/* {index === 0 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-yellow-400  inline-block"
+													/>
+												)}
+												{index === 1 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-gray-400 inline-block"
+													/>
+												)}
+
+												{index === 2 && (
+													<StarIcon
+														aria-hidden="true"
+														className="ml-auto h-6 w-6 text-orange-700 inline-block"
+													/>
+												)} */}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.sets}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.victory}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+												{player.lose}
+											</td>
+										</tr>
+									))
+								}
+							</tbody> -->
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>
