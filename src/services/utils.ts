@@ -17,7 +17,7 @@ export const getApi = (): Api<unknown> => {
 export const getRequestParams = (session: Session | null): RequestParams => {
 	return {
 		headers: {
-			Authorization: `Bearer ${session?.access_token}`, // Explicitly include the bearer token
+			Authorization: `Bearer ${session?.access_token}`,
 		},
 	};
 };

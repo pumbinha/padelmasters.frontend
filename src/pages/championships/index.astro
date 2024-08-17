@@ -1,14 +1,16 @@
 ---
+import type { ExtendedChampionshipDto } from "@/components/ui/types";
 import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import { type ChampionshipInformationDto, type ChampionshipUserProfileDto } from "@/services/api";
 import {
-	type ChampionshipDto,
-	type ChampionshipInformationDto,
-	type ChampionshipUserProfileDto,
-} from "@/services/api";
-import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+	getApi,
+	getFormattedDate,
+	getRequestParams,
+	orderChampionshipDtoByDate,
+} from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const t = useTranslations(Astro.url);
@@ -17,7 +19,7 @@ const session = await getSession(Astro.request);
 
 const api = getApi();
 
-let championships: ChampionshipDto[] = [];
+let championships: ExtendedChampionshipDto[] = []; // extend using UserProfile
 let userProfile: ChampionshipUserProfileDto = {};
 
 try {
@@ -29,11 +31,14 @@ try {
 		const data: ChampionshipInformationDto[] = championshipResponse.data || [];
 		data.flatMap((element: ChampionshipInformationDto) => {
 			if (element.Championship) {
-				championships.push(element.Championship);
+				championships.push({
+					...element.Championship,
+					...element.UserProfile,
+				});
 			}
 		});
 
-		//		championships = championshipResponse.data.ChampionshipInformationDto[]?.
+		championships = orderChampionshipDtoByDate(championships);
 	} else {
 		console.error("championshipResponse");
 	}
@@ -70,9 +75,9 @@ try {
 								data-url={`/championships/${championship.Id}`}
 							>
 								<div class="p-4">
-									<div>
+									<div class="mb-2 flex items-center">
 										<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
-										{userProfile.UserIsRegistered && (
+										{championship.UserIsRegistered && (
 											<UserIcon
 												aria-hidden="true"
 												className="ml-auto h-6 w-6 text-supporting-cyan-600"
@@ -115,8 +120,7 @@ try {
 			if (!event.currentTarget) {
 				return;
 			}
-			const target = event.currentTarget as HTMLElement; // Cast to HTMLElement
-			console.log(target);
+			const target = event.currentTarget as HTMLElement;
 			const url = target.getAttribute("data-url");
 
 			if (url) {

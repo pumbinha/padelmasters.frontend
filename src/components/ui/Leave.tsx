@@ -1,5 +1,5 @@
 
-
+import { HeartIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 type LeaveProps = {
 	championshipId: string;
 	text: string
@@ -17,8 +17,6 @@ const Leave: React.FC<LeaveProps> = ({ championshipId, text }) => {
       },
       body: JSON.stringify(data),
     });
-
-    console.log(response);
     
     if(response.ok) {
       
@@ -32,9 +30,10 @@ const Leave: React.FC<LeaveProps> = ({ championshipId, text }) => {
 	return (
 		<button
 			onClick={handleClick}
-			className="rounded-md bg-supporting-red-500 px-6 py-2 text-primary-foreground text-m transition-colors hover:bg-supporting-red-700 w-full"
+			className="rounded-md bg-supporting-red-500 px-6 py-2 text-primary-foreground text-m transition-colors hover:bg-supporting-red-700 w-full "
 		>
-			{text}
+			<UserMinusIcon className="h-6 w-6 inline-block mr-2" /> 
+      {text}
 		</button>
 	);
 };

@@ -9,6 +9,44 @@
  * ---------------------------------------------------------------
  */
 
+export interface DefaultCreatedResponse {
+  /** @format guid */
+  Id?: string;
+}
+
+export interface SaveMatchResultRequest {
+  MatchResult1?: GroupMatchResultDto;
+  MatchResult2?: GroupMatchResultDto;
+  MatchResult3?: GroupMatchResultDto;
+}
+
+export interface GroupMatchResultDto {
+  /** @format int32 */
+  MatchSet?: number;
+  /** @format int32 */
+  ResultTeam1?: number;
+  /** @format int32 */
+  ResultTeam2?: number;
+}
+
+export interface StandingDto {
+  PlayerStandings?: PlayerStandingDto[];
+}
+
+export interface PlayerStandingDto {
+  /** @format guid */
+  UserId?: string;
+  DisplayName?: string;
+  /** @format int32 */
+  Points?: number;
+  /** @format int32 */
+  WonMatches?: number;
+  /** @format int32 */
+  LostMatches?: number;
+  /** @format int32 */
+  PlayedMatches?: number;
+}
+
 export interface GetGroupResponse {
   Group?: GroupInformationDto;
 }
@@ -65,20 +103,6 @@ export interface GroupPlayer {
   Id?: string;
   FirstName?: string;
   LastName?: string;
-}
-
-export interface GroupMatchResultDto {
-  /** @format int32 */
-  MatchSet?: number;
-  /** @format int32 */
-  ResultTeam1?: number;
-  /** @format int32 */
-  ResultTeam2?: number;
-}
-
-export interface DefaultCreatedResponse {
-  /** @format guid */
-  Id?: string;
 }
 
 export interface CreateChampionshipRequest {
@@ -401,6 +425,63 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   api = {
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsMatchesEnrollChampionship
+     * @request DELETE:/api/matches/{matchId}
+     * @secure
+     */
+    padelmastersApiDomainEndpointsMatchesEnrollChampionship: (matchId: string, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/api/matches/${matchId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsMatchesCreateChampionship
+     * @request POST:/api/matches/{matchId}/results
+     * @secure
+     */
+    padelmastersApiDomainEndpointsMatchesCreateChampionship: (
+      matchId: string,
+      data: SaveMatchResultRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<DefaultCreatedResponse, void>({
+        path: `/api/matches/${matchId}/results`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint
+     * @request GET:/api/groups/{groupId}/standing
+     * @secure
+     */
+    padelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint: (groupId: string, params: RequestParams = {}) =>
+      this.request<StandingDto, void>({
+        path: `/api/groups/${groupId}/standing`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * No description
      *
