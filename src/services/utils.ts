@@ -28,11 +28,23 @@ export const getRequestParams = (session: Session | null): RequestParams => {
 	};
 };
 
-export const getFormattedDate = (date?: string) => {
+export const getFormattedDate = (date?: string, session?: Session | null) => {
 	if (!date) return "";
 
-	// TODO: what we can do with the locale?
-	return new Date(date).toLocaleDateString("en-GB").toString();
+	let lang = "en-Gb";
+
+	// forcing to always have 2 digits for day and month
+	const options: Intl.DateTimeFormatOptions = {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	};
+
+	if (session && session.locale) {
+		lang = session.locale;
+	}
+
+	return Intl.DateTimeFormat(lang, options).format(new Date(date));
 };
 
 export const isUserLoggedIn = async (session: Session | null) => {

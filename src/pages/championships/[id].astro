@@ -71,12 +71,12 @@ try {
 				<p class="mb-4 text-muted-foreground">{championship.Description}</p>
 				<div class="mb-4 flex items-center justify-between">
 					<div>
-						<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>{" "}
-						{getFormattedDate(championship.StartDate)}
+						<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>
+						{getFormattedDate(championship.StartDate, session)}
 					</div>
 					<div>
-						<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>{" "}
-						{getFormattedDate(championship.EndDate)}
+						<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>
+						{getFormattedDate(championship.EndDate, session)}
 					</div>
 				</div>
 				<div class="flex items-center justify-between">

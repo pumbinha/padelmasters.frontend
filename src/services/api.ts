@@ -9,15 +9,60 @@
  * ---------------------------------------------------------------
  */
 
-export interface DefaultCreatedResponse {
-  /** @format guid */
-  Id?: string;
+export interface UserDetailDto {
+  User?: UserDto;
+  UserStatistics?: UserStatisticsDto;
+  UserMatches?: GroupMatchDto[];
 }
 
-export interface SaveMatchResultRequest {
-  MatchResult1?: GroupMatchResultDto;
-  MatchResult2?: GroupMatchResultDto;
-  MatchResult3?: GroupMatchResultDto;
+export interface UserDto {
+  /** @format guid */
+  Id?: string;
+  FirstName?: string;
+  LastName?: string;
+}
+
+export interface UserStatisticsDto {
+  /** @format int32 */
+  MatchesPlayed?: number;
+  /** @format int32 */
+  MatchesWon?: number;
+  /** @format int32 */
+  MatchesLost?: number;
+  /** @format int32 */
+  SetsWon?: number;
+  /** @format int32 */
+  SetsLost?: number;
+  /** @format int32 */
+  PointsWon?: number;
+  /** @format int32 */
+  PointsLost?: number;
+  /** @format int32 */
+  WinRate?: number;
+}
+
+export interface GroupMatchDto {
+  Team1?: GroupTeamDtoResult;
+  Team2?: GroupTeamDtoResult;
+  /** @format date-time */
+  Date?: string | null;
+  Status?: MatchStatus | null;
+  ResultSet1?: GroupMatchResultDto | null;
+  ResultSet2?: GroupMatchResultDto | null;
+  ResultSet3?: GroupMatchResultDto | null;
+}
+
+export interface GroupTeamDtoResult {
+  Team?: GroupTeamDto;
+  IsWinner?: boolean;
+}
+
+export interface GroupTeamDto {
+  /** @format guid */
+  Id?: string;
+  Name?: string | null;
+  Player1?: UserDto;
+  Player2?: UserDto;
 }
 
 export interface GroupMatchResultDto {
@@ -29,22 +74,17 @@ export interface GroupMatchResultDto {
   ResultTeam2?: number;
 }
 
-export interface StandingDto {
-  PlayerStandings?: PlayerStandingDto[];
+export interface DefaultCreatedResponse {
+  /** @format guid */
+  Id?: string;
 }
 
-export interface PlayerStandingDto {
-  /** @format guid */
-  UserId?: string;
-  DisplayName?: string;
-  /** @format int32 */
-  Points?: number;
-  /** @format int32 */
-  WonMatches?: number;
-  /** @format int32 */
-  LostMatches?: number;
-  /** @format int32 */
-  PlayedMatches?: number;
+export interface SaveMatchResultRequest {
+  /** @format date-time */
+  Date?: string;
+  MatchResult1?: GroupMatchResultDto;
+  MatchResult2?: GroupMatchResultDto;
+  MatchResult3?: GroupMatchResultDto;
 }
 
 export interface GetGroupResponse {
@@ -74,35 +114,22 @@ export interface GroupDetailDto {
   NumberOfPendingMatches?: number;
 }
 
-export interface GroupMatchDto {
-  Team1?: GroupTeamDtoResult;
-  Team2?: GroupTeamDtoResult;
-  /** @format date-time */
-  Date?: string | null;
-  Status?: MatchStatus | null;
-  ResultSet1?: GroupMatchResultDto | null;
-  ResultSet2?: GroupMatchResultDto | null;
-  ResultSet3?: GroupMatchResultDto | null;
+export interface StandingDto {
+  PlayerStandings?: PlayerStandingDto[];
 }
 
-export interface GroupTeamDtoResult {
-  Team?: GroupTeamDto;
-  IsWinner?: boolean;
-}
-
-export interface GroupTeamDto {
+export interface PlayerStandingDto {
   /** @format guid */
-  Id?: string;
-  Name?: string | null;
-  Player1?: GroupPlayer;
-  Player2?: GroupPlayer;
-}
-
-export interface GroupPlayer {
-  /** @format guid */
-  Id?: string;
-  FirstName?: string;
-  LastName?: string;
+  UserId?: string;
+  DisplayName?: string;
+  /** @format int32 */
+  Points?: number;
+  /** @format int32 */
+  WonMatches?: number;
+  /** @format int32 */
+  LostMatches?: number;
+  /** @format int32 */
+  PlayedMatches?: number;
 }
 
 export interface CreateChampionshipRequest {
@@ -429,6 +456,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
+     * @name PadelmastersApiDomainEndpointsUsersGetUser
+     * @request GET:/api/users/{userId}
+     * @secure
+     */
+    padelmastersApiDomainEndpointsUsersGetUser: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDetailDto, void>({
+        path: `/api/users/${userId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
      * @name PadelmastersApiDomainEndpointsMatchesEnrollChampionship
      * @request DELETE:/api/matches/{matchId}
      * @secure
@@ -469,23 +513,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
-     * @name PadelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint
-     * @request GET:/api/groups/{groupId}/standing
-     * @secure
-     */
-    padelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint: (groupId: string, params: RequestParams = {}) =>
-      this.request<StandingDto, void>({
-        path: `/api/groups/${groupId}/standing`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Api
      * @name PadelmastersApiDomainEndpointsGroupsGetGroup
      * @request GET:/api/groups/{groupId}
      * @secure
@@ -510,6 +537,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     padelmastersApiDomainEndpointsGroupsGetGroupMatches: (groupId: string, params: RequestParams = {}) =>
       this.request<GroupMatchDto[], void>({
         path: `/api/groups/${groupId}/matches`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsGroupsGetGroupStandings
+     * @request GET:/api/groups/{groupId}/standing
+     * @secure
+     */
+    padelmastersApiDomainEndpointsGroupsGetGroupStandings: (groupId: string, params: RequestParams = {}) =>
+      this.request<StandingDto, void>({
+        path: `/api/groups/${groupId}/standing`,
         method: "GET",
         secure: true,
         format: "json",
