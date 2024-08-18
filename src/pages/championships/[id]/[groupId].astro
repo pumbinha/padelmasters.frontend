@@ -138,7 +138,7 @@ try {
 			</div>
 		</div>
 		<div class="p-4">
-			<h3 class="mb-6 font-bold">Standings</h3>
+			<h3 class="mb-6 font-bold">{t(TranslationKey.StandingsTitle)}</h3>
 
 			<div class="mt-8 flow-root">
 				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -150,31 +150,35 @@ try {
 										scope="col"
 										class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
 									>
-										Name
+										<div>{t(TranslationKey.StandingsName)}</div>
 									</th>
 									<th
 										scope="col"
 										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
 									>
-										P
+										<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
 									</th>
 									<th
 										scope="col"
 										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
 									>
-										V
+										<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
 									</th>
 									<th
 										scope="col"
 										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
 									>
-										L
+										<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
 									</th>
 									<th
 										scope="col"
 										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
 									>
-										Pts
+										<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
 									</th>
 								</tr>
 							</thead>
@@ -183,83 +187,45 @@ try {
 									playerStandings.map((player, index) => (
 										<tr>
 											<td class="font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
-												<span class="inline-block">{player.DisplayName}</span>
+												<span class="inline-block align-middle">
+													{index + 1}.{player.DisplayName}
+												</span>
 												{index === 0 && (
 													<StarIcon
 														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-yellow-400  inline-block"
+														className="ml-auto h-4 w-4 text-yellow-400  inline-block align-middle"
 													/>
 												)}
 												{index === 1 && (
 													<StarIcon
 														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-gray-400 inline-block"
+														className="ml-auto h-4 w-4 text-gray-400 inline-block align-middle "
 													/>
 												)}
 
 												{index === 2 && (
 													<StarIcon
 														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-orange-700 inline-block"
+														className="ml-auto h-4 w-4 text-orange-700 inline-block align-middle"
 													/>
 												)}
 											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
 												{player.PlayedMatches}
 											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
 												{player.WonMatches}
 											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
 												{player.LostMatches}
 											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm font-semibold text-gray-500">
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
 												{player.Points}
 											</td>
 										</tr>
 									))
 								}
 							</tbody>
-							<!-- <tbody class="divide-y divide-gray-200">
-								{
-									playerData.map((player, index) => (
-										<tr>
-											<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-												<span class={`inline-block ${getStatusClass(index)}`}>{player.name}</span>
-												{/* {player.name} */}
-												{/* {index === 0 && (
-													<StarIcon
-														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-yellow-400  inline-block"
-													/>
-												)}
-												{index === 1 && (
-													<StarIcon
-														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-gray-400 inline-block"
-													/>
-												)}
-
-												{index === 2 && (
-													<StarIcon
-														aria-hidden="true"
-														className="ml-auto h-6 w-6 text-orange-700 inline-block"
-													/>
-												)} */}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
-												{player.sets}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
-												{player.victory}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right text-sm text-gray-500">
-												{player.lose}
-											</td>
-										</tr>
-									))
-								}
-							</tbody> -->
 						</table>
 					</div>
 				</div>
