@@ -1,0 +1,43 @@
+---
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
+
+const t = useTranslations(session);
+---
+
+<Layout title="Padel Masters League - Not Found">
+	<main class="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
+		<div class="flex h-full items-center justify-center py-36">
+			<div
+				class="flex h-96 w-full max-w-2xl items-center justify-evenly divide-x divide-gray-200 rounded-lg bg-white p-8"
+			>
+				<div class="divide-y divide-gray-200 bg-white text-center">
+					<div class="flex-8 flex flex-col p-12">
+						<h3 class="text-4xl font-bold">
+							{t(TranslationKey.PageNotFound)}
+						</h3>
+
+						<p class="mt-8 text-sm text-gray-700">
+							{t(TranslationKey.PageNotFoundText)}
+						</p>
+					</div>
+
+					<div
+						class="flex place-items-center content-stretch items-center justify-evenly divide-x divide-gray-200"
+					>
+						<a
+							class="group mt-10 inline-flex items-center justify-center rounded-full bg-vivid-700 px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-vivid-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vivid-900 active:bg-vivid-800 active:text-vivid-300"
+							color="slate"
+							href="/"
+						>
+							{t(TranslationKey.GoBackHome)}
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</Layout>

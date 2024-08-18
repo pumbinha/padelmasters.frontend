@@ -45,6 +45,9 @@ export enum TranslationKey {
 	StandingsPointLong = "Standings.Point.Long",
 	Salutation = "Salutation",
 	AccounSettings = "AccounSettings",
+	GoBackHome = "ActionGoBackHome",
+	PageNotFound = "PageNotFound",
+	PageNotFoundText = "PageNotFoundText",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -107,6 +110,9 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsStatusnull]: "",
 		[TranslationKey.ChampionshipsStatusundefined]: "",
 		[TranslationKey.SignOut]: "Sign out",
+		[TranslationKey.GoBackHome]: "Go back home",
+		[TranslationKey.PageNotFound]: "Page not found",
+		[TranslationKey.PageNotFoundText]: "Sorry, we couldn’t find the page you’re looking for.",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -154,5 +160,8 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsStatusnull]: "",
 		[TranslationKey.ChampionshipsStatusundefined]: "",
 		[TranslationKey.SignOut]: "Salir",
+		[TranslationKey.GoBackHome]: "Ir a la página principal",
+		[TranslationKey.PageNotFound]: "Página no encontrada",
+		[TranslationKey.PageNotFoundText]: "Lo sentimos, no pudimos encontrar la página que buscas.",
 	},
 };

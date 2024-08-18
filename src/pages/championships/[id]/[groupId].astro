@@ -64,26 +64,12 @@ try {
 			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
 		} else {
 			// 404
-			Astro.redirect("/group/not-found");
+			Astro.redirect("/not-found");
 		}
 	}
 } catch (e) {
 	console.error(e);
 }
-
-// const getStatusClass = (index: number) => {
-// 	switch (index) {
-// 		case 0:
-// 			return "underline decoration-yellow-400 decoration-2 underline-offset-4";
-// 		case 1:
-// 			return "underline decoration-gray-400 decoration-2 underline-offset-4";
-// 		case 2:
-// 			return "underline decoration-orange-700 decoration-2 underline-offset-4";
-
-// 		default:
-// 			return "";
-// 	}
-// };
 ---
 
 <Layout title=`Padel Masters - Group ${group.Name} `>
@@ -187,7 +173,11 @@ try {
 										<tr>
 											<td class="font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
 												<span class="inline-block align-middle">
-													{index + 1}. {player.DisplayName}
+													<a href={`/players/${player.UserId}`} class="hover: text-primary-800">
+														<span class="decoration-primary-500 decoration-solid decoration-2 underline-offset-2 hover:underline">
+															{index + 1}. {player.DisplayName}
+														</span>
+													</a>
 												</span>
 												{index === 0 && (
 													<StarIcon

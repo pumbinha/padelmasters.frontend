@@ -1,0 +1,114 @@
+---
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import type { GroupMatchDto, UserDto, UserStatisticsDto } from "@/services/api";
+import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+import { getSession } from "auth-astro/server";
+
+const { id } = Astro.params;
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let user: UserDto = {};
+
+let userStatistics: UserStatisticsDto = {};
+let userMatches: GroupMatchDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// optimize! get get the champ name in the grops endpoint
+	// ========= get championship
+	const userResponse = await api.api.padelmastersApiDomainEndpointsUsersGetUser(
+		id || "",
+		getRequestParams(session)
+	);
+
+	if (userResponse.ok) {
+		user = userResponse.data.User || {};
+		userStatistics = userResponse.data.UserStatistics || {};
+		userMatches = userResponse.data.UserMatches || [];
+	} else {
+		// 404
+		Astro.redirect("/championships/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
+---
+
+<Layout title=`Padel Masters - User ${id} `>
+	<div class="container mx-auto p-4">
+		<div class="rounded-md bg-vivid-500 p-2 text-primary-foreground">TEMP STYLE. Coming soon!</div>
+		<!-- User Info Section -->
+		<div class="mb-6 rounded-lg bg-white p-4 shadow">
+			<h2 class="mb-2 text-xl font-bold">Player</h2>
+			<p class="text-gray-700">Name: {user.FirstName} {user.LastName}</p>
+		</div>
+
+		<!-- User Statistics Section -->
+		<div class="mb-6 rounded-lg bg-white p-4 shadow">
+			<h2 class="mb-2 text-xl font-bold">Statistics</h2>
+			<div class="grid grid-cols-2 gap-4">
+				<div>
+					<p class="text-gray-700">Matches P: {userStatistics.MatchesPlayed}</p>
+					<p class="text-gray-700">Matches W: {userStatistics.MatchesWon}</p>
+					<p class="text-gray-700">Matches L: {userStatistics.MatchesLost}</p>
+				</div>
+				<div>
+					<p class="text-gray-700">Sets W: {userStatistics.SetsWon}</p>
+					<p class="text-gray-700">Sets L: {userStatistics.SetsLost}</p>
+					<p class="text-gray-700">Win WR: {userStatistics.WinRate}%</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- User Matches Section -->
+		<div class="rounded-lg bg-white p-4 shadow">
+			<h2 class="mb-2 text-xl font-bold">Recent Matches</h2>
+			{
+				userMatches.map((match) => (
+					<div class="mb-4 border-b pb-4">
+						<p class="text-gray-600">{getFormattedDate(match.Date || "", session)}</p>
+						<p class="font-semibold text-gray-800">
+							{match.Team1?.Team?.Name} vs {match.Team2?.Team?.Name}
+						</p>
+						<p class="text-gray-700">
+							Status: <span class="font-bold">{match.Status}</span>
+						</p>
+						<div class="mt-2 grid grid-cols-2 gap-4">
+							<div>
+								<p class="text-gray-700">
+									Set 1: {match.ResultSet1?.ResultTeam1} - {match.ResultSet1?.ResultTeam2}
+								</p>
+								<p class="text-gray-700">
+									Set 2: {match.ResultSet2?.ResultTeam1} - {match.ResultSet2?.ResultTeam2}
+								</p>
+								<p class="text-gray-700">
+									Set 3: {match.ResultSet3?.ResultTeam1} - {match.ResultSet3?.ResultTeam2}
+								</p>
+							</div>
+							<div>
+								<p
+									class={`font-bold text-gray-700 ${match.Team1?.IsWinner ? "text-green-500" : "text-red-500"}`}
+								>
+									{match.Team1?.Team?.Name} {match.Team1?.IsWinner ? "Won" : "Lost"}
+								</p>
+								<p
+									class={`font-bold text-gray-700 ${match.Team2?.IsWinner ? "text-green-500" : "text-red-500"}`}
+								>
+									{match.Team2?.Team?.Name} {match.Team2?.IsWinner ? "Won" : "Lost"}
+								</p>
+							</div>
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</Layout>
