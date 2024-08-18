@@ -55,11 +55,10 @@ try {
 
 	// ========= get standings
 	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
-		const standingsResponse =
-			await api.api.padelmastersApiDomainEndpointsGroupsCurrentStandingEndpoint(
-				groupId || "",
-				getRequestParams(session)
-			);
+		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
+			groupId || "",
+			getRequestParams(session)
+		);
 		if (standingsResponse.ok) {
 			playerStandings = standingsResponse.data.PlayerStandings || [];
 			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
