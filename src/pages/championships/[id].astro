@@ -11,15 +11,15 @@ import {
 	type ChampionshipUserProfileDto,
 	type GroupDto,
 } from "@/services/api";
-import { generateGroupDtosMock } from "@/services/mocks";
+
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-const t = useTranslations(Astro.url);
 
 const { id } = Astro.params;
 
 const session = await getSession(Astro.request);
+const t = useTranslations(session);
 
 const api = getApi();
 
@@ -42,8 +42,6 @@ try {
 		championship = championshipResponse.data.Championship?.Championship || {};
 		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 		groups = championshipResponse.data.Groups || [];
-
-		groups.push(...generateGroupDtosMock(15));
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
@@ -85,7 +83,7 @@ try {
 					<span
 						class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
 					>
-						{championship.Status}
+						{t(`Championships.Status.${championship.Status}`)}
 					</span>
 				</div>
 			</div>

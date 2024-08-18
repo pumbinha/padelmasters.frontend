@@ -7,11 +7,11 @@ import type { ChampionshipDto, GroupDetailDto, GroupDto, PlayerStandingDto } fro
 import { getApi, getRequestParams, orderPlayerStandingDtoByPts } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
 import { getSession } from "auth-astro/server";
-const t = useTranslations(Astro.url);
 
 const { id, groupId } = Astro.params;
 
 const session = await getSession(Astro.request);
+const t = useTranslations(session);
 
 const api = getApi();
 let championship: ChampionshipDto = {};

@@ -13,9 +13,9 @@ import {
 } from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-const t = useTranslations(Astro.url);
 
 const session = await getSession(Astro.request);
+const t = useTranslations(session);
 
 const api = getApi();
 
@@ -99,7 +99,7 @@ try {
 										<span
 											class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
 										>
-											{championship.Status}
+											{t(`Championships.Status.${championship.Status}`)}
 										</span>
 									</div>
 								</div>

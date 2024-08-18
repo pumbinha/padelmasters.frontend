@@ -6,9 +6,9 @@ import { isUserLoggedIn } from "@/services/utils";
 import { Image } from "astro:assets";
 import { getSession } from "auth-astro/server";
 
-const t = useTranslations(Astro.url);
-
 const session = await getSession(Astro.request);
+
+const t = useTranslations(session);
 
 const isLogged = await isUserLoggedIn(session);
 

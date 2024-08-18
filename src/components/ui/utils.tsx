@@ -19,9 +19,9 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 		case ChampionshipStatus.Created:
 			return "bg-gray-200 text-black-800";
 		case ChampionshipStatus.Open:
-			return "bg-blue-200 text-blue-800";
+			return "bg-orange-200 text-orange-800";
 		case ChampionshipStatus.Started:
-			return "bg-yellow-200 text-yellow-800";
+			return "bg-blue-200 text-blue-800";
 		case ChampionshipStatus.Cancelled:
 			return "bg-red-200 text-red-800";
 		case ChampionshipStatus.Finished:

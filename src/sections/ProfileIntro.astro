@@ -5,15 +5,11 @@ import { useTranslations } from "@/i18n/utils";
 import { Cog8ToothIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const session = await getSession(Astro.request);
-const t = useTranslations(Astro.url);
+
+const t = useTranslations(session);
 
 const redirectUri = Astro.url.origin + "/profile";
 const accountUrl = `${import.meta.env.KEYCLOAK_ISSUER}/account?referrer=padelmasters&redirect_uri=${redirectUri}`;
-//const redirectUri = `${baseUrl}/profile`;
-//const keycloakAccountUrl = `/realms/test/account?referrer=my-app&redirect_uri=${encodeURIComponent(redirectUri)}`;
-//console.log(accountUrl);
-
-console.log(redirectUri);
 ---
 
 <div class="flex h-full items-center justify-center py-36">
@@ -31,13 +27,13 @@ console.log(redirectUri);
 			>
 				<a
 					href={accountUrl}
-					class="rounded-md bg-neutral-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-800"
+					class="rounded-md bg-neutral-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-700"
 				>
 					<Cog8ToothIcon className="mr-4 inline-block h-6 w-6 text-primary-foreground" />
 					{t(TranslationKey.AccounSettings)}
 				</a>
 
-				<SignOutComponent client:load text={"Sign Out"} />
+				<SignOutComponent client:load text={t(TranslationKey.SignOut)} />
 			</div>
 		</div>
 	</div>

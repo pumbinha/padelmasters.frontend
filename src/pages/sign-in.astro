@@ -1,9 +1,11 @@
 ---
 import SignInComponent from "@/components/ui/SignIn.tsx";
 import { TranslationKey } from "@/i18n/ui";
+import { getSession } from "auth-astro/server";
 import { useTranslations } from "../i18n/utils";
 import Layout from "../layouts/Layout.astro";
-const t = useTranslations(Astro.url);
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
 ---
 
 <Layout title="Welcome to Padel Masters - Sign in">
