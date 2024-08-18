@@ -35,6 +35,8 @@ export enum TranslationKey {
 	StandingsVictoryLong = "Standings.Victory.Long",
 	StandingsLostLong = "Standings.Lose.Long",
 	StandingsPointLong = "Standings.Point.Long",
+	Salutation = "Salutation",
+	AccounSettings = "AccounSettings",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -86,6 +88,8 @@ export const ui: UI = {
 		[TranslationKey.StandingsVictoryLong]: "Victory",
 		[TranslationKey.StandingsLostLong]: "Lost",
 		[TranslationKey.StandingsPointLong]: "Points",
+		[TranslationKey.Salutation]: "Welcome",
+		[TranslationKey.AccounSettings]: "Settings",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -123,5 +127,7 @@ export const ui: UI = {
 		[TranslationKey.StandingsPlayedLong]: "",
 		[TranslationKey.StandingsVictoryLong]: "",
 		[TranslationKey.StandingsPointLong]: "",
+		[TranslationKey.Salutation]: "",
+		[TranslationKey.AccounSettings]: "",
 	},
 };

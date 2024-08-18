@@ -1,20 +1,42 @@
 ---
 import SignOutComponent from "@/components/ui/SignOut.tsx";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { Cog8ToothIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const session = await getSession(Astro.request);
+const t = useTranslations(Astro.url);
+
+const redirectUri = Astro.url.origin + "/profile";
+const accountUrl = `${import.meta.env.KEYCLOAK_ISSUER}/account?referrer=padelmasters&redirect_uri=${redirectUri}`;
+//const redirectUri = `${baseUrl}/profile`;
+//const keycloakAccountUrl = `/realms/test/account?referrer=my-app&redirect_uri=${encodeURIComponent(redirectUri)}`;
+//console.log(accountUrl);
+
+console.log(redirectUri);
 ---
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-background">
-	<div class="w-full max-w-md rounded-lg bg-card px-6 py-8 shadow-lg">
-		<div class="flex flex-col items-center space-y-6">
-			<div class="text-center">
-				<h1 class="text-2xl font-bold text-supporting-cyan-800">
-					Welcome, {session?.user?.name}!
-				</h1>
+<div class="flex h-full items-center justify-center py-36">
+	<div
+		class="flex h-96 w-full max-w-2xl items-center justify-evenly divide-x divide-gray-200 rounded-lg bg-white p-8 shadow-lg"
+	>
+		<div class="divide-y divide-gray-200 rounded-lg bg-white text-center shadow">
+			<div class="flex-8 flex flex-col p-12">
+				<UserCircleIcon className="h-14 w-14 self-center text-gray-400" />
+				<h3 class="mt-6 text-base font-bold text-gray-900">{session?.user?.name}</h3>
 			</div>
 
-			<div class="grid w-full grid-cols-2 gap-4"></div>
-			<div class="flex items-center space-x-4">
+			<div
+				class="flex place-items-center content-stretch items-center justify-evenly divide-x divide-gray-200"
+			>
+				<a
+					href={accountUrl}
+					class="rounded-md bg-neutral-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-800"
+				>
+					<Cog8ToothIcon className="mr-4 inline-block h-6 w-6 text-primary-foreground" />
+					{t(TranslationKey.AccounSettings)}
+				</a>
+
 				<SignOutComponent client:load text={"Sign Out"} />
 			</div>
 		</div>
