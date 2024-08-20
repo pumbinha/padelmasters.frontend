@@ -73,3 +73,17 @@ export const orderPlayerStandingDtoByPts = (
 				(a.LostMatches ?? 0) - (a.LostMatches ?? 0)
 		);
 };
+
+export async function parseFormData<T extends object>(request: Request): Promise<Partial<T>> {
+	const formData = await request.formData();
+	console.log(formData);
+
+	const data: Partial<T> = {};
+
+	formData.forEach((value, key) => {
+		// Directly assign values to the data object
+		(data as any)[key as keyof T] = value.toString();
+	});
+
+	return data;
+}

@@ -1,11 +1,16 @@
 import type { Session } from "@auth/core/types";
 import { ui, defaultLang, type SupportedLanguages, TranslationKey } from "./ui";
 
-const getDefaultLang = (session: Session | null): SupportedLanguages => {
-	if (session && session.locale && session.locale in ui) {
-		return session.locale as SupportedLanguages;
+export const getDefaultLang = (session: Session | null): SupportedLanguages => {
+	const isSupportedLanguage = (locale: string): locale is SupportedLanguages => {
+		return locale in ui;
+	};
+
+	if (session && session.locale && isSupportedLanguage(session.locale)) {
+		return session.locale;
 	}
-	return defaultLang;
+
+	return defaultLang; // This should be a constant of type `SupportedLanguages`, e.g., 'en'
 };
 
 export const useTranslations = (session: Session | null) => {

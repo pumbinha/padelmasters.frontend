@@ -18,6 +18,7 @@ let championship: ChampionshipDto = {};
 let group: GroupDto = {};
 let groupDetail: GroupDetailDto = {};
 let playerStandings: PlayerStandingDto[] = [];
+let matches: any[] = [];
 
 try {
 	if (!id) {
@@ -39,7 +40,7 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 
-	// ========= get groups
+	// ========= get group
 	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
 		groupId || "",
 		getRequestParams(session)
@@ -67,12 +68,27 @@ try {
 			Astro.redirect("/not-found");
 		}
 	}
+
+	// ========= get matches
+	// if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+	// 	const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
+	// 		groupId || "",
+	// 		getRequestParams(session)
+	// 	);
+	// 	if (standingsResponse.ok) {
+	// 		playerStandings = standingsResponse.data.PlayerStandings || [];
+	// 		playerStandings = orderPlayerStandingDtoByPts(playerStandings);
+	// 	} else {
+	// 		// 404
+	// 		Astro.redirect("/not-found");
+	// 	}
+	// }
 } catch (e) {
 	console.error(e);
 }
 ---
 
-<Layout title=`Padel Masters - Group ${group.Name} `>
+<Layout title=`Group ${group.Name} `>
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
 		<div class="overflow-hidden rounded-lg bg-background shadow-md">
 			<div class="px-4">

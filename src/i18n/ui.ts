@@ -48,6 +48,14 @@ export enum TranslationKey {
 	GoBackHome = "ActionGoBackHome",
 	PageNotFound = "PageNotFound",
 	PageNotFoundText = "PageNotFoundText",
+	ProfileFirstName = "Profile.FirstName",
+	ProfileLastName = "Profile.LastName",
+	ProfileSelectALocale = "SelectALocale",
+	Cancel = "Cancel",
+	Save = "Save",
+	ProfileTitleEdit = "Profile.Title.Edit",
+	ProfileEmailAddress = "Profile.EmailAddress",
+	ProfileUsername = "Profile.Username",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -55,11 +63,11 @@ export enum TranslationKey {
 export type SupportedLanguages = "en" | "es";
 export const defaultLang: SupportedLanguages = "en";
 
-type Translations = {
+export type Translations = {
 	[key in TranslationKey]: string;
 };
 
-type UI = {
+export type UI = {
 	[lang in SupportedLanguages]: Translations;
 };
 
@@ -113,6 +121,14 @@ export const ui: UI = {
 		[TranslationKey.GoBackHome]: "Go back home",
 		[TranslationKey.PageNotFound]: "Page not found",
 		[TranslationKey.PageNotFoundText]: "Sorry, we couldn’t find the page you’re looking for.",
+		[TranslationKey.ProfileFirstName]: "First name",
+		[TranslationKey.ProfileLastName]: "Last name",
+		[TranslationKey.ProfileSelectALocale]: "Select a locale",
+		[TranslationKey.Cancel]: "Cancel",
+		[TranslationKey.Save]: "Save",
+		[TranslationKey.ProfileTitleEdit]: "Edit Profile",
+		[TranslationKey.ProfileEmailAddress]: "Email address",
+		[TranslationKey.ProfileUsername]: "Username",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -122,7 +138,7 @@ export const ui: UI = {
 		[TranslationKey.NavProfile]: "Perfil",
 		[TranslationKey.NavMatches]: "Partidos",
 		[TranslationKey.WelcomeTitle]: "Bienvenido a Padel Master",
-		[TranslationKey.SignInTitle]: "Entrar",
+		[TranslationKey.SignInTitle]: "Entrar en tu cuenta",
 		[TranslationKey.WelcomeJoin]: "Apúntate a la Liga",
 		[TranslationKey.ChampionshipsTitle]: "Campeonatos",
 		[TranslationKey.ChampionshipsName]: "Nombre",
@@ -163,5 +179,13 @@ export const ui: UI = {
 		[TranslationKey.GoBackHome]: "Ir a la página principal",
 		[TranslationKey.PageNotFound]: "Página no encontrada",
 		[TranslationKey.PageNotFoundText]: "Lo sentimos, no pudimos encontrar la página que buscas.",
+		[TranslationKey.ProfileFirstName]: "Nombre",
+		[TranslationKey.ProfileLastName]: "Apellidos",
+		[TranslationKey.ProfileSelectALocale]: "Idioma",
+		[TranslationKey.Cancel]: "Cancelar",
+		[TranslationKey.Save]: "Guardar",
+		[TranslationKey.ProfileTitleEdit]: "Editar Perfil",
+		[TranslationKey.ProfileEmailAddress]: "Correo electrónico",
+		[TranslationKey.ProfileUsername]: "Nombre de usuario",
 	},
 };

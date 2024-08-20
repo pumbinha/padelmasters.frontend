@@ -1,0 +1,271 @@
+---
+import { TranslationKey } from "@/i18n/ui";
+
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import { parseFormData } from "@/services/utils";
+
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
+
+const t = useTranslations(session);
+const issuerUrl = import.meta.env.KEYCLOAK_ISSUER;
+const accountUrl = `${issuerUrl}/account`;
+
+const errors = { firstName: "", lastName: "", username: "" };
+interface EditFormData {
+	firstName: string;
+	lastName: string;
+	username: string;
+	email: string;
+	locale: string;
+}
+
+let firstName: string = "";
+let lastName: string = "";
+let email: string = "";
+let username: string = "";
+let locale: string = "";
+let locales: string[] = [];
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await parseFormData<EditFormData>(Astro.request);
+		console.log(formData);
+		// Assign parsed data to your variables
+		firstName = formData["firstName"] || "";
+		lastName = formData["lastName"] || "";
+		email = formData.email || "";
+		username = formData.username || "";
+		locale = formData.locale || "";
+
+		// validation
+		if (typeof firstName !== "string" || firstName.length < 1) {
+			errors.firstName += "Please enter a firstName. ";
+		}
+
+		if (typeof lastName !== "string" || lastName.length < 1) {
+			errors.lastName += "Please enter a lastName. ";
+		}
+
+		if (typeof username !== "string" || username.length < 1) {
+			errors.username += "Please enter a username. ";
+		}
+		const hasErrors = Object.values(errors).some((msg) => msg);
+
+		const localeUrl = `${issuerUrl}/account/supportedLocales`;
+
+		try {
+			const response = await fetch(`${localeUrl}`, {
+				method: "get",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${session?.access_token}`,
+				},
+			});
+
+			await response.json().then((data) => {
+				locales = data;
+			});
+		} catch (e) {
+			console.log(e);
+		}
+
+		// SEND DATA TO KEYCLOACK
+
+		//has errors, show tooltip
+
+		const data = {
+			firstName: firstName,
+			lastName: lastName,
+			username: username,
+			email: email,
+			attributes: {
+				locale: [locale],
+			},
+		};
+		try {
+			const response = await fetch(`${accountUrl}`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${session?.access_token}`,
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (response.ok) {
+				Astro.redirect("/profile");
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message);
+		}
+	}
+} else if (Astro.request.method === "GET") {
+	//Fetch user data
+
+	if (!session) {
+		Astro.redirect("/sign-in");
+	}
+
+	try {
+		const response = await fetch(`${accountUrl}`, {
+			method: "get",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${session?.access_token}`,
+			},
+		});
+
+		await response.json().then((data) => {
+			firstName = data.firstName;
+			lastName = data.lastName;
+			email = data.email;
+			username = data.username;
+			locale = data.attributes.locale[0];
+		});
+	} catch (e) {
+		console.log(e);
+	}
+
+	const localeUrl = `${issuerUrl}/account/supportedLocales`;
+
+	try {
+		const response = await fetch(`${localeUrl}`, {
+			method: "get",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${session?.access_token}`,
+			},
+		});
+
+		await response.json().then((data) => {
+			locales = data;
+		});
+	} catch (e) {
+		console.log(e);
+	}
+}
+---
+
+<Layout title="Profile Edit">
+	<div class="flex h-full items-center justify-center py-36">
+		<form method="POST">
+			<div class="space-y-12">
+				<div class="border-b border-gray-900/10 pb-12">
+					<h2 class="text-base font-semibold leading-7 text-gray-900">
+						{t(TranslationKey.ProfileTitleEdit)}
+					</h2>
+
+					<div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+						<div class="sm:col-span-3">
+							<label class="block text-sm font-medium leading-6 text-gray-900"
+								>{t(TranslationKey.ProfileFirstName)}
+							</label>
+							<div class="mt-2">
+								<input
+									required
+									id="firstName"
+									name="firstName"
+									type="text"
+									class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									value={firstName}
+								/>
+							</div>
+						</div>
+
+						<div class="sm:col-span-3">
+							<label class="block text-sm font-medium leading-6 text-gray-900"
+								>{t(TranslationKey.ProfileLastName)}
+							</label>
+							<div class="mt-2">
+								<input
+									required
+									id="lastName"
+									name="lastName"
+									type="text"
+									class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									value={lastName}
+								/>
+							</div>
+						</div>
+						<div class="sm:col-span-4">
+							<label class="block text-sm font-medium leading-6 text-gray-900">
+								{t(TranslationKey.ProfileUsername)}
+							</label>
+							<div class="mt-2">
+								<input
+									readonly
+									id="username"
+									name="username"
+									type="text"
+									class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									value={username}
+								/>
+							</div>
+						</div>
+
+						<div class="sm:col-span-4">
+							<label class="block text-sm font-medium leading-6 text-gray-900">
+								{t(TranslationKey.ProfileEmailAddress)}
+							</label>
+							<div class="mt-2">
+								<input
+									readonly
+									id="email"
+									name="email"
+									type="email"
+									class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+									value={email}
+								/>
+							</div>
+						</div>
+
+						<div class="sm:col-span-3">
+							<label class="block text-sm font-medium leading-6 text-gray-900">
+								{t(TranslationKey.ProfileSelectALocale)}
+							</label>
+							<div class="mt-2">
+								<select
+									id="locale"
+									name="locale"
+									class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:max-w-xs sm:text-sm sm:leading-6"
+								>
+									{
+										locales.map((element: string) => {
+											return (
+												<option value={element} selected={element === locale}>
+													{element.toUpperCase()}
+												</option>
+											);
+										})
+									}
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="mt-6 flex items-center justify-end gap-x-6">
+				<button
+					type="button"
+					class="text-sm font-semibold leading-6 text-neutral-800"
+					onclick="window.location='/profile'"
+				>
+					{t(TranslationKey.Cancel)}
+				</button>
+				<button
+					type="submit"
+					class="rounded-md bg-primary-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+				>
+					{t(TranslationKey.Save)}
+				</button>
+			</div>
+		</form>
+	</div>
+</Layout>

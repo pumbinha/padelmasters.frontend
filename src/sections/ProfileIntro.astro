@@ -8,9 +8,6 @@ const session = await getSession(Astro.request);
 
 const t = useTranslations(session);
 
-const redirectUri = Astro.url.origin + "/profile";
-const accountUrl = `${import.meta.env.KEYCLOAK_ISSUER}/account?referrer=padelmasters&redirect_uri=${redirectUri}`;
-
 // https://tailwindui.com/components/application-ui/page-examples/settings-screens
 ---
 
@@ -28,7 +25,7 @@ const accountUrl = `${import.meta.env.KEYCLOAK_ISSUER}/account?referrer=padelmas
 				class="flex place-items-center content-stretch items-center justify-evenly divide-x divide-gray-200"
 			>
 				<a
-					href={accountUrl}
+					href="/profile/edit"
 					class="rounded-md bg-neutral-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-700"
 				>
 					<Cog8ToothIcon className="mr-4 inline-block h-6 w-6 text-primary-foreground" />
