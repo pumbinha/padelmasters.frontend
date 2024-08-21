@@ -38,6 +38,13 @@ export const getStandingRowClass = (
 	numberOfFinalists?: number
 ) => {
 	if (groupType === 1) {
-		return index < (numberOfFinalists || 0) ? "bg-supporting-red-100" : "bg-white";
-	} else throw new Error("Not implemented yet");
+		return index < (numberOfFinalists || 0)
+			? `bg-supporting-red-100 ${getSelectedItemHoverClass()}`
+			: `bg-white ${getSelectedItemHoverClass()}`;
+	}
+	return "";
+};
+
+export const getSelectedItemHoverClass = () => {
+	return "hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-700";
 };
