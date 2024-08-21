@@ -27,6 +27,8 @@ let championship: ChampionshipDto = {};
 let userProfile: ChampionshipUserProfileDto = {};
 let groups: GroupDto[] = [];
 
+const type: number = 1;
+
 try {
 	if (!id) {
 		Astro.redirect("/championships/not-found");

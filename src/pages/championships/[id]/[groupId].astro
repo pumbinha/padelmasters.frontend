@@ -1,5 +1,6 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
+import { getStandingRowClass } from "@/components/ui/utils";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
@@ -73,6 +74,9 @@ try {
 } catch (e) {
 	console.error(e);
 }
+
+// to be replaced with grouptype
+const groupType: number = 1;
 ---
 
 <Layout title=`Group ${group.Name} `>
@@ -173,10 +177,10 @@ try {
 							<tbody class="divide-y">
 								{
 									playerStandings.map((player, index) => (
-										<tr
-											class={` ${index < (groupDetail.NumberOfFinalists || 0) ? "border-l-4 border-l-supporting-red-300" : "border-4 border-l-white"}`}
-										>
-											<td class="font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
+										<tr>
+											<td
+												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0 ${getStandingRowClass(groupType, index, groupDetail.NumberOfFinalists)}`}
+											>
 												<span class="inline-block align-middle">
 													<a href={`/players/${player.UserId}`} class="hover: text-primary-800">
 														<span class="decoration-primary-500 decoration-solid decoration-2 underline-offset-2 hover:underline">

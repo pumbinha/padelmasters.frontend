@@ -22,7 +22,7 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 			return "bg-orange-200 text-orange-800";
 		case ChampionshipStatus.Started:
 			return "bg-green-200 text-green-800";
-			
+
 		case ChampionshipStatus.Cancelled:
 			return "bg-red-200 text-red-800";
 		case ChampionshipStatus.Finished:
@@ -30,4 +30,16 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 		default:
 			return "";
 	}
+};
+
+export const getStandingRowClass = (
+	groupType: number,
+	index: number,
+	numberOfFinalists?: number
+) => {
+	if (groupType === 1) {
+		return index < (numberOfFinalists || 0)
+			? "border-l-8 border-l-supporting-red-300"
+			: "border-l-8 border-l-white";
+	} else throw new Error("Not implemented yet");
 };
