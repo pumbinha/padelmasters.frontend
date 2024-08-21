@@ -94,6 +94,7 @@ export interface GetGroupResponse {
 export interface GroupInformationDto {
   Group?: GroupDto;
   GroupDetail?: GroupDetailDto;
+  Championship?: ChampionshipDto;
 }
 
 export interface GroupDto {
@@ -112,6 +113,21 @@ export interface GroupDetailDto {
   NumberOfPlayedMatches?: number;
   /** @format int32 */
   NumberOfPendingMatches?: number;
+  /** @format int32 */
+  NumberOfFinalists?: number;
+}
+
+export interface ChampionshipDto {
+  /** @format guid */
+  Id?: string;
+  Name?: string;
+  Description?: string | null;
+  /** @format date-time */
+  StartDate?: string;
+  /** @format date-time */
+  EndDate?: string;
+  Status?: ChampionshipStatus | null;
+  Type?: ChampionshipType | null;
 }
 
 export interface StandingDto {
@@ -165,19 +181,6 @@ export interface ChampionshipInformationDto {
   UserProfile?: ChampionshipUserProfileDto;
 }
 
-export interface ChampionshipDto {
-  /** @format guid */
-  Id?: string;
-  Name?: string;
-  Description?: string | null;
-  /** @format date-time */
-  StartDate?: string;
-  /** @format date-time */
-  EndDate?: string;
-  Status?: ChampionshipStatus | null;
-  Type?: ChampionshipType | null;
-}
-
 export interface ChampionshipDetailDto {
   /** @format int32 */
   NumberEnrolledPlayers?: number;
@@ -213,6 +216,14 @@ export enum MatchStatus {
   Cancelled = "Cancelled",
 }
 
+export enum ChampionshipStatus {
+  Created = "Created",
+  Open = "Open",
+  Started = "Started",
+  Cancelled = "Cancelled",
+  Finished = "Finished",
+}
+
 export enum ChampionshipType {
   AmericanoLeague = "AmericanoLeague",
 }
@@ -225,14 +236,6 @@ export enum ChampionshipConfigurationKey {
   PointsPerWin = "PointsPerWin",
   PointsPerDraw = "PointsPerDraw",
   PointsPerLoss = "PointsPerLoss",
-}
-
-export enum ChampionshipStatus {
-  Created = "Created",
-  Open = "Open",
-  Started = "Started",
-  Cancelled = "Cancelled",
-  Finished = "Finished",
 }
 
 export type QueryParamsType = Record<string | number, any>;

@@ -14,29 +14,15 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
-let championship: ChampionshipDto = {};
+
 let group: GroupDto = {};
+let championship: ChampionshipDto = {};
 let groupDetail: GroupDetailDto = {};
 let playerStandings: PlayerStandingDto[] = [];
 let matches: any[] = [];
 
 try {
 	if (!id) {
-		Astro.redirect("/championships/not-found");
-	}
-
-	// optimize! get get the champ name in the grops endpoint
-	// ========= get championship
-	const championshipResponse =
-		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
-			id || "",
-			getRequestParams(session)
-		);
-
-	if (championshipResponse.ok) {
-		championship = championshipResponse.data.Championship?.Championship || {};
-	} else {
-		// 404
 		Astro.redirect("/championships/not-found");
 	}
 
@@ -48,6 +34,7 @@ try {
 
 	if (groupResponse.ok) {
 		group = groupResponse.data.Group?.Group || {};
+		championship = groupResponse.data.Group?.Championship || {};
 		groupDetail = groupResponse.data.Group?.GroupDetail || {};
 	} else {
 		// 404
@@ -183,10 +170,12 @@ try {
 									</th>
 								</tr>
 							</thead>
-							<tbody class="divide-y divide-gray-200">
+							<tbody class="divide-y">
 								{
 									playerStandings.map((player, index) => (
-										<tr>
+										<tr
+											class={` ${index < (groupDetail.NumberOfFinalists || 0) ? "border-l-4 border-l-supporting-red-300" : "border-4 border-l-white"}`}
+										>
 											<td class="font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
 												<span class="inline-block align-middle">
 													<a href={`/players/${player.UserId}`} class="hover: text-primary-800">
