@@ -11,7 +11,7 @@ import {
 	getRequestParams,
 	orderChampionshipDtoByDate,
 } from "@/services/utils";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const session = await getSession(Astro.request);
@@ -78,9 +78,9 @@ try {
 									<div class="mb-2 flex items-center">
 										<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
 										{championship.UserIsRegistered && (
-											<UserIcon
+											<UserCircleIcon
 												aria-hidden="true"
-												className="ml-auto h-6 w-6 text-supporting-cyan-600"
+												className="ml-auto h-8 w-8 text-primary-600"
 											/>
 										)}
 									</div>

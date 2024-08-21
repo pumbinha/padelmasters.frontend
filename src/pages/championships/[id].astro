@@ -13,7 +13,7 @@ import {
 } from "@/services/api";
 
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -64,7 +64,7 @@ try {
 					</h2>
 					{
 						userProfile.UserIsRegistered && (
-							<UserIcon aria-hidden="true" className="ml-auto h-6 w-6 text-supporting-cyan-600" />
+							<UserCircleIcon aria-hidden="true" className="ml-auto h-8 w-8 text-primary-600" />
 						)
 					}
 				</div>
