@@ -38,8 +38,6 @@ export const getStandingRowClass = (
 	numberOfFinalists?: number
 ) => {
 	if (groupType === 1) {
-		return index < (numberOfFinalists || 0)
-			? "border-l-8 border-l-supporting-red-300"
-			: "border-l-8 border-l-white";
+		return index < (numberOfFinalists || 0) ? "bg-supporting-red-100" : "bg-white";
 	} else throw new Error("Not implemented yet");
 };
