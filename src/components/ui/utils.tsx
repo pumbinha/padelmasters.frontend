@@ -1,4 +1,4 @@
-import { ChampionshipStatus } from "@/services/api";
+import { ChampionshipStatus, type GroupMatchResultDto } from "@/services/api";
 import type { NavigationLink } from "./types";
 
 export const setLinkActive = (
@@ -47,4 +47,24 @@ export const getStandingRowClass = (
 
 export const getSelectedItemHoverClass = () => {
 	return "hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-700";
+};
+
+export const getWinnerLoserSetClass = (
+	team: number,
+	resultSet: GroupMatchResultDto | null | undefined
+) => {
+	const loserSet = "whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-neutral-400";
+
+	if (!resultSet) return loserSet;
+
+	const winnerSet =
+		"whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-neutral-600 font-semibold";
+
+	if (team === 1 && (resultSet?.ResultTeam1 ?? 0) > (resultSet?.ResultTeam2 ?? 0)) {
+		return winnerSet;
+	} else if (team === 2 && (resultSet?.ResultTeam2 ?? 0) > (resultSet?.ResultTeam1 ?? 0)) {
+		return winnerSet;
+	}
+
+	return loserSet;
 };

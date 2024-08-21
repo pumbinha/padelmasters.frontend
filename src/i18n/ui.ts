@@ -56,6 +56,7 @@ export enum TranslationKey {
 	ProfileTitleEdit = "Profile.Title.Edit",
 	ProfileEmailAddress = "Profile.EmailAddress",
 	ProfileUsername = "Profile.Username",
+	MatchesTitle = "Matches.Title",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -129,6 +130,7 @@ export const ui: UI = {
 		[TranslationKey.ProfileTitleEdit]: "Edit Profile",
 		[TranslationKey.ProfileEmailAddress]: "Email address",
 		[TranslationKey.ProfileUsername]: "Username",
+		[TranslationKey.MatchesTitle]: "Matches",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -187,5 +189,6 @@ export const ui: UI = {
 		[TranslationKey.ProfileTitleEdit]: "Editar Perfil",
 		[TranslationKey.ProfileEmailAddress]: "Correo electrónico",
 		[TranslationKey.ProfileUsername]: "Nombre de usuario",
+		[TranslationKey.MatchesTitle]: "Partidos",
 	},
 };
