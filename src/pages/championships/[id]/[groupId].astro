@@ -1,10 +1,12 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
+import Tabs from "@/components/ui/Tabs";
 import { getStandingRowClass, getWinnerLoserSetClass } from "@/components/ui/utils";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import {
+	GroupType,
 	MatchStatus,
 	type ChampionshipDto,
 	type GroupDetailDto,
@@ -12,8 +14,10 @@ import {
 	type GroupMatchDto,
 	type PlayerStandingDto,
 } from "@/services/api";
+import { generateGroupMatchDto } from "@/services/mocks";
 import { getApi, getRequestParams, orderPlayerStandingDtoByPts } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
+import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id, groupId } = Astro.params;
@@ -72,7 +76,7 @@ try {
 		);
 		if (standingsResponse.ok) {
 			matches = standingsResponse.data || [];
-			console.log(matches);
+			console.log(generateGroupMatchDto(15));
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -82,8 +86,10 @@ try {
 	console.error(e);
 }
 
-// to be replaced with grouptype
-const groupType: number = 1;
+const tabData = [
+	{ name: t(TranslationKey.MatchesTitle), icon: CalendarDaysIcon, current: true },
+	{ name: t(TranslationKey.StandingsTitle), icon: ChartBarIcon, current: false },
+];
 ---
 
 <Layout title=`Group ${group.Name} `>
@@ -136,96 +142,102 @@ const groupType: number = 1;
 				</div>
 			</div>
 		</div>
-		<div class="p-4">
-			<!-- <h3 class="mb-6 font-bold">{t(TranslationKey.StandingsTitle)}</h3> -->
-			<h3 class="font-semibold">{t(TranslationKey.MatchesTitle)}</h3>
 
+		<div class="border-b border-gray-200">
+			<Tabs tabs={tabData} client:load />
+		</div>
+
+		<div class="p-4">
 			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
-				{
-					matches.map((match) => (
-						<div class="py-4">
-							<div>
+				<div id="tab-0">
+					{
+						matches.map((match) => (
+							<div class="py-4">
 								<div>
-									<span class="text-xs font-light text-neutral-400">
-										{match.Date || new Date().toLocaleString()}
-									</span>
-									<span
-										class={`float-right rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
-									>
-										{match.Status}
-									</span>
+									<div>
+										<span
+											class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
+										>
+											{match.Status}
+										</span>
+										<span class="ml-4 text-xs font-light text-neutral-500">
+											{match.Date || new Date().toLocaleString()}
+										</span>
+									</div>
+								</div>
+								<div>
+									<table class="min-w-full">
+										<thead>
+											<tr>
+												<th
+													scope="col"
+													class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
+												/>
+												<th />
+												<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
+												<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
+												<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td
+													class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+												>
+													{match.Team1?.Team?.Player1?.FirstName}{" "}
+													{match.Team1?.Team?.Player1?.LastName}
+													<br />
+													{match.Team1?.Team?.Player2?.FirstName}{" "}
+													{match.Team1?.Team?.Player2?.LastName}
+												</td>
+												<td>
+													<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
+												</td>
+												<td class={`${getWinnerLoserSetClass(1, match.ResultSet1)} border-b-2`}>
+													{match.ResultSet1 ? match.ResultSet1.ResultTeam1 : ""}
+												</td>
+												<td class={`${getWinnerLoserSetClass(1, match.ResultSet2)} border-b-2`}>
+													{match.ResultSet2 ? match.ResultSet2.ResultTeam1 : ""}
+												</td>
+												<td class={`${getWinnerLoserSetClass(1, match.ResultSet3)} border-b-2`}>
+													{match.ResultSet3 ? match.ResultSet3.ResultTeam1 : ""}
+												</td>
+											</tr>
+											<tr>
+												<td
+													class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900"}`}
+												>
+													{match.Team2?.Team?.Player1?.FirstName}{" "}
+													{match.Team2?.Team?.Player1?.LastName}
+													<br />
+													{match.Team2?.Team?.Player2?.FirstName}{" "}
+													{match.Team2?.Team?.Player2?.LastName}
+												</td>
+												<td>
+													<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
+												</td>
+												<td class={`${getWinnerLoserSetClass(2, match.ResultSet1)}`}>
+													{match.ResultSet1 ? match.ResultSet1.ResultTeam2 : ""}
+												</td>
+												<td class={`${getWinnerLoserSetClass(2, match.ResultSet2)}`}>
+													{match.ResultSet2 ? match.ResultSet2.ResultTeam2 : ""}
+												</td>
+												<td class={` ${getWinnerLoserSetClass(2, match.ResultSet3)}`}>
+													{match.ResultSet3 ? match.ResultSet3.ResultTeam2 : ""}
+												</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
 							</div>
-							<div>
-								<table class="min-w-full">
-									<thead>
-										<tr>
-											<th
-												scope="col"
-												class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
-											/>
-											<th />
-											<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-											<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-											<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td
-												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
-											>
-												{match.Team1?.Team?.Player1?.FirstName}{" "}
-												{match.Team1?.Team?.Player1?.LastName}
-												<br />
-												{match.Team1?.Team?.Player2?.FirstName}{" "}
-												{match.Team1?.Team?.Player2?.LastName}
-											</td>
-											<td>
-												<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
-											</td>
-											<td class={`${getWinnerLoserSetClass(1, match.ResultSet1)}`}>
-												{match.ResultSet1 ? match.ResultSet1.ResultTeam1 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(1, match.ResultSet2)}`}>
-												{match.ResultSet2 ? match.ResultSet2.ResultTeam1 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(1, match.ResultSet3)}`}>
-												{match.ResultSet3 ? match.ResultSet3.ResultTeam1 : ""}
-											</td>
-										</tr>
-										<tr>
-											<td
-												class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900"}`}
-											>
-												{match.Team2?.Team?.Player1?.FirstName}{" "}
-												{match.Team2?.Team?.Player1?.LastName}
-												<br />
-												{match.Team2?.Team?.Player2?.FirstName}{" "}
-												{match.Team2?.Team?.Player2?.LastName}
-											</td>
-											<td>
-												<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
-											</td>
-											<td class={`${getWinnerLoserSetClass(2, match.ResultSet1)}`}>
-												{match.ResultSet1 ? match.ResultSet1.ResultTeam2 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(2, match.ResultSet2)}`}>
-												{match.ResultSet2 ? match.ResultSet2.ResultTeam2 : ""}
-											</td>
-											<td class={` ${getWinnerLoserSetClass(2, match.ResultSet3)}`}>
-												{match.ResultSet3 ? match.ResultSet3.ResultTeam2 : ""}
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					))
-				}
-
-				<!-- <div class="mt-8 flow-root">
-				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+						))
+					}
+				</div>
+				<div
+					id="tab-1"
+					style="display: none;"
+					class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"
+				>
 					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
 						<table class="min-w-full divide-y divide-gray-300">
 							<thead>
@@ -270,7 +282,7 @@ const groupType: number = 1;
 								{
 									playerStandings.map((player, index) => (
 										<tr
-											class={`${getStandingRowClass(groupType, index, groupDetail.NumberOfFinalists)}`}
+											class={`${getStandingRowClass(group.GroupType || GroupType.League, index, groupDetail.NumberOfFinalists)}`}
 										>
 											<td
 												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
@@ -282,7 +294,7 @@ const groupType: number = 1;
 														</span>
 													</a>
 												</span>
-												{groupType === 2 &&
+												{(group.GroupType || GroupType.League) === GroupType.Americano &&
 													((index === 0 && (
 														<StarIcon
 															aria-hidden="true"
@@ -321,8 +333,23 @@ const groupType: number = 1;
 						</table>
 					</div>
 				</div>
-			</div> -->
 			</div>
 		</div>
-	</section></Layout
->
+	</section>
+</Layout>
+
+<script>
+	import { activeTab } from "@/stores/groupsTabsStore";
+
+	// Listen to changes in the store, and show/hide the dialog accordingly
+	activeTab.subscribe((index) => {
+		console.log(index);
+		if (index === 0) {
+			document.getElementById("tab-0").style.display = "block";
+			document.getElementById("tab-1").style.display = "none";
+		} else {
+			document.getElementById("tab-1").style.display = "block";
+			document.getElementById("tab-0").style.display = "none";
+		}
+	});
+</script>

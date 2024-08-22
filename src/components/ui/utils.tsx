@@ -1,4 +1,4 @@
-import { ChampionshipStatus, type GroupMatchResultDto } from "@/services/api";
+import { ChampionshipStatus, GroupType, type GroupMatchResultDto } from "@/services/api";
 import type { NavigationLink } from "./types";
 
 export const setLinkActive = (
@@ -33,11 +33,11 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 };
 
 export const getStandingRowClass = (
-	groupType: number,
+	groupType: GroupType,
 	index: number,
 	numberOfFinalists?: number
 ) => {
-	if (groupType === 1) {
+	if (groupType === GroupType.League) {
 		return index < (numberOfFinalists || 0)
 			? `bg-supporting-red-100 ${getSelectedItemHoverClass()}`
 			: `bg-white ${getSelectedItemHoverClass()}`;
@@ -53,12 +53,12 @@ export const getWinnerLoserSetClass = (
 	team: number,
 	resultSet: GroupMatchResultDto | null | undefined
 ) => {
-	const loserSet = "whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-neutral-400";
+	const loserSet = "whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-neutral-400 ";
 
 	if (!resultSet) return loserSet;
 
 	const winnerSet =
-		"whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-neutral-600 font-semibold";
+		"whitespace-nowrap px-2 py-4 text-right align-middle text-sm text-primary-400 font-bold";
 
 	if (team === 1 && (resultSet?.ResultTeam1 ?? 0) > (resultSet?.ResultTeam2 ?? 0)) {
 		return winnerSet;

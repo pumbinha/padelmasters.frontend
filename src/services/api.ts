@@ -46,10 +46,16 @@ export interface GroupMatchDto {
   Team2?: GroupTeamDtoResult;
   /** @format date-time */
   Date?: string | null;
+  /** @format int32 */
+  RoundNumber?: number | null;
   Status?: MatchStatus | null;
+  MatchType?: MatchType | null;
   ResultSet1?: GroupMatchResultDto | null;
   ResultSet2?: GroupMatchResultDto | null;
   ResultSet3?: GroupMatchResultDto | null;
+  CurrentUserIsPlayer?: boolean;
+  CurrentUserCanEdit?: boolean;
+  CurrentUserCanDelete?: boolean;
 }
 
 export interface GroupTeamDtoResult {
@@ -102,6 +108,7 @@ export interface GroupDto {
   Id?: string;
   Name?: string;
   Description?: string | null;
+  GroupType?: GroupType | null;
 }
 
 export interface GroupDetailDto {
@@ -216,6 +223,16 @@ export enum MatchStatus {
   Cancelled = "Cancelled",
 }
 
+export enum MatchType {
+  Classic = "Classic",
+  Americano = "Americano",
+}
+
+export enum GroupType {
+  League = "League",
+  Americano = "Americano",
+}
+
 export enum ChampionshipStatus {
   Created = "Created",
   Open = "Open",
@@ -225,7 +242,7 @@ export enum ChampionshipStatus {
 }
 
 export enum ChampionshipType {
-  AmericanoLeague = "AmericanoLeague",
+  AmericanoLeagueWithAmericanoFinal = "AmericanoLeagueWithAmericanoFinal",
 }
 
 export enum ChampionshipConfigurationKey {
@@ -236,6 +253,7 @@ export enum ChampionshipConfigurationKey {
   PointsPerWin = "PointsPerWin",
   PointsPerDraw = "PointsPerDraw",
   PointsPerLoss = "PointsPerLoss",
+  AmericanoPoints = "AmericanoPoints",
 }
 
 export type QueryParamsType = Record<string | number, any>;
