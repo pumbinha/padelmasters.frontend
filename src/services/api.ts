@@ -42,6 +42,8 @@ export interface UserStatisticsDto {
 }
 
 export interface GroupMatchDto {
+  /** @format guid */
+  Id?: string;
   Team1?: GroupTeamDtoResult;
   Team2?: GroupTeamDtoResult;
   /** @format date-time */
@@ -50,9 +52,7 @@ export interface GroupMatchDto {
   RoundNumber?: number | null;
   Status?: MatchStatus | null;
   MatchType?: MatchType | null;
-  ResultSet1?: GroupMatchResultDto | null;
-  ResultSet2?: GroupMatchResultDto | null;
-  ResultSet3?: GroupMatchResultDto | null;
+  MatchResults?: GroupMatchResultDto[];
   CurrentUserIsPlayer?: boolean;
   CurrentUserCanEdit?: boolean;
   CurrentUserCanDelete?: boolean;

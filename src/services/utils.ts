@@ -28,7 +28,7 @@ export const getRequestParams = (session: Session | null): RequestParams => {
 	};
 };
 
-export const getFormattedDate = (date?: string, session?: Session | null) => {
+export const getFormattedDate = (date?: string | null | undefined, session?: Session | null) => {
 	if (!date) return "";
 
 	let lang = "en-Gb";
@@ -44,6 +44,7 @@ export const getFormattedDate = (date?: string, session?: Session | null) => {
 		lang = session.locale;
 	}
 
+	console.log(Intl.DateTimeFormat(lang, options).format(new Date(date)));
 	return Intl.DateTimeFormat(lang, options).format(new Date(date));
 };
 
