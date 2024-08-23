@@ -27,4 +27,7 @@ export default defineConfig({
 			enabled: true,
 		},
 	}),
+	redirects: {
+		"/championships/[id]/[groupId]": "/championships/[id]/[groupId]/matches",
+	},
 });

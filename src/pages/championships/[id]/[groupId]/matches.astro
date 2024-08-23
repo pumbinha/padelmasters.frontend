@@ -1,22 +1,20 @@
-<!-- ---
+---
 import BreadCrumb from "@/components/BreadCrumb.astro";
-import { getStandingRowClass,getWinnerLoserSetClass } from "@/components/ui/utils";
+import { getWinnerLoserSetClass } from "@/components/ui/utils";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import {
-GroupType,
-MatchStatus,
-type ChampionshipDto,
-type GroupDetailDto,
-type GroupDto,
-type GroupMatchDto,
-type PlayerStandingDto,
+	MatchStatus,
+	type ChampionshipDto,
+	type GroupDetailDto,
+	type GroupDto,
+	type GroupMatchDto,
+	type PlayerStandingDto,
 } from "@/services/api";
 import { generateGroupMatchDto } from "@/services/mocks";
-import { getApi,getRequestParams,orderPlayerStandingDtoByPts } from "@/services/utils";
-import { StarIcon } from "@heroicons/react/16/solid";
-import { CalendarDaysIcon,ChartBarIcon } from "@heroicons/react/24/outline";
+import { getApi, getRequestParams } from "@/services/utils";
+import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id, groupId } = Astro.params;
@@ -52,21 +50,6 @@ try {
 		Astro.redirect("/group/not-found");
 	}
 
-	// ========= get standings
-	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
-		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
-			groupId || "",
-			getRequestParams(session)
-		);
-		if (standingsResponse.ok) {
-			playerStandings = standingsResponse.data.PlayerStandings || [];
-			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
-		} else {
-			// 404
-			Astro.redirect("/not-found");
-		}
-	}
-
 	// ========= get matches
 	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
 		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupMatches(
@@ -86,8 +69,18 @@ try {
 }
 
 const tabData = [
-	{ name: t(TranslationKey.MatchesTitle), icon: CalendarDaysIcon, current: true },
-	{ name: t(TranslationKey.StandingsTitle), icon: ChartBarIcon, current: false },
+	{
+		name: t(TranslationKey.MatchesTitle),
+		url: `/championships/${id}/${groupId}/matches`,
+		icon: CalendarDaysIcon,
+		isCurrent: true,
+	},
+	{
+		name: t(TranslationKey.StandingsTitle),
+		url: `/championships/${id}/${groupId}/standings`,
+		icon: ChartBarIcon,
+		isCurrent: false,
+	},
 ];
 ---
 
@@ -142,7 +135,27 @@ const tabData = [
 			</div>
 		</div>
 
-		<div class="border-b border-gray-200"></div>
+		<div class="border-b border-gray-200">
+			<div class="border-b border-gray-200">
+				<nav aria-label="Tabs" class="-mb-px flex space-x-8">
+					{
+						tabData.map((tab) => (
+							<a
+								href={tab.url}
+								aria-current={tab.isCurrent ? "page" : undefined}
+								class={`group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium ${tab.isCurrent ? "border-indigo-500 text-indigo-600" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"}`}
+							>
+								<tab.icon
+									aria-hidden="true"
+									className={`${tab.isCurrent ? "text-indigo-500" : "text-gray-400 group-hover:text-gray-500"} -ml-0.5 mr-2 h-5 w-5`}
+								/>
+								<span>{tab.name}</span>
+							</a>
+						))
+					}
+				</nav>
+			</div>
+		</div>
 
 		<div class="p-4">
 			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
@@ -230,107 +243,7 @@ const tabData = [
 						))
 					}
 				</div>
-				<div
-					id="tab-1"
-					style="display: none;"
-					class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"
-				>
-					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-						<table class="min-w-full divide-y divide-gray-300">
-							<thead>
-								<tr>
-									<th
-										scope="col"
-										class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-									>
-										<div>{t(TranslationKey.StandingsName)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
-									</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y">
-								{
-									playerStandings.map((player, index) => (
-										<tr
-											class={`${getStandingRowClass(group.GroupType || GroupType.League, index, groupDetail.NumberOfFinalists)}`}
-										>
-											<td
-												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
-											>
-												<span class="inline-block align-middle">
-													<a href={`/players/${player.UserId}`} class="hover: text-primary-800">
-														<span class="decoration-primary-500">
-															{index + 1}. {player.DisplayName}
-														</span>
-													</a>
-												</span>
-												{(group.GroupType || GroupType.League) === GroupType.Americano &&
-													((index === 0 && (
-														<StarIcon
-															aria-hidden="true"
-															className="ml-auto h-4 w-4 text-yellow-400  inline-block align-middle"
-														/>
-													)) ||
-														(index === 1 && (
-															<StarIcon
-																aria-hidden="true"
-																className="ml-auto h-4 w-4 text-gray-400 inline-block align-middle "
-															/>
-														)) ||
-														(index === 2 && (
-															<StarIcon
-																aria-hidden="true"
-																className="ml-auto h-4 w-4 text-orange-700 inline-block align-middle"
-															/>
-														)))}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.PlayedMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.WonMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.LostMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
-												{player.Points}
-											</td>
-										</tr>
-									))
-								}
-							</tbody>
-						</table>
-					</div>
-				</div>
 			</div>
 		</div>
 	</section>
-</Layout> -->
+</Layout>
