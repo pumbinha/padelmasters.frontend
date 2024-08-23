@@ -1,0 +1,18 @@
+---
+export interface UserLinkProps {
+	userId: string;
+	displayName: string;
+	class?: string;
+}
+
+const props = Astro.props as UserLinkProps;
+const { userId, displayName } = props;
+
+const classes = props.class || "text-primary-700";
+---
+
+<a href={`/players/${userId}`} class={classes}>
+	<span class="decoration-primary-500">
+		{displayName}
+	</span>
+</a>

@@ -1,6 +1,8 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
+import Tabs from "@/components/Tabs.astro";
 import { getWinnerLoserSetClass } from "@/components/ui/utils";
+import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
@@ -135,28 +137,7 @@ const tabData = [
 			</div>
 		</div>
 
-		<div class="border-b border-gray-200">
-			<div class="border-b border-gray-200">
-				<nav aria-label="Tabs" class="-mb-px flex space-x-8">
-					{
-						tabData.map((tab) => (
-							<a
-								href={tab.url}
-								aria-current={tab.isCurrent ? "page" : undefined}
-								class={`group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium ${tab.isCurrent ? "border-indigo-500 text-indigo-600" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"}`}
-							>
-								<tab.icon
-									aria-hidden="true"
-									className={`${tab.isCurrent ? "text-indigo-500" : "text-gray-400 group-hover:text-gray-500"} -ml-0.5 mr-2 h-5 w-5`}
-								/>
-								<span>{tab.name}</span>
-							</a>
-						))
-					}
-				</nav>
-			</div>
-		</div>
-
+		<Tabs tabData={tabData} />
 		<div class="p-4">
 			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
 				<div id="tab-0">
@@ -194,11 +175,18 @@ const tabData = [
 												<td
 													class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
 												>
-													{match.Team1?.Team?.Player1?.FirstName}{" "}
-													{match.Team1?.Team?.Player1?.LastName}
+													<UsersLink
+														userId={match.Team1?.Team?.Player1?.Id || ""}
+														displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
+														class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													/>
+
 													<br />
-													{match.Team1?.Team?.Player2?.FirstName}{" "}
-													{match.Team1?.Team?.Player2?.LastName}
+													<UsersLink
+														userId={match.Team1?.Team?.Player2?.Id || ""}
+														displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
+														class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													/>
 												</td>
 												<td>
 													<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
@@ -217,11 +205,18 @@ const tabData = [
 												<td
 													class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900"}`}
 												>
-													{match.Team2?.Team?.Player1?.FirstName}{" "}
-													{match.Team2?.Team?.Player1?.LastName}
+													<UsersLink
+														userId={match.Team2?.Team?.Player1?.Id || ""}
+														displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
+														class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													/>
+
 													<br />
-													{match.Team2?.Team?.Player2?.FirstName}{" "}
-													{match.Team2?.Team?.Player2?.LastName}
+													<UsersLink
+														userId={match.Team2?.Team?.Player2?.Id || ""}
+														displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
+														class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													/>
 												</td>
 												<td>
 													<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
