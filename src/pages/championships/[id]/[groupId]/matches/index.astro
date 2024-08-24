@@ -14,7 +14,7 @@ import {
 	type GroupMatchDto,
 	type PlayerStandingDto,
 } from "@/services/api";
-import { generateGroupMatchDto } from "@/services/mocks";
+
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { PencilIcon } from "@heroicons/react/20/solid";
 import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
@@ -61,7 +61,6 @@ try {
 		);
 		if (standingsResponse.ok) {
 			matches = standingsResponse.data || [];
-			console.log(generateGroupMatchDto(15));
 		} else {
 			// 404
 			Astro.redirect("/not-found");
