@@ -157,9 +157,7 @@ const tabData = [
 
 									<span class="float-right ml-4 text-xs font-light text-neutral-500">
 										{match.CurrentUserCanEdit && (
-											<a
-												href={`/championships/${id}/${groupId}/matches/${"match.Id" || "aaa"}/edit`}
-											>
+											<a href={`/championships/${id}/${groupId}/matches/${match.Id}/edit`}>
 												<PencilIcon className="h-4 w-4" />
 											</a>
 										)}
@@ -180,9 +178,6 @@ const tabData = [
 													<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
 												);
 											})}
-											{/* <th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-											<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-											<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" /> */}
 										</tr>
 									</thead>
 									<tbody>
@@ -213,15 +208,6 @@ const tabData = [
 													</td>
 												);
 											})}
-											{/* <td class={`${getWinnerLoserSetClass(1, match.ResultSet1)} border-b-2`}>
-												{match.ResultSet1 ? match.ResultSet1.ResultTeam1 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(1, match.ResultSet2)} border-b-2`}>
-												{match.ResultSet2 ? match.ResultSet2.ResultTeam1 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(1, match.ResultSet3)} border-b-2`}>
-												{match.ResultSet3 ? match.ResultSet3.ResultTeam1 : ""}
-											</td> */}
 										</tr>
 										<tr>
 											<td
@@ -245,20 +231,11 @@ const tabData = [
 											</td>
 											{match.MatchResults?.map((result) => {
 												return (
-													<td class={`${getWinnerLoserSetClass(1, result)} border-b-2`}>
-														{result ? result.ResultTeam1 : ""}
+													<td class={`${getWinnerLoserSetClass(2, result)} border-b-2`}>
+														{result ? result.ResultTeam2 : ""}
 													</td>
 												);
 											})}
-											{/* <td class={`${getWinnerLoserSetClass(2, match.ResultSet1)}`}>
-												{match.ResultSet1 ? match.ResultSet1.ResultTeam2 : ""}
-											</td>
-											<td class={`${getWinnerLoserSetClass(2, match.ResultSet2)}`}>
-												{match.ResultSet2 ? match.ResultSet2.ResultTeam2 : ""}
-											</td>
-											<td class={` ${getWinnerLoserSetClass(2, match.ResultSet3)}`}>
-												{match.ResultSet3 ? match.ResultSet3.ResultTeam2 : ""}
-											</td> */}
 										</tr>
 									</tbody>
 								</table>

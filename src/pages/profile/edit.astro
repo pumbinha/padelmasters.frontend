@@ -31,7 +31,7 @@ let locales: string[] = [];
 if (Astro.request.method === "POST") {
 	try {
 		const formData = await parseFormData<EditFormData>(Astro.request);
-		console.log(formData);
+
 		// Assign parsed data to your variables
 		firstName = formData["firstName"] || "";
 		lastName = formData["lastName"] || "";

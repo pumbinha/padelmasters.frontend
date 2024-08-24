@@ -44,7 +44,6 @@ export const getFormattedDate = (date?: string | null | undefined, session?: Ses
 		lang = session.locale;
 	}
 
-	console.log(Intl.DateTimeFormat(lang, options).format(new Date(date)));
 	return Intl.DateTimeFormat(lang, options).format(new Date(date));
 };
 
@@ -77,7 +76,6 @@ export const orderPlayerStandingDtoByPts = (
 
 export async function parseFormData<T extends object>(request: Request): Promise<Partial<T>> {
 	const formData = await request.formData();
-	console.log(formData);
 
 	const data: Partial<T> = {};
 

@@ -511,6 +511,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
+     * @name PadelmastersApiDomainEndpointsMatchesGetMatch
+     * @request GET:/api/matches/{matchId}
+     * @secure
+     */
+    padelmastersApiDomainEndpointsMatchesGetMatch: (matchId: string, params: RequestParams = {}) =>
+      this.request<GroupMatchDto, void>({
+        path: `/api/matches/${matchId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
      * @name PadelmastersApiDomainEndpointsMatchesCreateChampionship
      * @request POST:/api/matches/{matchId}/results
      * @secure
