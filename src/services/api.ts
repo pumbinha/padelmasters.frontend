@@ -89,8 +89,8 @@ export interface SaveMatchResultRequest {
   /** @format date-time */
   Date?: string;
   MatchResult1?: GroupMatchResultDto;
-  MatchResult2?: GroupMatchResultDto;
-  MatchResult3?: GroupMatchResultDto;
+  MatchResult2?: GroupMatchResultDto | null;
+  MatchResult3?: GroupMatchResultDto | null;
 }
 
 export interface GetGroupResponse {
