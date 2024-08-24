@@ -83,15 +83,11 @@ try {
 						</p>
 						<div class="mt-2 grid grid-cols-2 gap-4">
 							<div>
-								<p class="text-gray-700">
-									Set 1: {match.ResultSet1?.ResultTeam1} - {match.ResultSet1?.ResultTeam2}
-								</p>
-								<p class="text-gray-700">
-									Set 2: {match.ResultSet2?.ResultTeam1} - {match.ResultSet2?.ResultTeam2}
-								</p>
-								<p class="text-gray-700">
-									Set 3: {match.ResultSet3?.ResultTeam1} - {match.ResultSet3?.ResultTeam2}
-								</p>
+								{match.MatchResults?.map((result) => (
+									<p class="text-gray-700">
+										{result.ResultTeam1} - {result.ResultTeam2}
+									</p>
+								))}
 							</div>
 							<div>
 								<p
