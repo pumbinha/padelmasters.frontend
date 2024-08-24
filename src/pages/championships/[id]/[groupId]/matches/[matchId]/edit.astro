@@ -1,5 +1,5 @@
 ---
-import InputScore from "@/components/InputScore.astro";
+import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
 import ReturnButton from "@/components/ui/ReturnButton ";
 import { TranslationKey } from "@/i18n/ui";
 
@@ -188,33 +188,33 @@ if (Astro.request.method === "POST") {
 
 					<div class="grid grid-cols-3 items-center gap-4 py-8 text-center">
 						<div class="flex flex-col items-center">
-							<InputScore id="team1set1" value={team1set1} />
+							<AutoSelectInputScore id="team1set1" value={team1set1} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
 							<div class="text-xs text-gray-400 md:text-sm">Set - 1</div>
 						</div>
 						<div class="flex flex-col items-center">
-							<InputScore id="team2set1" value={team2set1} />
+							<AutoSelectInputScore id="team2set1" value={team2set1} client:load />
 						</div>
 
 						<div class="flex flex-col items-center">
-							<InputScore id="team1set2" value={team1set2} />
+							<AutoSelectInputScore id="team1set2" value={team1set2} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
 							<div class="text-xs text-gray-400 md:text-sm">Set - 2</div>
 						</div>
 						<div class="flex flex-col items-center">
-							<InputScore id="team2set2" value={team2set2} />
+							<AutoSelectInputScore id="team2set2" value={team2set2} client:load />
 						</div>
 
 						<div class="flex flex-col items-center">
-							<InputScore id="team1set3" value={team1set3} />
+							<AutoSelectInputScore id="team1set3" value={team1set3} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
 							<div class="text-xs text-gray-400 md:text-sm">Set - 3</div>
 						</div>
 						<div class="flex flex-col items-center">
-							<InputScore id="team2set3" value={team2set3} />
+							<AutoSelectInputScore id="team2set3" value={team2set3} client:load />
 						</div>
 					</div>
 				</div>
