@@ -2,7 +2,6 @@
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
 import Enroll from "@/components/ui/Enroll.tsx";
-import GroupItemLink from "@/components/ui/GroupItemLink";
 import Leave from "@/components/ui/Leave.tsx";
 import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
@@ -59,13 +58,13 @@ const tabData = [
 		name: t(TranslationKey.GroupsTitle),
 		url: `/championships/${id}`,
 		icon: UserGroupIcon,
-		isCurrent: true,
+		isCurrent: false,
 	},
 	{
 		name: t(TranslationKey.RulesTitle),
 		url: `/championships/${id}/rules`,
 		icon: BookOpenIcon,
-		isCurrent: false,
+		isCurrent: true,
 	},
 ];
 ---
@@ -120,19 +119,6 @@ const tabData = [
 			</div>
 		</div>
 		<Tabs tabData={tabData} />
-		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
-			<ol class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">
-				{
-					groups.map((group) => (
-						<GroupItemLink
-							url={`/championships/${id}/${group.Id}/matches`}
-							name={group.Name || ""}
-							description={group.Description || ""}
-							client:load
-						/>
-					))
-				}
-			</ol>
-		</div>
+		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">Rules here</div>
 	</section>
 </Layout>

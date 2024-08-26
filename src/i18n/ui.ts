@@ -60,6 +60,8 @@ export enum TranslationKey {
 	MatchRestartTitle = "Match.RestartTitle",
 	MatchRestartMessage = "Match.RestartMessage",
 	Restart = "Restart",
+	GroupsTitle = "Groups.Title",
+	RulesTitle = "Rules.Title",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -137,6 +139,8 @@ export const ui: UI = {
 		[TranslationKey.MatchRestartTitle]: "Restart match",
 		[TranslationKey.MatchRestartMessage]: "Are you sure you want to restart the match?",
 		[TranslationKey.Restart]: "Restart",
+		[TranslationKey.GroupsTitle]: "Groups",
+		[TranslationKey.RulesTitle]: "Rules",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -199,5 +203,7 @@ export const ui: UI = {
 		[TranslationKey.MatchRestartTitle]: "Reiniciar partido",
 		[TranslationKey.MatchRestartMessage]: "estás seguro de que quieres reiniciar el partido?",
 		[TranslationKey.Restart]: "Reiniciar",
+		[TranslationKey.GroupsTitle]: "Grupos",
+		[TranslationKey.RulesTitle]: "Reglas",
 	},
 };
