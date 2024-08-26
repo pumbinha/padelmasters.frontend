@@ -1,0 +1,226 @@
+---
+import Tabs from "@/components/Tabs.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import PlayerHeader from "@/sections/PlayerHeader.astro";
+import { type SearchMatchesRequest, type UserDto, type UserStatisticsDto } from "@/services/api";
+import {
+	distinctGroupMatchSearchDtos,
+	getApi,
+	getRequestParams,
+	orderPlayerStandingDtoByPts,
+	type ChampionshipAndGroupDto,
+	type GroupMatchSearchDtoWithPosition,
+} from "@/services/utils";
+import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { getSession } from "auth-astro/server";
+
+const { id } = Astro.params;
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let user: UserDto = {};
+
+let userStatistics: UserStatisticsDto = {};
+let playerStandingsInGroups: GroupMatchSearchDtoWithPosition[] = [];
+
+let championshipsAndGroups: ChampionshipAndGroupDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// optimize! get get the champ name in the grops endpoint
+	// ========= get championship
+	const userResponse = await api.api.padelmastersApiDomainEndpointsUsersGetUser(
+		id || "",
+		getRequestParams(session)
+	);
+
+	if (userResponse.ok) {
+		user = userResponse.data.User || {};
+		userStatistics = userResponse.data.UserStatistics || {};
+	} else {
+		// 404
+		Astro.redirect("/championships/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
+
+try {
+	const searchMatchesRequest: SearchMatchesRequest = {
+		UserId: session?.user?.id || "",
+	};
+	const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+		searchMatchesRequest,
+		getRequestParams(session)
+	);
+	if (standingsResponse.ok) {
+		const championships = standingsResponse.data || [];
+		championshipsAndGroups = distinctGroupMatchSearchDtos(championships);
+
+		if (championshipsAndGroups.length > 0) {
+			/*
+			 * Get the player standings in each group
+			 * and add the position of the player in the group
+			 * This code doesn't belong here, it should be in the backend
+			 */
+			for (const group of championshipsAndGroups) {
+				const standingsResponse =
+					await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
+						group.Group?.Id || "",
+						getRequestParams(session)
+					);
+				if (standingsResponse.ok) {
+					let allPlayerStandings = standingsResponse.data.PlayerStandings || [];
+					allPlayerStandings = orderPlayerStandingDtoByPts(allPlayerStandings);
+					const position =
+						allPlayerStandings.findIndex((playerStanding) => playerStanding.UserId === id) + 1;
+					const thisPlayerStanding = allPlayerStandings.find(
+						(playerStanding) => playerStanding.UserId === id
+					);
+
+					const one: GroupMatchSearchDtoWithPosition = {
+						Championship: group.Championship,
+						Group: group.Group,
+						Position: position,
+						...thisPlayerStanding,
+					};
+
+					playerStandingsInGroups.push(one);
+				} else {
+					// 404
+					Astro.redirect("/not-found");
+				}
+			}
+		}
+	} else {
+		// 404
+		Astro.redirect("/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
+
+const tabData = [
+	{
+		name: t(TranslationKey.MatchesTitle),
+		url: `/players/${id}`,
+		icon: CalendarDaysIcon,
+		isCurrent: false,
+	},
+	{
+		name: t(TranslationKey.StandingsTitle),
+		url: `/players/${id}/standings`,
+		icon: ChartBarIcon,
+		isCurrent: true,
+	},
+];
+---
+
+<Layout title=`Player - ${user.FirstName} ${user.LastName} `>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<PlayerHeader user={user} userStatistics={userStatistics} />
+		<Tabs tabData={tabData} />
+
+		<div class="w-full rounded-md bg-white shadow">
+			<ul role="list" class="divide-y divide-gray-200">
+				{
+					playerStandingsInGroups.map((playerStandingsInGroup) => {
+						return (
+							<li class="px-6 py-4">
+								<a
+									href={`/championships/${playerStandingsInGroup.Championship?.Id}`}
+									class="bg-primary-50 block rounded-md px-2.5 py-1.5 text-lg font-semibold text-primary-600 hover:text-primary-400"
+								>
+									{playerStandingsInGroup.Championship?.Name}
+								</a>
+
+								<a
+									href={`/championships/${playerStandingsInGroup.Championship?.Id}/${playerStandingsInGroup.Group?.Id}/standings`}
+									class="bg-primary-50 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-600 hover:text-primary-400"
+								>
+									{playerStandingsInGroup.Group?.Name}
+								</a>
+
+								<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+									<table class="min-w-full divide-y divide-gray-300">
+										<thead>
+											<tr>
+												<th
+													scope="col"
+													class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-0"
+												>
+													<div>{t(TranslationKey.StandingsName)}</div>
+												</th>
+												<th
+													scope="col"
+													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+												>
+													<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+													<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
+												</th>
+												<th
+													scope="col"
+													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+												>
+													<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+													<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
+												</th>
+												<th
+													scope="col"
+													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+												>
+													<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+													<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
+												</th>
+												<th
+													scope="col"
+													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+												>
+													<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+													<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
+												</th>
+											</tr>
+										</thead>
+										<tbody class="divide-y">
+											<tr
+												class={`hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-700`}
+											>
+												<td
+													class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
+												>
+													<span class="inline-block align-middle">
+														{`${playerStandingsInGroup.Position}. ${user.FirstName} ${user.LastName}`}
+													</span>
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+													{playerStandingsInGroup.PlayedMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+													{playerStandingsInGroup.WonMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+													{playerStandingsInGroup.LostMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
+													{playerStandingsInGroup.Points}
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</li>
+						);
+					})
+				}
+			</ul>
+		</div>
+	</section>
+</Layout>

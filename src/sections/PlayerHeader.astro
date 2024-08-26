@@ -1,0 +1,48 @@
+---
+const { user, userStatistics } = Astro.props;
+---
+
+<div class="overflow-hidden rounded-lg bg-background shadow-md">
+	<div class="p-4">
+		<div class="mb-2 flex items-center">
+			<h2 class="mb-2 text-xl font-bold">{user.FirstName} {user.LastName}</h2>
+		</div>
+	</div>
+	<div class="mb-6 rounded-lg bg-white p-4 shadow">
+		<div class="mt-5 grid grid-cols-3">
+			<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+				<dt class="truncate text-sm font-medium text-gray-500">Played</dt>
+				<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
+					{userStatistics.MatchesPlayed}
+				</dd>
+			</div>
+
+			<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+				<dt class="truncate text-sm font-medium text-gray-500">Won</dt>
+				<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
+					{userStatistics.MatchesWon}
+				</dd>
+			</div>
+
+			<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+				<dt class="truncate text-sm font-medium text-gray-500">Lost</dt>
+				<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
+					{userStatistics.MatchesLost}
+				</dd>
+			</div>
+			<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+				<dt class="truncate text-sm font-medium text-gray-500">WinRate</dt>
+				<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
+					{userStatistics.WinRate}
+				</dd>
+			</div>
+		</div>
+		<div class="grid grid-cols-2 gap-4">
+			<div>
+				<p class="text-gray-700">Sets W: {userStatistics.SetsWon}</p>
+				<p class="text-gray-700">Sets L: {userStatistics.SetsLost}</p>
+				<p class="text-gray-700">Win WR: {userStatistics.WinRate}%</p>
+			</div>
+		</div>
+	</div>
+</div>

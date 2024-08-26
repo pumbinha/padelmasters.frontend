@@ -94,6 +94,7 @@ export async function parseFormData<T extends object>(request: Request): Promise
 }
 
 export type ChampionshipAndGroupDto = Pick<GroupMatchSearchDto, "Championship" | "Group">;
+
 export const distinctGroupMatchSearchDtos = (
 	dtos: GroupMatchSearchDto[]
 ): GroupMatchSearchDto[] => {
@@ -115,3 +116,7 @@ export const distinctGroupMatchSearchDtos = (
 
 	return result;
 };
+
+// this type is useful for filtering at player level
+export type GroupMatchSearchDtoWithPosition = GroupMatchSearchDto &
+	PlayerStandingDto & { Position: number };

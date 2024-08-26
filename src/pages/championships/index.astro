@@ -51,7 +51,9 @@ try {
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
 		<div class="w-full rounded-lg bg-background p-6 shadow-lg">
 			<div class="mb-6 flex items-center justify-between">
-				<h1 class="text-2xl font-bold text-foreground">{t(TranslationKey.ChampionshipsTitle)}</h1>
+				<h1 class="text-base font-semibold text-foreground text-gray-600">
+					{t(TranslationKey.ChampionshipsTitle)}
+				</h1>
 			</div>
 			{
 				championships.length === 0 && (
@@ -76,7 +78,7 @@ try {
 							>
 								<div class="p-4">
 									<div class="mb-2 flex items-center">
-										<h2 class="mb-2 text-xl font-bold">{championship.Name}</h2>
+										<h2 class="mb-2 text-xl font-bold text-gray-700">{championship.Name}</h2>
 										{championship.UserIsRegistered && (
 											<UserCircleIcon
 												aria-hidden="true"
@@ -87,12 +89,20 @@ try {
 									<p class="mb-4 text-muted-foreground">{championship.Description}</p>
 									<div class="mb-4 flex items-center justify-between">
 										<div>
-											<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>{" "}
-											{getFormattedDate(championship.StartDate, session)}
+											<span class="text-xs font-light">
+												{t(TranslationKey.ChampionshipsStartDate)}
+											</span>
+											<span class="block text-sm font-semibold">
+												{getFormattedDate(championship.StartDate, session)}
+											</span>
 										</div>
 										<div>
-											<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>{" "}
-											{getFormattedDate(championship.EndDate, session)}
+											<span class="text-xs font-light">
+												{t(TranslationKey.ChampionshipsEndDate)}:
+											</span>
+											<span class="block text-sm font-semibold">
+												{getFormattedDate(championship.EndDate, session)}
+											</span>
 										</div>
 									</div>
 									<div class="flex items-center justify-between">
