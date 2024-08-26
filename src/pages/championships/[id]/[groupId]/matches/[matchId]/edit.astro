@@ -90,7 +90,7 @@ if (Astro.request.method === "POST") {
 			);
 
 			// TODO: use server validation
-			console.log(postMatch);
+
 			if (postMatch.status == 400) {
 				const err = postMatch.error;
 				console.log("here");
@@ -100,6 +100,8 @@ if (Astro.request.method === "POST") {
 			}
 		} catch (e) {
 			console.log(e);
+
+			//console.log(e.error.Errors.GeneralErrors);
 			console.log("but here");
 		}
 	} catch (error) {
@@ -132,9 +134,12 @@ if (Astro.request.method === "POST") {
 			team2set3 = (model.MatchResults && model.MatchResults[2]?.ResultTeam2) || 0;
 		} else {
 			// 404
+
 			Astro.redirect("/not-found");
 		}
+		console.log(matchResponse.error);
 	} catch (e) {
+		console.log("here");
 		console.log(e);
 	}
 }

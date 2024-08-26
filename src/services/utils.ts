@@ -4,6 +4,7 @@ import {
 	type ApiConfig,
 	type ChampionshipDto,
 	type GroupDto,
+	type GroupMatchSearchDto,
 	type PlayerStandingDto,
 	type RequestParams,
 } from "@/services/api";
@@ -91,3 +92,26 @@ export async function parseFormData<T extends object>(request: Request): Promise
 
 	return data;
 }
+
+export type ChampionshipAndGroupDto = Pick<GroupMatchSearchDto, "Championship" | "Group">;
+export const distinctGroupMatchSearchDtos = (
+	dtos: GroupMatchSearchDto[]
+): GroupMatchSearchDto[] => {
+	const result: ChampionshipAndGroupDto[] = [];
+
+	dtos.forEach((dto) => {
+		const { Championship, Group } = dto;
+
+		// Check if the current combination of Championship and Group is already in the result array
+		const exists = result.some(
+			(item) => item.Championship?.Id === Championship?.Id && item.Group?.Id === Group?.Id
+		);
+
+		// If it doesn't exist, add it to the result array
+		if (!exists) {
+			result.push({ Championship, Group });
+		}
+	});
+
+	return result;
+};

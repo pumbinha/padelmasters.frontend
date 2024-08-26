@@ -62,6 +62,10 @@ export enum TranslationKey {
 	Restart = "Restart",
 	GroupsTitle = "Groups.Title",
 	RulesTitle = "Rules.Title",
+	MyChampionships = "MyChampionships",
+	NoChampionshipsTitle = "NoChampionshipsTitle",
+	NoChampionshipsDescription = "NoChampionshipsDescription",
+	FindChampionship = "Find.Championship",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -141,6 +145,10 @@ export const ui: UI = {
 		[TranslationKey.Restart]: "Restart",
 		[TranslationKey.GroupsTitle]: "Groups",
 		[TranslationKey.RulesTitle]: "Rules",
+		[TranslationKey.MyChampionships]: "My Championships",
+		[TranslationKey.NoChampionshipsTitle]: "No championships",
+		[TranslationKey.NoChampionshipsDescription]: "Enroll in a championship now!",
+		[TranslationKey.FindChampionship]: "Find championship",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -205,5 +213,9 @@ export const ui: UI = {
 		[TranslationKey.Restart]: "Reiniciar",
 		[TranslationKey.GroupsTitle]: "Grupos",
 		[TranslationKey.RulesTitle]: "Reglas",
+		[TranslationKey.MyChampionships]: "Mis Campeonatos",
+		[TranslationKey.NoChampionshipsTitle]: "No tienes campeonatos",
+		[TranslationKey.NoChampionshipsDescription]: "Apúntate a un campeonato ahora!",
+		[TranslationKey.FindChampionship]: "Buscar campeonato",
 	},
 };

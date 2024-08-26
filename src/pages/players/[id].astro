@@ -1,7 +1,14 @@
 ---
+import { getWinnerLoserSetClass } from "@/components/ui/utils";
+import UsersLink from "@/components/UsersLink.astro";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import type { GroupMatchDto, UserDto, UserStatisticsDto } from "@/services/api";
+import {
+	MatchStatus,
+	type GroupMatchDto,
+	type UserDto,
+	type UserStatisticsDto,
+} from "@/services/api";
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { getSession } from "auth-astro/server";
 
@@ -44,34 +51,80 @@ try {
 
 <Layout title=`Player - ${user.FirstName} ${user.LastName} `>
 	<div class="container mx-auto p-4">
-		<div class="rounded-md bg-vivid-500 p-2 text-primary-foreground">TEMP STYLE. Coming soon!</div>
 		<!-- User Info Section -->
-		<div class="mb-6 rounded-lg bg-white p-4 shadow">
-			<h2 class="mb-2 text-xl font-bold">Player</h2>
-			<p class="text-gray-700">Name: {user.FirstName} {user.LastName}</p>
+		<div class="p-4">
+			<div class="mb-2 flex items-center">
+				<h2 class="mb-2 text-xl font-bold">
+					<p class="text-gray-700">{user.FirstName} {user.LastName}</p>
+				</h2>
+			</div>
 		</div>
+
+		<dl class="mx-auto grid grid-cols-4 gap-px bg-gray-900/5">
+			<div
+				class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8"
+			>
+				<dt class="text-sm font-medium leading-6 text-gray-500">Played</dt>
+
+				<dd class="w-full flex-none text-2xl font-medium leading-10 tracking-tight text-gray-900">
+					{userStatistics.MatchesPlayed}
+				</dd>
+			</div>
+			<div
+				class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8"
+			>
+				<dt class="text-sm font-medium leading-6 text-gray-500">Won</dt>
+
+				<dd class="w-full flex-none text-2xl font-medium leading-10 tracking-tight text-gray-900">
+					{userStatistics.MatchesWon}
+				</dd>
+			</div>
+			<div
+				class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8"
+			>
+				<dt class="text-sm font-medium leading-6 text-gray-500">Lost</dt>
+
+				<dd class="w-full flex-none text-2xl font-medium leading-10 tracking-tight text-gray-900">
+					{userStatistics.MatchesLost}
+				</dd>
+			</div>
+			<div
+				class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8"
+			>
+				<dt class="text-sm font-medium leading-6 text-gray-500">WinRate</dt>
+
+				<dd class="w-full flex-none text-2xl font-medium leading-10 tracking-tight text-gray-900">
+					{userStatistics.WinRate}
+				</dd>
+			</div>
+		</dl>
 
 		<!-- User Statistics Section -->
 		<div class="mb-6 rounded-lg bg-white p-4 shadow">
-			<!-- <h2 class="mb-2 text-xl font-bold">Statistics</h2> -->
-			<div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+			<div class="mt-5 grid grid-cols-3">
 				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-					<dt class="truncate text-sm font-medium text-gray-500">Matches P</dt>
-					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+					<dt class="truncate text-sm font-medium text-gray-500">Played</dt>
+					<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
 						{userStatistics.MatchesPlayed}
 					</dd>
 				</div>
 
 				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-					<dt class="truncate text-sm font-medium text-gray-500">Matches w</dt>
-					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+					<dt class="truncate text-sm font-medium text-gray-500">Won</dt>
+					<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
 						{userStatistics.MatchesWon}
 					</dd>
 				</div>
 
 				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-					<dt class="truncate text-sm font-medium text-gray-500">Matches L</dt>
-					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+					<dt class="truncate text-sm font-medium text-gray-500">Lost</dt>
+					<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
+						{userStatistics.MatchesLost}
+					</dd>
+				</div>
+				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+					<dt class="truncate text-sm font-medium text-gray-500">Lost</dt>
+					<dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">
 						{userStatistics.MatchesLost}
 					</dd>
 				</div>
@@ -91,38 +144,95 @@ try {
 		</div>
 
 		<!-- User Matches Section -->
-		<div class="rounded-lg bg-white p-4 shadow">
-			<h2 class="mb-2 text-xl font-bold">Recent Matches</h2>
+		<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
 			{
 				userMatches.map((match) => (
-					<div class="mb-4 border-b pb-4">
-						<p class="text-gray-600">{getFormattedDate(match.Date || "", session)}</p>
-						<p class="font-semibold text-gray-800">
-							{match.Team1?.Team?.Name} vs {match.Team2?.Team?.Name}
-						</p>
-						<p class="text-gray-700">
-							Status: <span class="font-bold">{match.Status}</span>
-						</p>
-						<div class="mt-2 grid grid-cols-2 gap-4">
+					<div class="py-4">
+						<div>
 							<div>
-								{match.MatchResults?.map((result) => (
-									<p class="text-gray-700">
-										{result.ResultTeam1} - {result.ResultTeam2}
-									</p>
-								))}
-							</div>
-							<div>
-								<p
-									class={`font-bold text-gray-700 ${match.Team1?.IsWinner ? "text-green-500" : "text-red-500"}`}
+								<span
+									class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
 								>
-									{match.Team1?.Team?.Name} {match.Team1?.IsWinner ? "Won" : "Lost"}
-								</p>
-								<p
-									class={`font-bold text-gray-700 ${match.Team2?.IsWinner ? "text-green-500" : "text-red-500"}`}
-								>
-									{match.Team2?.Team?.Name} {match.Team2?.IsWinner ? "Won" : "Lost"}
-								</p>
+									{match.Status}
+								</span>
+								<span class="ml-4 text-xs font-light text-neutral-500">
+									{getFormattedDate(match.Date, session)}
+								</span>
 							</div>
+						</div>
+						<div>
+							<table class="min-w-full">
+								<thead>
+									<tr>
+										<th
+											scope="col"
+											class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
+										/>
+										<th />
+										{match.MatchResults?.map((result) => {
+											return <th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />;
+										})}
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td
+											class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
+										>
+											<UsersLink
+												userId={match.Team1?.Team?.Player1?.Id || ""}
+												displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
+												class={`${match.Team1?.Team?.Player1?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
+											/>
+
+											<br />
+											<UsersLink
+												userId={match.Team1?.Team?.Player2?.Id || ""}
+												displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
+												class={`${match.Team1?.Team?.Player2?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
+											/>
+										</td>
+										<td>
+											<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
+										</td>
+										{match.MatchResults?.map((result) => {
+											return (
+												<td class={`${getWinnerLoserSetClass(1, result)} border-b-2`}>
+													{result ? result.ResultTeam1 : ""}
+												</td>
+											);
+										})}
+									</tr>
+									<tr>
+										<td
+											class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900"}`}
+										>
+											<UsersLink
+												userId={match.Team2?.Team?.Player1?.Id || ""}
+												displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
+												class={`${match.Team2?.Team?.Player1?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
+											/>
+
+											<br />
+											<UsersLink
+												userId={match.Team2?.Team?.Player2?.Id || ""}
+												displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
+												class={`${match.Team2?.Team?.Player2?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
+											/>
+										</td>
+										<td>
+											<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
+										</td>
+										{match.MatchResults?.map((result) => {
+											return (
+												<td class={`${getWinnerLoserSetClass(2, result)} border-b-2`}>
+													{result ? result.ResultTeam2 : ""}
+												</td>
+											);
+										})}
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				))

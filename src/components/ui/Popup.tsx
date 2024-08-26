@@ -31,7 +31,6 @@ const Popup: React.FC<PopupProps> = ({
 	const [open, setOpen] = useState(false);
 
 	const handleClick = async () => {
-		console.log("handleClick");
 		const data = { matchId };
 
 		const response = await fetch("/api/matches/result", {
@@ -51,7 +50,6 @@ const Popup: React.FC<PopupProps> = ({
 		setOpen(false);
 	};
 	const showPopup = () => {
-		console.log("showPopup");
 		setOpen(true);
 	};
 

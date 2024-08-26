@@ -202,19 +202,19 @@ const tabData = [
 									<tbody>
 										<tr>
 											<td
-												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
 											>
 												<UsersLink
 													userId={match.Team1?.Team?.Player1?.Id || ""}
 													displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
-													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
 												/>
 
 												<br />
 												<UsersLink
 													userId={match.Team1?.Team?.Player2?.Id || ""}
 													displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
-													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
 												/>
 											</td>
 											<td>
@@ -230,19 +230,19 @@ const tabData = [
 										</tr>
 										<tr>
 											<td
-												class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900"}`}
+												class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900 hover:text-gray-600"}`}
 											>
 												<UsersLink
 													userId={match.Team2?.Team?.Player1?.Id || ""}
 													displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
-													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
 												/>
 
 												<br />
 												<UsersLink
 													userId={match.Team2?.Team?.Player2?.Id || ""}
 													displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
-													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600" : "text-gray-900"}`}
+													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
 												/>
 											</td>
 											<td>
