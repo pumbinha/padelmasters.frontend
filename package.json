@@ -11,7 +11,7 @@
 		"pretty": "prettier . --write",
 		"prepare": "husky && husky install",
 		"check": "astro check",
-		"api": "npx swagger-typescript-api --path https://test.api.padelmasters.net/swagger/v1/swagger.json -o ./src/services/ -n api"
+		"api": "npx swagger-typescript-api --path https://test.api.padelmasters.net/swagger/v1/swagger.json -o ./src/services/ -n api "
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.2",

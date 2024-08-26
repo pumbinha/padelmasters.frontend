@@ -83,18 +83,24 @@ if (Astro.request.method === "POST") {
 				},
 			};
 
-			console.log(matchId);
 			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesCreateChampionship(
 				matchId || "",
 				model,
 				getRequestParams(session)
 			);
 
+			// TODO: use server validation
+			console.log(postMatch);
+			if (postMatch.status == 400) {
+				const err = postMatch.error;
+				console.log("here");
+			}
 			if (postMatch.ok) {
 				return Astro.redirect(returnUrl);
 			}
 		} catch (e) {
 			console.log(e);
+			console.log("but here");
 		}
 	} catch (error) {
 		if (error instanceof Error) {
@@ -102,8 +108,6 @@ if (Astro.request.method === "POST") {
 		}
 	}
 } else if (Astro.request.method === "GET") {
-	//Fetch user data
-
 	if (!session) {
 		Astro.redirect("/sign-in");
 	}

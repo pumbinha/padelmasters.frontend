@@ -93,35 +93,10 @@ export interface SaveMatchResultRequest {
   MatchResult3?: GroupMatchResultDto | null;
 }
 
-export interface GetGroupResponse {
-  Group?: GroupInformationDto;
-}
-
-export interface GroupInformationDto {
-  Group?: GroupDto;
-  GroupDetail?: GroupDetailDto;
+export interface GroupMatchSearchDto {
   Championship?: ChampionshipDto;
-}
-
-export interface GroupDto {
-  /** @format guid */
-  Id?: string;
-  Name?: string;
-  Description?: string | null;
-  GroupType?: GroupType | null;
-}
-
-export interface GroupDetailDto {
-  /** @format int32 */
-  NumberPlayers?: number;
-  /** @format int32 */
-  NumberMatches?: number;
-  /** @format int32 */
-  NumberOfPlayedMatches?: number;
-  /** @format int32 */
-  NumberOfPendingMatches?: number;
-  /** @format int32 */
-  NumberOfFinalists?: number;
+  Group?: GroupDto;
+  Match?: GroupMatchDto;
 }
 
 export interface ChampionshipDto {
@@ -135,6 +110,45 @@ export interface ChampionshipDto {
   EndDate?: string;
   Status?: ChampionshipStatus | null;
   Type?: ChampionshipType | null;
+}
+
+export interface GroupDto {
+  /** @format guid */
+  Id?: string;
+  Name?: string;
+  Description?: string | null;
+  GroupType?: GroupType | null;
+}
+
+export interface SearchMatchesRequest {
+  /** @format guid */
+  GroupId?: string | null;
+  /** @format guid */
+  UserId?: string | null;
+  MatchStatus?: MatchStatus | null;
+}
+
+export interface GetGroupResponse {
+  Group?: GroupInformationDto;
+}
+
+export interface GroupInformationDto {
+  Group?: GroupDto;
+  GroupDetail?: GroupDetailDto;
+  Championship?: ChampionshipDto;
+}
+
+export interface GroupDetailDto {
+  /** @format int32 */
+  NumberPlayers?: number;
+  /** @format int32 */
+  NumberMatches?: number;
+  /** @format int32 */
+  NumberOfPlayedMatches?: number;
+  /** @format int32 */
+  NumberOfPendingMatches?: number;
+  /** @format int32 */
+  NumberOfFinalists?: number;
 }
 
 export interface StandingDto {
@@ -228,11 +242,6 @@ export enum MatchType {
   Americano = "Americano",
 }
 
-export enum GroupType {
-  League = "League",
-  Americano = "Americano",
-}
-
 export enum ChampionshipStatus {
   Created = "Created",
   Open = "Open",
@@ -243,6 +252,11 @@ export enum ChampionshipStatus {
 
 export enum ChampionshipType {
   AmericanoLeagueWithAmericanoFinal = "AmericanoLeagueWithAmericanoFinal",
+}
+
+export enum GroupType {
+  League = "League",
+  Americano = "Americano",
 }
 
 export enum ChampionshipConfigurationKey {
@@ -460,7 +474,6 @@ export class HttpClient<SecurityDataType = unknown> {
         this.abortControllers.delete(cancelToken);
       }
 
-      if (!response.ok) throw data;
       return data;
     });
   };
@@ -551,15 +564,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
-     * @name PadelmastersApiDomainEndpointsGroupsGetGroup
-     * @request GET:/api/groups/{groupId}
+     * @name PadelmastersApiDomainEndpointsMatchesSearchMatches
+     * @request POST:/api/matches/search
      * @secure
      */
-    padelmastersApiDomainEndpointsGroupsGetGroup: (groupId: string, params: RequestParams = {}) =>
-      this.request<GetGroupResponse, void>({
-        path: `/api/groups/${groupId}`,
-        method: "GET",
+    padelmastersApiDomainEndpointsMatchesSearchMatches: (data: SearchMatchesRequest, params: RequestParams = {}) =>
+      this.request<GroupMatchSearchDto[], void>({
+        path: `/api/matches/search`,
+        method: "POST",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -568,13 +583,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
-     * @name PadelmastersApiDomainEndpointsGroupsGetGroupMatches
-     * @request GET:/api/groups/{groupId}/matches
+     * @name PadelmastersApiDomainEndpointsGroupsGetGroup
+     * @request GET:/api/groups/{groupId}
      * @secure
      */
-    padelmastersApiDomainEndpointsGroupsGetGroupMatches: (groupId: string, params: RequestParams = {}) =>
-      this.request<GroupMatchDto[], void>({
-        path: `/api/groups/${groupId}/matches`,
+    padelmastersApiDomainEndpointsGroupsGetGroup: (groupId: string, params: RequestParams = {}) =>
+      this.request<GetGroupResponse, void>({
+        path: `/api/groups/${groupId}`,
         method: "GET",
         secure: true,
         format: "json",

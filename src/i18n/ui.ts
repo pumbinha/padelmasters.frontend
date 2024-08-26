@@ -57,6 +57,9 @@ export enum TranslationKey {
 	ProfileEmailAddress = "Profile.EmailAddress",
 	ProfileUsername = "Profile.Username",
 	MatchesTitle = "Matches.Title",
+	MatchRestartTitle = "Match.RestartTitle",
+	MatchRestartMessage = "Match.RestartMessage",
+	Restart = "Restart",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -131,6 +134,9 @@ export const ui: UI = {
 		[TranslationKey.ProfileEmailAddress]: "Email address",
 		[TranslationKey.ProfileUsername]: "Username",
 		[TranslationKey.MatchesTitle]: "Matches",
+		[TranslationKey.MatchRestartTitle]: "Restart match",
+		[TranslationKey.MatchRestartMessage]: "Are you sure you want to restart the match?",
+		[TranslationKey.Restart]: "Restart",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -190,5 +196,8 @@ export const ui: UI = {
 		[TranslationKey.ProfileEmailAddress]: "Correo electrónico",
 		[TranslationKey.ProfileUsername]: "Nombre de usuario",
 		[TranslationKey.MatchesTitle]: "Partidos",
+		[TranslationKey.MatchRestartTitle]: "Reiniciar partido",
+		[TranslationKey.MatchRestartMessage]: "estás seguro de que quieres reiniciar el partido?",
+		[TranslationKey.Restart]: "Reiniciar",
 	},
 };

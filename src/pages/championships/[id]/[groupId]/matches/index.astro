@@ -1,6 +1,7 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
+import Popup from "@/components/ui/Popup";
 import { getWinnerLoserSetClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
@@ -55,12 +56,18 @@ try {
 
 	// ========= get matches
 	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
-		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupMatches(
-			groupId || "",
+		const SearchMatchesRequest = {
+			GroupId: groupId || "",
+		};
+		const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+			SearchMatchesRequest,
 			getRequestParams(session)
 		);
 		if (standingsResponse.ok) {
-			matches = standingsResponse.data || [];
+			const searchData = standingsResponse.data || [];
+			matches = searchData.flatMap((group) => {
+				return group.Match || [];
+			});
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -152,6 +159,19 @@ const tabData = [
 									</span>
 									<span class="ml-4 text-xs font-light text-neutral-500">
 										{getFormattedDate(match.Date, session)}
+									</span>
+									<span class="float-right ml-4 text-xs font-light text-neutral-500">
+										{match.CurrentUserCanDelete && (
+											<Popup
+												title={t(TranslationKey.MatchRestartTitle)}
+												text={t(TranslationKey.MatchRestartMessage)}
+												textActionButton={t(TranslationKey.Restart)}
+												textCancelButton={t(TranslationKey.Cancel)}
+												matchId={match.Id || ""}
+												url={`/championships/${id}/${groupId}/matches`}
+												client:load
+											/>
+										)}
 									</span>
 
 									<span class="float-right ml-4 text-xs font-light text-neutral-500">
