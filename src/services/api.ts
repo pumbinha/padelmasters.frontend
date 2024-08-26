@@ -104,6 +104,7 @@ export interface ChampionshipDto {
   Id?: string;
   Name?: string;
   Description?: string | null;
+  Rules?: string | null;
   /** @format date-time */
   StartDate?: string;
   /** @format date-time */
@@ -172,7 +173,6 @@ export interface PlayerStandingDto {
 export interface CreateChampionshipRequest {
   Name?: string;
   Description?: string | null;
-  Rules?: string;
   /** @format date-time */
   StartDate?: string;
   /** @format date-time */
@@ -474,6 +474,7 @@ export class HttpClient<SecurityDataType = unknown> {
         this.abortControllers.delete(cancelToken);
       }
 
+      if (!response.ok) throw data;
       return data;
     });
   };
@@ -507,11 +508,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
-     * @name PadelmastersApiDomainEndpointsMatchesEnrollChampionship
+     * @name PadelmastersApiDomainEndpointsMatchesDeleteMatchResult
      * @request DELETE:/api/matches/{matchId}
      * @secure
      */
-    padelmastersApiDomainEndpointsMatchesEnrollChampionship: (matchId: string, params: RequestParams = {}) =>
+    padelmastersApiDomainEndpointsMatchesDeleteMatchResult: (matchId: string, params: RequestParams = {}) =>
       this.request<any, void>({
         path: `/api/matches/${matchId}`,
         method: "DELETE",

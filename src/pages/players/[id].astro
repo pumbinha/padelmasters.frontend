@@ -53,13 +53,35 @@ try {
 
 		<!-- User Statistics Section -->
 		<div class="mb-6 rounded-lg bg-white p-4 shadow">
-			<h2 class="mb-2 text-xl font-bold">Statistics</h2>
+			<!-- <h2 class="mb-2 text-xl font-bold">Statistics</h2> -->
+			<div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+					<dt class="truncate text-sm font-medium text-gray-500">Matches P</dt>
+					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+						{userStatistics.MatchesPlayed}
+					</dd>
+				</div>
+
+				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+					<dt class="truncate text-sm font-medium text-gray-500">Matches w</dt>
+					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+						{userStatistics.MatchesWon}
+					</dd>
+				</div>
+
+				<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+					<dt class="truncate text-sm font-medium text-gray-500">Matches L</dt>
+					<dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+						{userStatistics.MatchesLost}
+					</dd>
+				</div>
+			</div>
 			<div class="grid grid-cols-2 gap-4">
-				<div>
+				<!-- <div>
 					<p class="text-gray-700">Matches P: {userStatistics.MatchesPlayed}</p>
 					<p class="text-gray-700">Matches W: {userStatistics.MatchesWon}</p>
 					<p class="text-gray-700">Matches L: {userStatistics.MatchesLost}</p>
-				</div>
+				</div> -->
 				<div>
 					<p class="text-gray-700">Sets W: {userStatistics.SetsWon}</p>
 					<p class="text-gray-700">Sets L: {userStatistics.SetsLost}</p>

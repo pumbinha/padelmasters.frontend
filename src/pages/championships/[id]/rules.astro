@@ -13,7 +13,7 @@ import {
 	type GroupDto,
 } from "@/services/api";
 
-import { getApi, getFormattedDate, getRequestParams, orderGroupsByName } from "@/services/utils";
+import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
@@ -43,8 +43,6 @@ try {
 	if (championshipResponse.ok) {
 		championship = championshipResponse.data.Championship?.Championship || {};
 		userProfile = championshipResponse.data.Championship?.UserProfile || {};
-		groups = championshipResponse.data.Groups || [];
-		groups = orderGroupsByName(groups);
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
@@ -119,6 +117,10 @@ const tabData = [
 			</div>
 		</div>
 		<Tabs tabData={tabData} />
-		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">Rules here</div>
+		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
+			<div class="grid grid-cols-1 gap-4 text-gray-600 md:grid-cols-2 lg:grid-cols-1">
+				<div set:html={championship.Rules} />
+			</div>
+		</div>
 	</section>
 </Layout>
