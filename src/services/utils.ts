@@ -3,6 +3,7 @@ import {
 	Api,
 	type ApiConfig,
 	type ChampionshipDto,
+	type GroupDto,
 	type PlayerStandingDto,
 	type RequestParams,
 } from "@/services/api";
@@ -59,6 +60,10 @@ export const orderChampionshipDtoByDate = (championships: ChampionshipDto[]): Ch
 			(b.EndDate ? new Date(b.EndDate).getTime() : 0)
 		);
 	});
+};
+
+export const orderGroupsByName = (groups: GroupDto[]): GroupDto[] => {
+	return groups.sort((a, b) => (a.Name ?? "").localeCompare(b.Name ?? ""));
 };
 
 export const orderPlayerStandingDtoByPts = (
