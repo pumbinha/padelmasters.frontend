@@ -18,7 +18,10 @@ const GroupItemLink: React.FC<GroupItemLinkProps> = ({
 	};
 
 	return (
-		<li className="group-card rounded-lg bg-background p-4 shadow-md" onClick={handleClick}>
+		<li
+			className="group-card cursor-pointer rounded-lg bg-background p-4 shadow-md"
+			onClick={handleClick}
+		>
 			<div className="mb-2">
 				<div className="flex items-center justify-between font-medium text-neutral-700">
 					<h3 className="mb-2 text-xl font-bold">{name}</h3>
