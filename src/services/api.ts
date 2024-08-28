@@ -222,6 +222,8 @@ export interface ChampionshipUserProfileDto {
   UserIsOwner?: boolean;
   UserCanJoin?: boolean;
   UserCanLeave?: boolean;
+  /** @format guid */
+  CurrentGroupId?: string | null;
 }
 
 export interface ChampionshipConfigurationDto {

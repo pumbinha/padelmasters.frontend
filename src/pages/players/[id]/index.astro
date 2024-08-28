@@ -59,9 +59,10 @@ const tabData = [
 		icon: CalendarDaysIcon,
 		isCurrent: true,
 	},
+
 	{
-		name: t(TranslationKey.StandingsTitle),
-		url: `/players/${id}/standings`,
+		name: "Ranking", //t(TranslationKey.StandingsTitle),
+		url: `/players/${id}/ranking`,
 		icon: ChartBarIcon,
 		isCurrent: false,
 	},
@@ -97,7 +98,7 @@ const tabData = [
 												scope="col"
 												class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
 											/>
-											<th />
+
 											{match.MatchResults?.map((result) => {
 												return (
 													<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
@@ -123,9 +124,7 @@ const tabData = [
 													class={`${match.Team1?.Team?.Player2?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
 												/>
 											</td>
-											<td>
-												<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
-											</td>
+
 											{match.MatchResults?.map((result) => {
 												return (
 													<td class={`${getWinnerLoserSetClass(1, result)} border-b-2`}>
@@ -151,12 +150,10 @@ const tabData = [
 													class={`${match.Team2?.Team?.Player2?.Id === id ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900"}`}
 												/>
 											</td>
-											<td>
-												<span class="mr-2 h-2 w-2 rounded-full bg-yellow-500" />
-											</td>
+
 											{match.MatchResults?.map((result) => {
 												return (
-													<td class={`${getWinnerLoserSetClass(2, result)} border-b-2`}>
+													<td class={`${getWinnerLoserSetClass(2, result)} `}>
 														{result ? result.ResultTeam2 : ""}
 													</td>
 												);

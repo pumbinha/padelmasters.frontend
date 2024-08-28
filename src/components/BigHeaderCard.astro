@@ -1,0 +1,10 @@
+---
+const { title, value } = Astro.props;
+---
+
+<div class="m-2 overflow-hidden rounded-lg bg-white px-4 py-5 text-center shadow sm:p-6">
+	<dt class="truncate text-sm font-medium text-gray-400">{title}</dt>
+	<dd class="mt-1 text-2xl font-semibold tracking-tight text-primary-400">
+		{value}
+	</dd>
+</div>
