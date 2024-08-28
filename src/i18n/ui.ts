@@ -77,6 +77,8 @@ export enum TranslationKey {
 	SetsLost = "Sets.Lost",
 	PointsWon = "Points.Won",
 	PointsLost = "Points.Lost",
+	Set = "Set",
+	MatchDate = "Match.Date",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -171,6 +173,8 @@ export const ui: UI = {
 		[TranslationKey.SetsLost]: "Sets Lost",
 		[TranslationKey.PointsWon]: "Points Won",
 		[TranslationKey.PointsLost]: "Points Lost",
+		[TranslationKey.Set]: "Set",
+		[TranslationKey.MatchDate]: "Match Date",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -250,5 +254,7 @@ export const ui: UI = {
 		[TranslationKey.SetsLost]: "Sets Perdidos",
 		[TranslationKey.PointsWon]: "Puntos Ganados",
 		[TranslationKey.PointsLost]: " Puntos Perdidos",
+		[TranslationKey.Set]: "Set",
+		[TranslationKey.MatchDate]: "Fecha del partido",
 	},
 };

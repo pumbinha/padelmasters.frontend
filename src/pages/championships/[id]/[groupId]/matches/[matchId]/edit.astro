@@ -17,6 +17,9 @@ const { id, groupId, matchId } = Astro.params;
 
 const errors = { firstName: "", lastName: "", username: "" };
 interface EditFormData {
+	matchDate: string;
+	startDate: string;
+	endDate: string;
 	displayNameTeam1Player1: string;
 	displayNameTeam1Player2: string;
 	displayNameTeam2Player1: string;
@@ -29,6 +32,7 @@ interface EditFormData {
 	team2set3: number;
 }
 
+let matchDate = "";
 let displayNameTeam1Player1 = "";
 let displayNameTeam1Player2 = "";
 let displayNameTeam2Player1 = "";
@@ -39,6 +43,8 @@ let team1set2 = 0;
 let team2set2 = 0;
 let team1set3 = 0;
 let team2set3 = 0;
+let startDate = "";
+let endDate = "";
 
 const returnUrl = `/championships/${id}/${groupId}/matches`;
 
@@ -47,6 +53,10 @@ const api = getApi();
 if (Astro.request.method === "POST") {
 	try {
 		const formData = await parseFormData<EditFormData>(Astro.request);
+		console.log(formData);
+		matchDate = formData["matchDate"] || "";
+		endDate = formData["endDate"] || "";
+		startDate = formData["startDate"] || "";
 		// Assign parsed data to your variables
 		displayNameTeam1Player1 = formData["displayNameTeam1Player1"] || "";
 		displayNameTeam1Player2 = formData["displayNameTeam1Player2"] || "";
@@ -62,7 +72,7 @@ if (Astro.request.method === "POST") {
 
 		try {
 			const model = {
-				Date: new Date().toISOString(),
+				Date: matchDate,
 				MatchResult1: {
 					MatchSet: 1,
 
@@ -122,6 +132,9 @@ if (Astro.request.method === "POST") {
 		if (matchResponse.ok) {
 			const model = matchResponse.data || {};
 
+			matchDate = model.Date || "";
+			startDate = model.StartDate || "";
+			endDate = model.EndDate || "";
 			displayNameTeam1Player1 = `${model.Team1?.Team?.Player1?.FirstName} ${model.Team1?.Team?.Player1?.LastName}`;
 			displayNameTeam1Player2 = `${model.Team1?.Team?.Player2?.FirstName} ${model.Team1?.Team?.Player2?.LastName}`;
 			displayNameTeam2Player1 = `${model.Team2?.Team?.Player1?.FirstName} ${model.Team2?.Team?.Player1?.LastName}`;
@@ -200,7 +213,7 @@ if (Astro.request.method === "POST") {
 							<AutoSelectInputScore id="team1set1" initialValue={team1set1} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">Set - 1</div>
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 1</div>
 						</div>
 						<div class="flex flex-col items-center">
 							<AutoSelectInputScore id="team2set1" initialValue={team2set1} client:load />
@@ -210,7 +223,7 @@ if (Astro.request.method === "POST") {
 							<AutoSelectInputScore id="team1set2" initialValue={team1set2} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">Set - 2</div>
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 2</div>
 						</div>
 						<div class="flex flex-col items-center">
 							<AutoSelectInputScore id="team2set2" initialValue={team2set2} client:load />
@@ -220,11 +233,29 @@ if (Astro.request.method === "POST") {
 							<AutoSelectInputScore id="team1set3" initialValue={team1set3} client:load />
 						</div>
 						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">Set - 3</div>
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 3</div>
 						</div>
 						<div class="flex flex-col items-center">
 							<AutoSelectInputScore id="team2set3" initialValue={team2set3} client:load />
 						</div>
+					</div>
+
+					<div class="py-4">
+						<label for="matchDate" class="block text-sm font-medium text-gray-700">
+							{t(TranslationKey.MatchDate)}
+						</label>
+						<input
+							type="date"
+							id="matchDate"
+							name="matchDate"
+							value={matchDate}
+							min={startDate}
+							max={endDate}
+							required
+							class="my-4 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+						/>
+						<input type="hidden" name="startDate" value={startDate} />
+						<input type="hidden" name="endDate" value={endDate} />
 					</div>
 				</div>
 			</div>
