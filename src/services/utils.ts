@@ -4,6 +4,7 @@ import {
 	type ApiConfig,
 	type ChampionshipDto,
 	type GroupDto,
+	type GroupMatchDto,
 	type GroupMatchSearchDto,
 	type PlayerStandingDto,
 	type RequestParams,
@@ -49,6 +50,12 @@ export const getFormattedDate = (date?: string | null | undefined, session?: Ses
 	return Intl.DateTimeFormat(lang, options).format(new Date(date));
 };
 
+export const getFormattedDateForInput = (date?: string | null | undefined) => {
+	if (!date) return "";
+
+	return new Date(date).toISOString().split("T")[0];
+};
+
 export const isUserLoggedIn = async (session: Session | null) => {
 	const validationResult = await verifyAuth(session);
 	return validationResult.status === "authorized";
@@ -60,6 +67,12 @@ export const orderChampionshipDtoByDate = (championships: ChampionshipDto[]): Ch
 			(a.EndDate ? new Date(a.EndDate).getTime() : 0) -
 			(b.EndDate ? new Date(b.EndDate).getTime() : 0)
 		);
+	});
+};
+
+export const orderGroupMatchSearchDtoByDate = (matches: GroupMatchDto[]): GroupMatchDto[] => {
+	return matches.sort((a, b) => {
+		return (a.Date ? new Date(a.Date).getTime() : 0) - (b.Date ? new Date(b.Date).getTime() : 0);
 	});
 };
 

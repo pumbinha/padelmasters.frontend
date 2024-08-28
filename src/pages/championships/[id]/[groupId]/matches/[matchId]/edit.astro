@@ -6,7 +6,12 @@ import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 
-import { getApi, getRequestParams, parseFormData } from "@/services/utils";
+import {
+	getApi,
+	getFormattedDateForInput,
+	getRequestParams,
+	parseFormData,
+} from "@/services/utils";
 
 import { getSession } from "auth-astro/server";
 const session = await getSession(Astro.request);
@@ -132,9 +137,9 @@ if (Astro.request.method === "POST") {
 		if (matchResponse.ok) {
 			const model = matchResponse.data || {};
 
-			matchDate = model.Date || "";
-			startDate = model.StartDate || "";
-			endDate = model.EndDate || "";
+			matchDate = getFormattedDateForInput(model.Date) || "";
+			startDate = getFormattedDateForInput(model.StartDate) || "";
+			endDate = getFormattedDateForInput(model.EndDate) || "";
 			displayNameTeam1Player1 = `${model.Team1?.Team?.Player1?.FirstName} ${model.Team1?.Team?.Player1?.LastName}`;
 			displayNameTeam1Player2 = `${model.Team1?.Team?.Player2?.FirstName} ${model.Team1?.Team?.Player2?.LastName}`;
 			displayNameTeam2Player1 = `${model.Team2?.Team?.Player1?.FirstName} ${model.Team2?.Team?.Player1?.LastName}`;
@@ -240,8 +245,8 @@ if (Astro.request.method === "POST") {
 						</div>
 					</div>
 
-					<div class="py-4">
-						<label for="matchDate" class="block text-sm font-medium text-gray-700">
+					<div class="py-6">
+						<label for="matchDate" class="block text-sm font-medium text-gray-400">
 							{t(TranslationKey.MatchDate)}
 						</label>
 						<input
@@ -252,7 +257,7 @@ if (Astro.request.method === "POST") {
 							min={startDate}
 							max={endDate}
 							required
-							class="my-4 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+							class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
 						/>
 						<input type="hidden" name="startDate" value={startDate} />
 						<input type="hidden" name="endDate" value={endDate} />
