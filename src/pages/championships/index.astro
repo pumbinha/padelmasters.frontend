@@ -4,7 +4,7 @@ import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
-import { type ChampionshipInformationDto, type ChampionshipUserProfileDto } from "@/services/api";
+import { type ChampionshipInformationDto } from "@/services/api";
 import {
 	getApi,
 	getFormattedDate,
@@ -20,7 +20,6 @@ const t = useTranslations(session);
 const api = getApi();
 
 let championships: ExtendedChampionshipDto[] = []; // extend using UserProfile
-let userProfile: ChampionshipUserProfileDto = {};
 
 try {
 	const championshipResponse =

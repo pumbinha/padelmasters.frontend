@@ -33,8 +33,6 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 
-	// optimize! get get the champ name in the grops endpoint
-	// ========= get championship
 	const userResponse = await api.api.padelmastersApiDomainEndpointsUsersGetUser(
 		id || "",
 		getRequestParams(session)
