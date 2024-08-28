@@ -1,4 +1,4 @@
-import { UserCircleIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { TranslationKey } from "@/i18n/ui";

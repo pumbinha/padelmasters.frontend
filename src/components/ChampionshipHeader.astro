@@ -1,0 +1,71 @@
+---
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { getFormattedDate } from "@/services/utils";
+import { UserCircleIcon } from "@heroicons/react/20/solid";
+import BreadCrumb from "./BreadCrumb.astro";
+import Enroll from "./ui/Enroll";
+import Leave from "./ui/Leave";
+import { getStatusClass } from "./ui/utils";
+
+const { id, championship, userProfile, session } = Astro.props;
+
+const t = useTranslations(session);
+---
+
+<div class="overflow-hidden rounded-lg bg-background shadow-md">
+	<div class="px-4">
+		<BreadCrumb pages={[{ name: "Championships", href: "/championships" }]} />
+	</div>
+	<div class="p-4">
+		<div class="mb-2 flex items-center">
+			<h2 class="mb-2 text-xl font-bold">
+				{championship.Name}
+			</h2>
+			{
+				userProfile.UserIsRegistered && (
+					<UserCircleIcon aria-hidden="true" className="ml-auto h-8 w-8 text-primary-600" />
+				)
+			}
+		</div>
+		<p class="mb-4 text-muted-foreground">{championship.Description}</p>
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-1">
+				<p class="text-xs font-normal text-neutral-600">
+					{t(TranslationKey.ChampionshipsStartDate)}
+				</p>
+				<p class="text-sm font-medium text-neutral-800">
+					{getFormattedDate(championship.StartDate, session)}
+				</p>
+			</div>
+			<div class="flex flex-col gap-1">
+				<p class="text-xs font-normal text-neutral-600">
+					{t(TranslationKey.ChampionshipsEndDate)}
+				</p>
+				<p class="text-sm font-medium text-neutral-800">
+					{getFormattedDate(championship.EndDate, session)}
+				</p>
+			</div>
+		</div>
+
+		<div class="mt-4 flex items-center justify-between">
+			<span
+				class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
+			>
+				{t(`Championships.Status.${championship.Status}`)}
+			</span>
+		</div>
+	</div>
+	<div class="w-full rounded-lg bg-background md:w-auto">
+		{
+			userProfile.UserCanJoin && (
+				<Enroll client:load championshipId={id || ""} text={t(TranslationKey.ActionEnroll)} />
+			)
+		}
+		{
+			userProfile.UserCanLeave && (
+				<Leave client:load championshipId={id || ""} text={t(TranslationKey.ActionLeave)} />
+			)
+		}
+	</div>
+</div>

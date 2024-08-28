@@ -1,9 +1,6 @@
 ---
-import BreadCrumb from "@/components/BreadCrumb.astro";
+import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
 import Tabs from "@/components/Tabs.astro";
-import Enroll from "@/components/ui/Enroll.tsx";
-import Leave from "@/components/ui/Leave.tsx";
-import { getStatusClass } from "@/components/ui/utils.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
@@ -13,9 +10,8 @@ import {
 	type GroupDto,
 } from "@/services/api";
 
-import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
+import { getApi, getRequestParams } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -69,53 +65,12 @@ const tabData = [
 
 <Layout title=`Championship ${championship.Name} `>
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
-		<div class="overflow-hidden rounded-lg bg-background shadow-md">
-			<div class="px-4">
-				<BreadCrumb pages={[{ name: "Championships", href: "/championships" }]} />
-			</div>
-			<div class="p-4">
-				<div class="mb-2 flex items-center">
-					<h2 class="mb-2 text-xl font-bold">
-						{championship.Name}
-					</h2>
-					{
-						userProfile.UserIsRegistered && (
-							<UserCircleIcon aria-hidden="true" className="ml-auto h-8 w-8 text-primary-600" />
-						)
-					}
-				</div>
-				<p class="mb-4 text-muted-foreground">{championship.Description}</p>
-				<div class="mb-4 flex items-center justify-between">
-					<div>
-						<span class="font-medium">{t(TranslationKey.ChampionshipsStartDate)}:</span>
-						{getFormattedDate(championship.StartDate, session)}
-					</div>
-					<div>
-						<span class="font-medium">{t(TranslationKey.ChampionshipsEndDate)}:</span>
-						{getFormattedDate(championship.EndDate, session)}
-					</div>
-				</div>
-				<div class="flex items-center justify-between">
-					<span
-						class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
-					>
-						{t(`Championships.Status.${championship.Status}`)}
-					</span>
-				</div>
-			</div>
-			<div class="w-full rounded-lg bg-background md:w-auto">
-				{
-					userProfile.UserCanJoin && (
-						<Enroll client:load championshipId={id || ""} text={t(TranslationKey.ActionEnroll)} />
-					)
-				}
-				{
-					userProfile.UserCanLeave && (
-						<Leave client:load championshipId={id || ""} text={t(TranslationKey.ActionLeave)} />
-					)
-				}
-			</div>
-		</div>
+		<ChampionshipHeader
+			id={id}
+			championship={championship}
+			userProfile={userProfile}
+			session={session}
+		/>
 		<Tabs tabData={tabData} />
 		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
 			<div class="grid grid-cols-1 gap-4 text-gray-600 md:grid-cols-2 lg:grid-cols-1">
