@@ -1,3 +1,5 @@
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
 import { getApi, getRequestParams } from "@/services/utils";
 import type { APIRoute } from "astro";
 import { getSession } from "auth-astro/server";
@@ -18,12 +20,13 @@ export const POST: APIRoute = async ({ request }) => {
 		const session = await getSession(request);
 
 		const api = getApi();
+		const t = useTranslations(session);
 
 		await api.api.padelmastersApiDomainEndpointsChampionshipsLeaveChampionship(
 			data.championshipId,
 			getRequestParams(session)
 		);
-		return new Response(JSON.stringify("yaaas"), {
+		return new Response(JSON.stringify(t(TranslationKey.LeaveSuccessful)), {
 			status: 200,
 			headers: {
 				"Content-Type": "application/json",

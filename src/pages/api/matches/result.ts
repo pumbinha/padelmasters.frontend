@@ -18,7 +18,6 @@ export const DELETE: APIRoute = async ({ request }) => {
 		const session = await getSession(request);
 
 		const api = getApi();
-		console.log(data.matchId);
 
 		const response = await api.api.padelmastersApiDomainEndpointsMatchesDeleteMatchResult(
 			data.matchId,

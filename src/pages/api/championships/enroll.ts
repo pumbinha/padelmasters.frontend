@@ -22,13 +22,12 @@ export const POST: APIRoute = async ({ request }) => {
 		const api = getApi();
 		const t = useTranslations(session);
 
-		const serverResponse =
-			await api.api.padelmastersApiDomainEndpointsChampionshipsEnrollChampionship(
-				data.championshipId,
-				{},
-				getRequestParams(session)
-			);
-		console.log(serverResponse);
+		await api.api.padelmastersApiDomainEndpointsChampionshipsEnrollChampionship(
+			data.championshipId,
+			{},
+			getRequestParams(session)
+		);
+
 		return new Response(JSON.stringify(t(TranslationKey.EnrollSuccessful)), {
 			status: 200,
 			headers: {

@@ -1,4 +1,5 @@
 ---
+import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 
 import { useTranslations } from "@/i18n/utils";
@@ -27,6 +28,8 @@ let email: string = "";
 let username: string = "";
 let locale: string = "";
 let locales: string[] = [];
+
+let errorMessage = "";
 
 if (Astro.request.method === "POST") {
 	try {
@@ -69,11 +72,8 @@ if (Astro.request.method === "POST") {
 			});
 		} catch (e) {
 			console.log(e);
+			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
-
-		// SEND DATA TO KEYCLOACK
-
-		//has errors, show tooltip
 
 		const data = {
 			firstName: firstName,
@@ -99,11 +99,13 @@ if (Astro.request.method === "POST") {
 			}
 		} catch (e) {
 			console.log(e);
+			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error.message);
 		}
+		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 } else if (Astro.request.method === "GET") {
 	//Fetch user data
@@ -130,6 +132,7 @@ if (Astro.request.method === "POST") {
 		});
 	} catch (e) {
 		console.log(e);
+		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 
 	const localeUrl = `${issuerUrl}/account/supportedLocales`;
@@ -148,6 +151,7 @@ if (Astro.request.method === "POST") {
 		});
 	} catch (e) {
 		console.log(e);
+		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 }
 ---
@@ -267,5 +271,6 @@ if (Astro.request.method === "POST") {
 				</button>
 			</div>
 		</form>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</div>
 </Layout>
