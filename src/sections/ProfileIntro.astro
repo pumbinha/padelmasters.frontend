@@ -1,6 +1,7 @@
 ---
 import Tabs from "@/components/Tabs.astro";
 import SignOutComponent from "@/components/ui/SignOut.tsx";
+import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { type SearchMatchesRequest } from "@/services/api";
@@ -19,6 +20,7 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let championshipsAndGroups: ChampionshipAndGroupDto[] = [];
 
@@ -39,6 +41,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -128,4 +131,5 @@ const tabData = [
 			</ul>
 		)
 	}
+	{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 </div>

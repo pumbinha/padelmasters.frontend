@@ -1,6 +1,7 @@
 ---
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
+import Toast from "@/components/ui/Toast";
 import { getStandingRowClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
@@ -25,6 +26,7 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let group: GroupDto = {};
 let championship: ChampionshipDto = {};
@@ -68,6 +70,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -237,5 +240,6 @@ const tabData = [
 				</div>
 			</div>
 		</div>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

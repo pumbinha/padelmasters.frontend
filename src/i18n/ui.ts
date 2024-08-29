@@ -79,6 +79,9 @@ export enum TranslationKey {
 	PointsLost = "Points.Lost",
 	Set = "Set",
 	MatchDate = "Match.Date",
+	ErrorLoadingData = "Error.Loading.Data",
+	EnrollSuccessful = "Enroll.Successful",
+	LeaveSuccessful = "Leave.Successful",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -175,6 +178,9 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: "Points Lost",
 		[TranslationKey.Set]: "Set",
 		[TranslationKey.MatchDate]: "Match Date",
+		[TranslationKey.ErrorLoadingData]: "Oops! Something went wrong. Please try again later.",
+		[TranslationKey.EnrollSuccessful]: "Enroll successful!",
+		[TranslationKey.LeaveSuccessful]: "Leave successful!",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -256,6 +262,10 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: " Puntos Perdidos",
 		[TranslationKey.Set]: "Set",
 		[TranslationKey.MatchDate]: "Fecha del partido",
+		[TranslationKey.ErrorLoadingData]:
+			"Oops! Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+		[TranslationKey.EnrollSuccessful]: "Apuntado con éxito!",
+		[TranslationKey.LeaveSuccessful]: "Abandonado con éxito!",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -275,7 +285,8 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsStatus]: "Status",
 		[TranslationKey.ChampionshipsType]: "Typ",
 		[TranslationKey.ChampionshipsAdd]: "Meisterschaft hinzufügen",
-		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "Wie wäre es mit der Erstellung einer?",
+		[TranslationKey.ChampionshipsNoChampionshipsDescription]:
+			"Wie wäre es mit der Erstellung einer?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "Es gibt keine erstellten Meisterschaften!",
 		[TranslationKey.ActionEnroll]: "Einschreiben",
 		[TranslationKey.ActionLeave]: "Verlassen",
@@ -316,7 +327,8 @@ export const ui: UI = {
 		[TranslationKey.ProfileUsername]: "Benutzername",
 		[TranslationKey.MatchesTitle]: "Spiele",
 		[TranslationKey.MatchRestartTitle]: "Spiel zurücksetzen",
-		[TranslationKey.MatchRestartMessage]: "Bist du sicher, dass du das Spiel zurücksetzten möchtest?",
+		[TranslationKey.MatchRestartMessage]:
+			"Bist du sicher, dass du das Spiel zurücksetzten möchtest?",
 		[TranslationKey.Restart]: "Zurücksetzen",
 		[TranslationKey.GroupsTitle]: "Gruppen",
 		[TranslationKey.RulesTitle]: "Regeln",
@@ -337,5 +349,8 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: "Verlorene Punkte",
 		[TranslationKey.Set]: "Satz",
 		[TranslationKey.MatchDate]: "Datum des Spiels",
-	},	
+		[TranslationKey.ErrorLoadingData]: "", // TODO: @Karl, please provide a translation
+		[TranslationKey.EnrollSuccessful]: "", // TODO: @Karl, please provide a translation
+		[TranslationKey.LeaveSuccessful]: "", // TODO: @Karl, please provide a translation
+	},
 };

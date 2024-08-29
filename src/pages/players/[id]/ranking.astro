@@ -1,5 +1,6 @@
 ---
 import Tabs from "@/components/Tabs.astro";
+import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
@@ -22,6 +23,7 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let user: UserDto = {};
 
@@ -51,6 +53,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 try {
@@ -106,6 +109,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -228,5 +232,6 @@ const tabData = [
 				}
 			</ul>
 		</div>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

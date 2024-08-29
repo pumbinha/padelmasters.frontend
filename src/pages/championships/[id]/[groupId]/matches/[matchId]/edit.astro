@@ -1,10 +1,12 @@
 ---
 import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
 import ReturnButton from "@/components/ui/ReturnButton ";
+import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import { isAPIError, type APIError } from "@/services/types.ts";
 
 import {
 	getApi,
@@ -20,7 +22,7 @@ const t = useTranslations(session);
 
 const { id, groupId, matchId } = Astro.params;
 
-const errors = { firstName: "", lastName: "", username: "" };
+let errorMessage = "";
 interface EditFormData {
 	matchDate: string;
 	startDate: string;
@@ -58,7 +60,7 @@ const api = getApi();
 if (Astro.request.method === "POST") {
 	try {
 		const formData = await parseFormData<EditFormData>(Astro.request);
-		console.log(formData);
+
 		matchDate = formData["matchDate"] || "";
 		endDate = formData["endDate"] || "";
 		startDate = formData["startDate"] || "";
@@ -104,31 +106,21 @@ if (Astro.request.method === "POST") {
 				getRequestParams(session)
 			);
 
-			// TODO: use server validation
-
-			if (postMatch.status == 400) {
-				const err = postMatch.error;
-				console.log("here");
-			}
 			if (postMatch.ok) {
 				return Astro.redirect(returnUrl);
 			}
 		} catch (e) {
+			if (isAPIError(e)) {
+				const errorAPI = e as APIError;
+				errorMessage = errorAPI.error.Errors.GeneralErrors.join("\n");
+			}
 			console.log(e);
-
-			//console.log(e.error.Errors.GeneralErrors);
-			console.log("but here");
 		}
 	} catch (error) {
-		if (error instanceof Error) {
-			console.error(error.message);
-		}
+		console.log(error);
+		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 } else if (Astro.request.method === "GET") {
-	if (!session) {
-		Astro.redirect("/sign-in");
-	}
-
 	try {
 		const matchResponse = await api.api.padelmastersApiDomainEndpointsMatchesGetMatch(
 			matchId || "",
@@ -155,16 +147,15 @@ if (Astro.request.method === "POST") {
 
 			Astro.redirect("/not-found");
 		}
-		console.log(matchResponse.error);
 	} catch (e) {
-		console.log("here");
 		console.log(e);
+		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 }
 ---
 
 <Layout title="Match Edit">
-	<div class="flex h-full items-center justify-center py-36">
+	<div class="flex h-full items-center justify-center py-12">
 		<form method="POST">
 			<div class="overflow-hidden bg-white shadow sm:rounded-md">
 				<div class="mt-4 w-full max-w-lg divide-y-2 rounded-lg bg-white p-6 shadow-md">
@@ -274,5 +265,6 @@ if (Astro.request.method === "POST") {
 				</button>
 			</div>
 		</form>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</div>
 </Layout>

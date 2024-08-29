@@ -38,6 +38,7 @@
 		"nanostores": "^0.11.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"react-toastify": "^10.0.5",
 		"sharp": "^0.33.4",
 		"swagger-typescript-api": "^13.0.13",
 		"tailwind-merge": "^2.4.0",
