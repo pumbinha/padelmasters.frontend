@@ -1,0 +1,271 @@
+---
+import BreadCrumb from "@/components/BreadCrumb.astro";
+import Tabs from "@/components/Tabs.astro";
+import Popup from "@/components/ui/Popup";
+import { getWinnerLoserSetClass } from "@/components/ui/utils";
+import UsersLink from "@/components/UsersLink.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import {
+	MatchStatus,
+	type ChampionshipDto,
+	type GroupDetailDto,
+	type GroupDto,
+	type GroupMatchDto,
+	type PlayerStandingDto,
+} from "@/services/api";
+
+import {
+	getApi,
+	getFormattedDate,
+	getRequestParams,
+	orderGroupMatchSearchDtoByDate,
+} from "@/services/utils";
+import { PencilIcon } from "@heroicons/react/20/solid";
+import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { getSession } from "auth-astro/server";
+
+const { id, groupId } = Astro.params;
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let group: GroupDto = {};
+let championship: ChampionshipDto = {};
+let groupDetail: GroupDetailDto = {};
+let playerStandings: PlayerStandingDto[] = [];
+let matches: GroupMatchDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// ========= get group
+	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
+		groupId || "",
+		getRequestParams(session)
+	);
+
+	if (groupResponse.ok) {
+		group = groupResponse.data.Group?.Group || {};
+		championship = groupResponse.data.Group?.Championship || {};
+		groupDetail = groupResponse.data.Group?.GroupDetail || {};
+	} else {
+		// 404
+		Astro.redirect("/group/not-found");
+	}
+
+	// ========= get matches
+	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+		const SearchMatchesRequest = {
+			GroupId: groupId || "",
+		};
+		const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+			SearchMatchesRequest,
+			getRequestParams(session)
+		);
+		if (standingsResponse.ok) {
+			const searchData = standingsResponse.data || [];
+			matches = searchData.flatMap((group) => {
+				return group.Match || [];
+			});
+
+			matches = orderGroupMatchSearchDtoByDate(matches);
+		} else {
+			// 404
+			Astro.redirect("/not-found");
+		}
+	}
+} catch (e) {
+	console.error(e);
+}
+
+const tabData = [
+	{
+		name: t(TranslationKey.MatchesTitle),
+		url: `/championships/${id}/${groupId}/matches`,
+		icon: CalendarDaysIcon,
+		isCurrent: true,
+	},
+	{
+		name: t(TranslationKey.StandingsTitle),
+		url: `/championships/${id}/${groupId}/standings`,
+		icon: ChartBarIcon,
+		isCurrent: false,
+	},
+];
+---
+
+<Layout title=`Group ${group.Name} `>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="overflow-hidden rounded-lg bg-background shadow-md">
+			<div class="px-4">
+				<BreadCrumb
+					pages={[
+						{ name: "Championships", href: "/championships" },
+						{ name: championship.Name, href: `/championships/${id}` },
+					]}
+				/>
+			</div>
+
+			<div class="p-4">
+				<div class="mb-2 flex items-center">
+					<h2 class="mb-2 text-xl font-bold">
+						{group.Name}
+					</h2>
+				</div>
+				<p class="mb-4 text-muted-foreground">{group.Description}</p>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">{t(TranslationKey.NumberOfPlayers)}</p>
+						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberPlayers}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.NumberMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberMatches}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.PlayedMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">
+							{groupDetail.NumberOfPlayedMatches}
+						</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.PendingMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">
+							{groupDetail.NumberOfPendingMatches}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<Tabs tabData={tabData} />
+		<div class="p-4">
+			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
+				{
+					matches.map((match) => (
+						<div class="py-4">
+							<div>
+								<div>
+									<span
+										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
+									>
+										{match.Status}
+									</span>
+									<span class="ml-4 text-xs font-light text-neutral-500">
+										{getFormattedDate(match.Date, session)}
+									</span>
+									<span class="float-right ml-4 text-xs font-light text-neutral-500">
+										{match.CurrentUserCanDelete && (
+											<Popup
+												title={t(TranslationKey.MatchRestartTitle)}
+												text={t(TranslationKey.MatchRestartMessage)}
+												textActionButton={t(TranslationKey.Restart)}
+												textCancelButton={t(TranslationKey.Cancel)}
+												matchId={match.Id || ""}
+												url={`/championships/${id}/${groupId}/matches`}
+												client:load
+											/>
+										)}
+									</span>
+
+									<span class="float-right ml-4 text-xs font-light text-neutral-500">
+										{match.CurrentUserCanEdit && (
+											<a href={`/championships/${id}/${groupId}/matches/${match.Id}/edit`}>
+												<PencilIcon className="h-4 w-4" />
+											</a>
+										)}
+									</span>
+								</div>
+							</div>
+							<div>
+								<table class="min-w-full">
+									<thead>
+										<tr>
+											<th
+												scope="col"
+												class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
+											/>
+
+											{match.MatchResults?.map(() => {
+												return (
+													<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
+												);
+											})}
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td
+												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
+											>
+												<UsersLink
+													userId={match.Team1?.Team?.Player1?.Id || ""}
+													displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
+													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
+												/>
+
+												<br />
+												<UsersLink
+													userId={match.Team1?.Team?.Player2?.Id || ""}
+													displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
+													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
+												/>
+											</td>
+
+											{match.MatchResults?.map((result) => {
+												return (
+													<td class={`${getWinnerLoserSetClass(1, result)} border-b-2`}>
+														{result ? result.ResultTeam1 : ""}
+													</td>
+												);
+											})}
+										</tr>
+										<tr>
+											<td
+												class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900 hover:text-gray-600"}`}
+											>
+												<UsersLink
+													userId={match.Team2?.Team?.Player1?.Id || ""}
+													displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
+													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
+												/>
+
+												<br />
+												<UsersLink
+													userId={match.Team2?.Team?.Player2?.Id || ""}
+													displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
+													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
+												/>
+											</td>
+
+											{match.MatchResults?.map((result) => {
+												return (
+													<td class={`${getWinnerLoserSetClass(2, result)}`}>
+														{result ? result.ResultTeam2 : ""}
+													</td>
+												);
+											})}
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</section>
+</Layout>

@@ -1,20 +1,28 @@
 ---
-import { SignIn as SignInComponent } from "astro-clerk-auth/components/interactive";
+import SignInComponent from "@/components/ui/SignIn.tsx";
+import { TranslationKey } from "@/i18n/ui";
+import { getSession } from "auth-astro/server";
+import { useTranslations } from "../i18n/utils";
 import Layout from "../layouts/Layout.astro";
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
 ---
 
-<Layout title="Welcome to Padel Masters">
-  <div>
-    <SignInComponent />
-  </div>
-</Layout>
+<Layout title="Sign in">
+	<div
+		class="flex h-auto flex-col items-center justify-center self-auto bg-background"
+		id="thefather"
+	>
+		<div class="w-full max-w-md self-auto rounded-lg bg-card px-6 py-8 shadow-lg">
+			<div class="flex flex-col place-content-center items-center space-y-6">
+				<div class="text-center">
+					<h1 class="text-xl font-bold text-foreground">{t(TranslationKey.SignInTitle)}</h1>
+				</div>
 
-<style>
-  div {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
-</style>
+				<div class="flex items-center space-x-4">
+					<SignInComponent client:load>{t(TranslationKey.SignIn)}</SignInComponent>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>

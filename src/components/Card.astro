@@ -1,18 +1,20 @@
 ---
 interface Props {
-	name: string
-	points: number
+	name: string;
+	points: number;
 }
 
-const { name, points } = Astro.props
+const { name, points } = Astro.props;
 ---
 
 <div>
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-4">
-			<div class="font-medium">{name}</div>
+			<div class="font-medium">Karl Muller Gonzalez</div>
 			<div class="text-sm text-muted-foreground">9-7</div>
 		</div>
-		<div class="font-medium text-primary">{points} pts</div>
+		<div class="font-medium text-muted">{points}</div>
+		<div class="font-medium text-primary">{points}</div>
+		<div class="font-medium text-primary">{points}</div>
 	</div>
 </div>

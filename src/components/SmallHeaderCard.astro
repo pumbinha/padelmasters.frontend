@@ -1,0 +1,12 @@
+---
+const { title, value } = Astro.props;
+---
+
+<div
+	class="m-2 flex grid-cols-2 justify-between overflow-hidden rounded-lg bg-white px-4 py-2 text-center align-middle shadow sm:p-6"
+>
+	<div class="text-xs font-medium text-gray-400">{title}</div>
+	<div class="text-base font-semibold text-primary-400">
+		{value}
+	</div>
+</div>

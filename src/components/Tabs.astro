@@ -1,0 +1,36 @@
+---
+type TabItem = {
+	name: string;
+	icon: any;
+	url: string;
+	isCurrent: boolean;
+};
+
+export type TabsProps = {
+	tabData?: TabItem[];
+};
+
+const { tabData = [] }: TabsProps = Astro.props;
+---
+
+<div class="border-b border-gray-200 px-4">
+	<div class="border-b border-gray-200">
+		<nav aria-label="tabs" class="-mb-px flex space-x-8">
+			{
+				tabData.map((tab: TabItem) => (
+					<a
+						href={tab.url}
+						aria-current={tab.isCurrent ? "page" : undefined}
+						class={`group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium ${tab.isCurrent ? "border-vivid-700 text-vivid-700" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"}`}
+					>
+						<tab.icon
+							aria-hidden="true"
+							className={`${tab.isCurrent ? "text-vivid-700" : "text-gray-400 group-hover:text-gray-500"} -ml-0.5 mr-2 h-5 w-5`}
+						/>
+						<span>{tab.name}</span>
+					</a>
+				))
+			}
+		</nav>
+	</div>
+</div>

@@ -1,0 +1,75 @@
+---
+import { type BreadCrumbProps } from "@/components/ui/types.ts";
+import { HomeIcon } from "@heroicons/react/20/solid";
+
+let pages: BreadCrumbProps = Astro.props.pages;
+---
+
+<div aria-label="Breadcrumb" class="flex">
+	<!-- <ol role="list" class="flex items-center space-x-4">
+		<li>
+			<div>
+				<a href="/" class="text-neutral-400 hover:text-vivid-700">
+					<HomeIcon aria-hidden="true" class="h-5 w-5 flex-shrink-0" />
+					<span class="sr-only">Home</span>
+				</a>
+			</div>
+		</li>
+		{
+			pages.map((page) => (
+				<li>
+					<div class="flex items-center">
+						<svg
+							fill="currentColor"
+							viewBox="0 0 20 20"
+							aria-hidden="true"
+							class="h-5 w-5 flex-shrink-0 text-gray-300"
+						>
+							<path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+						</svg>
+						<a
+							href={page.href}
+							class="ml-4 text-sm font-medium text-neutral-400 hover:text-vivid-700"
+						>
+							{page.name}
+						</a>
+					</div>
+				</li>
+			))
+		}
+	</ol> -->
+
+	<ol role="list" class="flex space-x-4 rounded-md bg-white px-6 shadow">
+		<li class="flex">
+			<div class="flex items-center">
+				<a href="/" class="text-gray-400 hover:text-gray-500">
+					<HomeIcon className="h-5 w-5" />
+					<span class="sr-only">Home</span>
+				</a>
+			</div>
+		</li>
+		{
+			pages.map((page) => (
+				<li class="flex">
+					<div class="flex items-center">
+						<svg
+							fill="currentColor"
+							viewBox="0 0 24 44"
+							preserveAspectRatio="none"
+							aria-hidden="true"
+							class="h-full w-6 flex-shrink-0 text-gray-200"
+						>
+							<path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+						</svg>
+						<a
+							href={page.href}
+							class="gray-red-500 ml-4 text-sm font-medium text-neutral-400 hover:text-gray-700"
+						>
+							{page.name}
+						</a>
+					</div>
+				</li>
+			))
+		}
+	</ol>
+</div>

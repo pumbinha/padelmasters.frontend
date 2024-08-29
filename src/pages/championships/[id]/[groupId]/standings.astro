@@ -1,0 +1,241 @@
+---
+import BreadCrumb from "@/components/BreadCrumb.astro";
+import Tabs from "@/components/Tabs.astro";
+import { getStandingRowClass } from "@/components/ui/utils";
+import UsersLink from "@/components/UsersLink.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import {
+	GroupType,
+	type ChampionshipDto,
+	type GroupDetailDto,
+	type GroupDto,
+	type GroupMatchDto,
+	type PlayerStandingDto,
+} from "@/services/api";
+import { getApi, getRequestParams, orderPlayerStandingDtoByPts } from "@/services/utils";
+import { StarIcon } from "@heroicons/react/16/solid";
+import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { getSession } from "auth-astro/server";
+
+const { id, groupId } = Astro.params;
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let group: GroupDto = {};
+let championship: ChampionshipDto = {};
+let groupDetail: GroupDetailDto = {};
+let playerStandings: PlayerStandingDto[] = [];
+let matches: GroupMatchDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// ========= get group
+	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
+		groupId || "",
+		getRequestParams(session)
+	);
+
+	if (groupResponse.ok) {
+		group = groupResponse.data.Group?.Group || {};
+		championship = groupResponse.data.Group?.Championship || {};
+		groupDetail = groupResponse.data.Group?.GroupDetail || {};
+	} else {
+		// 404
+		Astro.redirect("/group/not-found");
+	}
+
+	// ========= get standings
+	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
+			groupId || "",
+			getRequestParams(session)
+		);
+		if (standingsResponse.ok) {
+			playerStandings = standingsResponse.data.PlayerStandings || [];
+			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
+		} else {
+			// 404
+			Astro.redirect("/not-found");
+		}
+	}
+} catch (e) {
+	console.error(e);
+}
+
+const tabData = [
+	{
+		name: t(TranslationKey.MatchesTitle),
+		url: `/championships/${id}/${groupId}/matches`,
+		icon: CalendarDaysIcon,
+		isCurrent: false,
+	},
+	{
+		name: t(TranslationKey.StandingsTitle),
+		url: `/championships/${id}/${groupId}/standings`,
+		icon: ChartBarIcon,
+		isCurrent: true,
+	},
+];
+---
+
+<Layout title=`Group ${group.Name} `>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="overflow-hidden rounded-lg bg-background shadow-md">
+			<div class="px-4">
+				<BreadCrumb
+					pages={[
+						{ name: "Championships", href: "/championships" },
+						{ name: championship.Name, href: `/championships/${id}` },
+					]}
+				/>
+			</div>
+
+			<div class="p-4">
+				<div class="mb-2 flex items-center">
+					<h2 class="mb-2 text-xl font-bold">
+						{group.Name}
+					</h2>
+				</div>
+				<p class="mb-4 text-muted-foreground">{group.Description}</p>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">{t(TranslationKey.NumberOfPlayers)}</p>
+						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberPlayers}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.NumberMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberMatches}</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.PlayedMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">
+							{groupDetail.NumberOfPlayedMatches}
+						</p>
+					</div>
+					<div class="flex flex-col gap-1">
+						<p class="text-xs font-normal text-neutral-600">
+							{t(TranslationKey.PendingMatches)}
+						</p>
+						<p class="text-sm font-medium text-neutral-800">
+							{groupDetail.NumberOfPendingMatches}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<Tabs tabData={tabData} />
+		<div class="p-4">
+			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
+				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+						<table class="min-w-full divide-y divide-gray-300">
+							<thead>
+								<tr>
+									<th
+										scope="col"
+										class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+									>
+										<div>{t(TranslationKey.StandingsName)}</div>
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
+									</th>
+									<th
+										scope="col"
+										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
+									>
+										<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+										<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y">
+								{
+									playerStandings.map((player, index) => (
+										<tr
+											class={`${getStandingRowClass(group.GroupType || GroupType.League, index, groupDetail.NumberOfFinalists)}`}
+										>
+											<td
+												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
+											>
+												<span class="inline-block align-middle">
+													<UsersLink
+														userId={player.UserId}
+														displayName={`${index + 1}. ${player.DisplayName}`}
+													/>
+												</span>
+												{(group.GroupType || GroupType.League) === GroupType.Americano &&
+													((index === 0 && (
+														<StarIcon
+															aria-hidden="true"
+															className="ml-auto h-4 w-4 text-yellow-400  inline-block align-middle"
+														/>
+													)) ||
+														(index === 1 && (
+															<StarIcon
+																aria-hidden="true"
+																className="ml-auto h-4 w-4 text-gray-400 inline-block align-middle "
+															/>
+														)) ||
+														(index === 2 && (
+															<StarIcon
+																aria-hidden="true"
+																className="ml-auto h-4 w-4 text-orange-700 inline-block align-middle"
+															/>
+														)))}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+												{player.PlayedMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+												{player.WonMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+												{player.LostMatches}
+											</td>
+											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
+												{player.Points}
+											</td>
+										</tr>
+									))
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>

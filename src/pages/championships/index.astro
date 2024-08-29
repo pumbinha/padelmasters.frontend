@@ -1,7 +1,140 @@
 ---
+import type { ExtendedChampionshipDto } from "@/components/ui/types";
+import { getStatusClass } from "@/components/ui/utils.tsx";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import { type ChampionshipInformationDto } from "@/services/api";
+import {
+	getApi,
+	getFormattedDate,
+	getRequestParams,
+	orderChampionshipDtoByDate,
+} from "@/services/utils";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { getSession } from "auth-astro/server";
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let championships: ExtendedChampionshipDto[] = []; // extend using UserProfile
+
+try {
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionships(
+			getRequestParams(session)
+		);
+	if (championshipResponse.ok) {
+		const data: ChampionshipInformationDto[] = championshipResponse.data || [];
+		data.flatMap((element: ChampionshipInformationDto) => {
+			if (element.Championship) {
+				championships.push({
+					...element.Championship,
+					...element.UserProfile,
+				});
+			}
+		});
+
+		championships = orderChampionshipDtoByDate(championships);
+	} else {
+		console.error(championshipResponse);
+	}
+} catch (e) {
+	console.error(e);
+}
 ---
 
-<Layout title="Padel Masters - Championships">
-  <div>This is a list of championships</div>
+<Layout title="Championships">
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<div class="w-full rounded-lg bg-background p-6">
+			<div class="mb-6 flex items-center justify-between">
+				<h1 class="text-base font-semibold text-foreground text-gray-600">
+					{t(TranslationKey.ChampionshipsTitle)}
+				</h1>
+			</div>
+			{
+				championships.length === 0 && (
+					<div class="w-full max-w-md rounded-lg bg-background p-6 text-center shadow-md">
+						<h2 class="mb-2 text-xl font-bold">
+							{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
+						</h2>
+						<p class="text-muted-foreground">
+							{t(TranslationKey.ChampionshipsNoChampionshipsDescription)}
+						</p>
+					</div>
+				)
+			}
+
+			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+				{
+					championships.map((championship) => {
+						return (
+							<div
+								class="championship-card cursor-pointer overflow-hidden rounded-lg bg-background shadow-md"
+								data-url={`/championships/${championship.Id}`}
+							>
+								<div class="p-4">
+									<div class="mb-2 flex items-center">
+										<h2 class="mb-2 text-xl font-bold text-gray-700">{championship.Name}</h2>
+										{championship.UserIsRegistered && (
+											<UserCircleIcon
+												aria-hidden="true"
+												className="ml-auto h-8 w-8 text-primary-600"
+											/>
+										)}
+									</div>
+									<p class="mb-4 text-muted-foreground">{championship.Description}</p>
+									<div class="mb-4 flex items-center justify-between">
+										<div>
+											<span class="text-xs font-light">
+												{t(TranslationKey.ChampionshipsStartDate)}
+											</span>
+											<span class="block text-sm font-semibold">
+												{getFormattedDate(championship.StartDate, session)}
+											</span>
+										</div>
+										<div>
+											<span class="text-xs font-light">
+												{t(TranslationKey.ChampionshipsEndDate)}:
+											</span>
+											<span class="block text-sm font-semibold">
+												{getFormattedDate(championship.EndDate, session)}
+											</span>
+										</div>
+									</div>
+									<div class="flex items-center justify-between">
+										<span
+											class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
+										>
+											{t(`Championships.Status.${championship.Status}`)}
+										</span>
+									</div>
+								</div>
+							</div>
+						);
+					})
+				}
+			</div>
+		</div>
+	</section>
 </Layout>
+
+<script>
+	const cards = document.querySelectorAll(".championship-card");
+
+	cards.forEach((card) => {
+		card.addEventListener("click", (event) => {
+			if (!event.currentTarget) {
+				return;
+			}
+			const target = event.currentTarget as HTMLElement;
+			const url = target.getAttribute("data-url");
+
+			if (url) {
+				window.location.href = url;
+			}
+		});
+	});
+</script>

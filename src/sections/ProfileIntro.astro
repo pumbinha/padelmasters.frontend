@@ -1,0 +1,131 @@
+---
+import Tabs from "@/components/Tabs.astro";
+import SignOutComponent from "@/components/ui/SignOut.tsx";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { type SearchMatchesRequest } from "@/services/api";
+import {
+	distinctGroupMatchSearchDtos,
+	getApi,
+	getRequestParams,
+	type ChampionshipAndGroupDto,
+} from "@/services/utils";
+import { ListBulletIcon } from "@heroicons/react/20/solid";
+import { Cog8ToothIcon, PlusIcon, QueueListIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
+
+const t = useTranslations(session);
+
+const api = getApi();
+
+let championshipsAndGroups: ChampionshipAndGroupDto[] = [];
+
+try {
+	const searchMatchesRequest: SearchMatchesRequest = {
+		UserId: session?.user?.id || "",
+	};
+	const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+		searchMatchesRequest,
+		getRequestParams(session)
+	);
+	if (standingsResponse.ok) {
+		const championships = standingsResponse.data || [];
+		championshipsAndGroups = distinctGroupMatchSearchDtos(championships);
+	} else {
+		// 404
+		Astro.redirect("/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
+
+const tabData = [
+	{
+		name: t(TranslationKey.MyChampionships),
+		url: `/championships/profile`,
+		icon: ListBulletIcon,
+		isCurrent: true,
+	},
+];
+---
+
+<div class="flex h-full items-center justify-center">
+	<div
+		class="flex h-96 w-full max-w-2xl items-center justify-evenly divide-x divide-gray-200 rounded-lg bg-white p-8 shadow-lg"
+	>
+		<div class="divide-y divide-gray-200 rounded-lg bg-white text-center shadow">
+			<div class="flex-8 flex flex-col p-12">
+				<UserCircleIcon className="h-14 w-14 self-center text-primary-600" />
+				<h3 class="mt-6 text-base font-bold text-gray-900">{session?.user?.name}</h3>
+			</div>
+
+			<div
+				class="flex place-items-center content-stretch items-center justify-evenly divide-x divide-gray-200"
+			>
+				<a
+					href="/profile/edit"
+					class="rounded-md bg-neutral-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-700"
+				>
+					<Cog8ToothIcon className="mr-4 inline-block h-6 w-6 text-primary-foreground" />
+					{t(TranslationKey.AccounSettings)}
+				</a>
+
+				<SignOutComponent client:load text={t(TranslationKey.SignOut)} />
+			</div>
+		</div>
+	</div>
+</div>
+
+<Tabs tabData={tabData} />
+<div class="w-full rounded-md bg-white shadow">
+	{
+		(!championshipsAndGroups || championshipsAndGroups.length === 0) && (
+			<div class="mb-8 mt-8 text-center">
+				<QueueListIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-400" />
+
+				<h3 class="mt-2 text-sm font-semibold text-gray-900">
+					{t(TranslationKey.NoChampionshipsTitle)}
+				</h3>
+				<p class="mt-1 text-sm text-gray-500">{t(TranslationKey.NoChampionshipsDescription)}</p>
+				<div class="mb-8 py-8">
+					<a
+						href="/championships"
+						class="inline-flex items-center rounded-md bg-primary-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-1000 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+					>
+						<PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
+
+						{t(TranslationKey.FindChampionship)}
+					</a>
+				</div>
+			</div>
+		)
+	}
+
+	{
+		championshipsAndGroups.length > 0 && (
+			<ul role="list" class="divide-y divide-gray-200">
+				{championshipsAndGroups.map((championshipsAndGroup) => {
+					return (
+						<li class="px-6 py-4">
+							<a
+								href={`/championships/${championshipsAndGroup.Championship?.Id}`}
+								class="bg-primary-50 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-600 hover:text-primary-400"
+							>
+								{championshipsAndGroup.Championship?.Name}
+							</a>
+							<span class="mx-2 text-gray-500">/</span>
+							<a
+								href={`/championships/${championshipsAndGroup.Championship?.Id}/${championshipsAndGroup.Group?.Id}/matches`}
+								class="bg-primary-50 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-600 hover:text-primary-400"
+							>
+								{championshipsAndGroup.Group?.Name}
+							</a>
+						</li>
+					);
+				})}
+			</ul>
+		)
+	}
+</div>

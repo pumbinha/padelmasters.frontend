@@ -1,0 +1,94 @@
+---
+import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
+import Tabs from "@/components/Tabs.astro";
+import GroupItemLink from "@/components/ui/GroupItemLink";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import {
+	type ChampionshipDto,
+	type ChampionshipUserProfileDto,
+	type GroupDto,
+} from "@/services/api";
+
+import { getApi, getRequestParams, orderGroupsByName } from "@/services/utils";
+import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { getSession } from "auth-astro/server";
+
+const { id } = Astro.params;
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+
+let championship: ChampionshipDto = {};
+let userProfile: ChampionshipUserProfileDto = {};
+let groups: GroupDto[] = [];
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	const championshipResponse =
+		await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
+			id || "",
+			getRequestParams(session)
+		);
+
+	if (championshipResponse.ok) {
+		championship = championshipResponse.data.Championship?.Championship || {};
+		userProfile = championshipResponse.data.Championship?.UserProfile || {};
+		groups = championshipResponse.data.Groups || [];
+		groups = orderGroupsByName(groups);
+	} else {
+		// 404
+		Astro.redirect("/championships/not-found");
+	}
+} catch (e) {
+	console.error(e);
+}
+
+const tabData = [
+	{
+		name: t(TranslationKey.GroupsTitle),
+		url: `/championships/${id}`,
+		icon: UserGroupIcon,
+		isCurrent: true,
+	},
+	{
+		name: t(TranslationKey.RulesTitle),
+		url: `/championships/${id}/rules`,
+		icon: BookOpenIcon,
+		isCurrent: false,
+	},
+];
+---
+
+<Layout title=`Championship ${championship.Name} `>
+	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+		<ChampionshipHeader
+			id={id}
+			championship={championship}
+			userProfile={userProfile}
+			session={session}
+		/>
+		<Tabs tabData={tabData} />
+		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
+			<ol class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">
+				{
+					groups.map((group) => (
+						<GroupItemLink
+							url={`/championships/${id}/${group.Id}/matches`}
+							name={group.Name || ""}
+							description={group.Description || ""}
+							currentUserIsRegistered={group.Id === userProfile.CurrentGroupId}
+							client:load
+						/>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+</Layout>

@@ -1,0 +1,10 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ProfileIntro from "@/sections/ProfileIntro.astro";
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
+---
+
+<Layout title="Profile">
+	<ProfileIntro />
+</Layout>

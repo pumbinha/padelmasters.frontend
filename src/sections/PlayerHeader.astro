@@ -1,0 +1,36 @@
+---
+import BigHeaderCard from "@/components/BigHeaderCard.astro";
+import SmallHeaderCard from "@/components/SmallHeaderCard.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { getSession } from "auth-astro/server";
+
+const { user, userStatistics } = Astro.props;
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+---
+
+<div class="overflow-hidden rounded-lg bg-background shadow-md">
+	<div class="p-4">
+		<div class="mb-2 flex items-center">
+			<h2 class="mb-2 text-xl font-bold">{user.FirstName} {user.LastName}</h2>
+		</div>
+	</div>
+	<div class="mb-6 rounded-lg bg-white px-4">
+		<div class="grid grid-cols-2">
+			<BigHeaderCard title={t(TranslationKey.MatchesWon)} value={userStatistics.MatchesWon} />
+			<BigHeaderCard title={t(TranslationKey.MatchesLost)} value={userStatistics.MatchesLost} />
+			<BigHeaderCard title={t(TranslationKey.MatchesPlayed)} value={userStatistics.MatchesPlayed} />
+			<BigHeaderCard title={t(TranslationKey.WinRate)} value={userStatistics.WinRate + "%"} />
+		</div>
+		<div class="grid grid-cols-1 sm:grid-cols-2">
+			<SmallHeaderCard title={t(TranslationKey.SetsWon)} value={userStatistics.SetsWon} />
+
+			<SmallHeaderCard title={t(TranslationKey.SetsLost)} value={userStatistics.SetsLost} />
+
+			<SmallHeaderCard title={t(TranslationKey.PointsWon)} value={userStatistics.PointsWon} />
+
+			<SmallHeaderCard title={t(TranslationKey.PointsLost)} value={userStatistics.PointsLost} />
+		</div>
+	</div>
+</div>

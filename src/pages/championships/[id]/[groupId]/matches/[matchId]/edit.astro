@@ -1,0 +1,278 @@
+---
+import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
+import ReturnButton from "@/components/ui/ReturnButton ";
+import { TranslationKey } from "@/i18n/ui";
+
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+
+import {
+	getApi,
+	getFormattedDateForInput,
+	getRequestParams,
+	parseFormData,
+} from "@/services/utils";
+
+import { getSession } from "auth-astro/server";
+const session = await getSession(Astro.request);
+
+const t = useTranslations(session);
+
+const { id, groupId, matchId } = Astro.params;
+
+const errors = { firstName: "", lastName: "", username: "" };
+interface EditFormData {
+	matchDate: string;
+	startDate: string;
+	endDate: string;
+	displayNameTeam1Player1: string;
+	displayNameTeam1Player2: string;
+	displayNameTeam2Player1: string;
+	displayNameTeam2Player2: string;
+	team1set1: string;
+	team2set1: number;
+	team1set2: number;
+	team2set2: number;
+	team1set3: number;
+	team2set3: number;
+}
+
+let matchDate = "";
+let displayNameTeam1Player1 = "";
+let displayNameTeam1Player2 = "";
+let displayNameTeam2Player1 = "";
+let displayNameTeam2Player2 = "";
+let team1set1 = 0;
+let team2set1 = 0;
+let team1set2 = 0;
+let team2set2 = 0;
+let team1set3 = 0;
+let team2set3 = 0;
+let startDate = "";
+let endDate = "";
+
+const returnUrl = `/championships/${id}/${groupId}/matches`;
+
+const api = getApi();
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await parseFormData<EditFormData>(Astro.request);
+		console.log(formData);
+		matchDate = formData["matchDate"] || "";
+		endDate = formData["endDate"] || "";
+		startDate = formData["startDate"] || "";
+		// Assign parsed data to your variables
+		displayNameTeam1Player1 = formData["displayNameTeam1Player1"] || "";
+		displayNameTeam1Player2 = formData["displayNameTeam1Player2"] || "";
+		displayNameTeam2Player1 = formData["displayNameTeam2Player1"] || "";
+		displayNameTeam2Player2 = formData["displayNameTeam2Player2"] || "";
+
+		team1set1 = Number(formData["team1set1"]) || 0;
+		team2set1 = Number(formData["team2set1"]) || 0;
+		team1set2 = Number(formData["team1set2"]) || 0;
+		team2set2 = Number(formData["team2set2"]) || 0;
+		team1set3 = Number(formData["team1set3"]) || 0;
+		team2set3 = Number(formData["team2set3"]) || 0;
+
+		try {
+			const model = {
+				Date: matchDate,
+				MatchResult1: {
+					MatchSet: 1,
+
+					ResultTeam1: team1set1,
+					ResultTeam2: team2set1,
+				},
+				MatchResult2: {
+					MatchSet: 2,
+
+					ResultTeam1: team1set2,
+					ResultTeam2: team2set2,
+				},
+				MatchResult3: {
+					MatchSet: 3,
+
+					ResultTeam1: team1set3,
+					ResultTeam2: team2set3,
+				},
+			};
+
+			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesCreateChampionship(
+				matchId || "",
+				model,
+				getRequestParams(session)
+			);
+
+			// TODO: use server validation
+
+			if (postMatch.status == 400) {
+				const err = postMatch.error;
+				console.log("here");
+			}
+			if (postMatch.ok) {
+				return Astro.redirect(returnUrl);
+			}
+		} catch (e) {
+			console.log(e);
+
+			//console.log(e.error.Errors.GeneralErrors);
+			console.log("but here");
+		}
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message);
+		}
+	}
+} else if (Astro.request.method === "GET") {
+	if (!session) {
+		Astro.redirect("/sign-in");
+	}
+
+	try {
+		const matchResponse = await api.api.padelmastersApiDomainEndpointsMatchesGetMatch(
+			matchId || "",
+			getRequestParams(session)
+		);
+		if (matchResponse.ok) {
+			const model = matchResponse.data || {};
+
+			matchDate = getFormattedDateForInput(model.Date) || "";
+			startDate = getFormattedDateForInput(model.StartDate) || "";
+			endDate = getFormattedDateForInput(model.EndDate) || "";
+			displayNameTeam1Player1 = `${model.Team1?.Team?.Player1?.FirstName} ${model.Team1?.Team?.Player1?.LastName}`;
+			displayNameTeam1Player2 = `${model.Team1?.Team?.Player2?.FirstName} ${model.Team1?.Team?.Player2?.LastName}`;
+			displayNameTeam2Player1 = `${model.Team2?.Team?.Player1?.FirstName} ${model.Team2?.Team?.Player1?.LastName}`;
+			displayNameTeam2Player2 = `${model.Team2?.Team?.Player2?.FirstName} ${model.Team2?.Team?.Player2?.LastName}`;
+			team1set1 = (model.MatchResults && model.MatchResults[0]?.ResultTeam1) || 0;
+			team2set1 = (model.MatchResults && model.MatchResults[0]?.ResultTeam2) || 0;
+			team1set2 = (model.MatchResults && model.MatchResults[1]?.ResultTeam1) || 0;
+			team2set2 = (model.MatchResults && model.MatchResults[1]?.ResultTeam2) || 0;
+			team1set3 = (model.MatchResults && model.MatchResults[2]?.ResultTeam1) || 0;
+			team2set3 = (model.MatchResults && model.MatchResults[2]?.ResultTeam2) || 0;
+		} else {
+			// 404
+
+			Astro.redirect("/not-found");
+		}
+		console.log(matchResponse.error);
+	} catch (e) {
+		console.log("here");
+		console.log(e);
+	}
+}
+---
+
+<Layout title="Match Edit">
+	<div class="flex h-full items-center justify-center py-36">
+		<form method="POST">
+			<div class="overflow-hidden bg-white shadow sm:rounded-md">
+				<div class="mt-4 w-full max-w-lg divide-y-2 rounded-lg bg-white p-6 shadow-md">
+					<div class="mb-4 grid grid-cols-3 items-center gap-4 text-center">
+						<div class="flex flex-col items-end">
+							<div class="text-sm font-semibold text-supporting-cyan-700">
+								{displayNameTeam1Player1}
+
+								<input
+									type="hidden"
+									name="displayNameTeam1Player1"
+									value={displayNameTeam1Player1}
+								/>
+							</div>
+							<div class="text-sm font-semibold text-supporting-cyan-700">
+								{displayNameTeam1Player2}
+								<input
+									type="hidden"
+									name="displayNameTeam1Player2"
+									value={displayNameTeam1Player2}
+								/>
+							</div>
+						</div>
+
+						<div class="flex items-center justify-center">
+							<div class="text-lg font-bold text-neutral-600">VS</div>
+						</div>
+
+						<div class="flex flex-col items-start">
+							<div class="text-sm font-semibold text-supporting-red-700">
+								{displayNameTeam2Player1}
+								<input
+									type="hidden"
+									name="displayNameTeam2Player1"
+									value={displayNameTeam2Player1}
+								/>
+							</div>
+							<div class="text-sm font-semibold text-supporting-red-700">
+								{displayNameTeam2Player2}
+								<input
+									type="hidden"
+									name="displayNameTeam2Player2"
+									value={displayNameTeam2Player2}
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 items-center gap-4 py-8 text-center">
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team1set1" initialValue={team1set1} client:load />
+						</div>
+						<div class="flex flex-col items-center justify-center">
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 1</div>
+						</div>
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team2set1" initialValue={team2set1} client:load />
+						</div>
+
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team1set2" initialValue={team1set2} client:load />
+						</div>
+						<div class="flex flex-col items-center justify-center">
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 2</div>
+						</div>
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team2set2" initialValue={team2set2} client:load />
+						</div>
+
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team1set3" initialValue={team1set3} client:load />
+						</div>
+						<div class="flex flex-col items-center justify-center">
+							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 3</div>
+						</div>
+						<div class="flex flex-col items-center">
+							<AutoSelectInputScore id="team2set3" initialValue={team2set3} client:load />
+						</div>
+					</div>
+
+					<div class="py-6">
+						<label for="matchDate" class="block text-sm font-medium text-gray-400">
+							{t(TranslationKey.MatchDate)}
+						</label>
+						<input
+							type="date"
+							id="matchDate"
+							name="matchDate"
+							value={matchDate}
+							min={startDate}
+							max={endDate}
+							required
+							class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+						/>
+						<input type="hidden" name="startDate" value={startDate} />
+						<input type="hidden" name="endDate" value={endDate} />
+					</div>
+				</div>
+			</div>
+			<div class="mr-4 mt-6 flex items-center justify-end gap-x-6">
+				<ReturnButton returnUrl={returnUrl} text={t(TranslationKey.Cancel)} client:load />
+				<button
+					type="submit"
+					class="rounded-md bg-primary-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+				>
+					{t(TranslationKey.Save)}
+				</button>
+			</div>
+		</form>
+	</div>
+</Layout>

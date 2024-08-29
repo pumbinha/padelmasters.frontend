@@ -1,11 +1,81 @@
-import { clerkMiddleware, createRouteMatcher } from 'astro-clerk-auth/server'
+import type { Session } from "@auth/core/types";
+import { PUBLIC_ROUTES, ASSET_PATHS } from "./constant";
+import { defineMiddleware } from "astro/middleware";
+import { getSession } from "auth-astro/server";
+import { errors } from "jose";
 
-const isProtectedPage = createRouteMatcher(['/user(.*)'])
+export const verifyAuth = async (session?: Session | null) => {
+	if (!session) {
+		return {
+			status: "unauthorized",
+			msg: "NO session available",
+		} as const;
+	}
 
-export const onRequest = clerkMiddleware((auth, context, next) => {
-  if (isProtectedPage(context.request) && !auth().userId) {
-    return auth().redirectToSignIn()
-  }
+	if (!session.access_token) {
+		return {
+			status: "unauthorized",
+			msg: "NO token available",
+		} as const;
+	}
 
-  return next()
-})
+	try {
+		const now = new Date().toISOString();
+
+		if (session.access_token_expires < now) {
+			return {
+				status: "unauthorized",
+				msg: "Session has expired",
+			} as const;
+		}
+
+		return {
+			status: "authorized",
+			msg: "successfully authenticated",
+		} as const;
+	} catch (err) {
+		if (err instanceof errors.JOSEError) {
+			return { status: "error", msg: err.message } as const;
+		}
+
+		console.debug(err);
+		return { status: "error", msg: "could not validate auth token" } as const;
+	}
+};
+
+export const onRequest = defineMiddleware(async (context, next) => {
+	const urlPath = context.url.pathname;
+
+	if (PUBLIC_ROUTES.includes(context.url.pathname)) {
+		return next();
+	}
+
+	// Check if the request is for an allowed image path
+	if (ASSET_PATHS.some((path) => urlPath.startsWith(path))) {
+		return next();
+	}
+
+	const session = await getSession(context.request);
+
+	const validationResult = await verifyAuth(session);
+
+	switch (validationResult.status) {
+		case "authorized":
+			return next();
+
+		case "error":
+		case "unauthorized":
+			if (context.url.pathname.startsWith("/api/")) {
+				return new Response(JSON.stringify({ message: "Unauthorized" }), {
+					status: 401,
+				});
+			}
+			// otherwise, redirect to the root page for the user to login
+			else {
+				return Response.redirect(new URL("/", context.url));
+			}
+
+		default:
+			return Response.redirect(new URL("/", context.url));
+	}
+});
