@@ -13,7 +13,9 @@ const t = useTranslations(session);
 const isLogged = await isUserLoggedIn(session);
 
 const link = isLogged ? "/championships" : "/sign-in";
-const text = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.WelcomeJoin);
+const titleText = isLogged ? t(TranslationKey.WelcomeTitle) : t(TranslationKey.WelcomeJoin);
+const descriptionText = t(TranslationKey.WelcomeDescription);
+const buttonText = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.WelcomeJoin);
 ---
 
 <section class="w-full pt-12 md:pt-24 lg:pt-32">
@@ -31,19 +33,18 @@ const text = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.We
 			</div>
 			<div class="flex flex-col items-start space-y-4">
 				<h1
-					class="lg:leading-tighter text-4xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[1.4rem] 2xl:text-[1.75rem]"
+					class="lg:leading-tighter text-4xl font-bold tracking-tighter sm:text-3xl md:text-5xl xl:text-[1.4rem] 2xl:text-[1.75rem]"
 				>
-					Join the Padel League
+					{titleText}
 				</h1>
 				<p class="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-					Compete against other players in our exciting padel league. Beat Carlos and win a free
-					padel racket!
+					{descriptionText}
 				</p>
 				<a
 					href={link}
 					class="inline-flex h-9 items-center justify-center rounded-md bg-primary-800 px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
 				>
-					{text}
+					{buttonText}
 				</a>
 			</div>
 		</div>

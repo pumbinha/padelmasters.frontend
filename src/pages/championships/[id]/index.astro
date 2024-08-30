@@ -7,6 +7,7 @@ import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import {
+	type ChampionshipDetailDto,
 	type ChampionshipDto,
 	type ChampionshipUserProfileDto,
 	type GroupDto,
@@ -25,6 +26,7 @@ const api = getApi();
 let errorMessage = "";
 
 let championship: ChampionshipDto = {};
+let championshipDetail: ChampionshipDetailDto = {};
 let userProfile: ChampionshipUserProfileDto = {};
 let groups: GroupDto[] = [];
 
@@ -41,6 +43,7 @@ try {
 
 	if (championshipResponse.ok) {
 		championship = championshipResponse.data.Championship?.Championship || {};
+		championshipDetail = championshipResponse.data.Championship?.ChampionshipDetail || {};
 		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 		groups = championshipResponse.data.Groups || [];
 		groups = orderGroupsByName(groups);
@@ -75,6 +78,7 @@ const tabData = [
 			id={id}
 			championship={championship}
 			userProfile={userProfile}
+			championshipDetail={championshipDetail}
 			session={session}
 		/>
 		<Tabs tabData={tabData} />
