@@ -349,8 +349,8 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: "Verlorene Punkte",
 		[TranslationKey.Set]: "Satz",
 		[TranslationKey.MatchDate]: "Datum des Spiels",
-		[TranslationKey.ErrorLoadingData]: "", // TODO: @Karl, please provide a translation
-		[TranslationKey.EnrollSuccessful]: "", // TODO: @Karl, please provide a translation
-		[TranslationKey.LeaveSuccessful]: "", // TODO: @Karl, please provide a translation
+		[TranslationKey.ErrorLoadingData]: "Ups, da ist etwas schief gelaufen. Bitte versuche es später noch einmal.",
+		[TranslationKey.EnrollSuccessful]: "Erfolgreich eingeschrieben!",
+		[TranslationKey.LeaveSuccessful]: "Erfolgreich aufgegeben!",
 	},
 };
