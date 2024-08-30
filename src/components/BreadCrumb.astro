@@ -5,41 +5,8 @@ import { HomeIcon } from "@heroicons/react/20/solid";
 let pages: BreadCrumbProps = Astro.props.pages;
 ---
 
-<div aria-label="Breadcrumb" class="flex">
-	<!-- <ol role="list" class="flex items-center space-x-4">
-		<li>
-			<div>
-				<a href="/" class="text-neutral-400 hover:text-vivid-700">
-					<HomeIcon aria-hidden="true" class="h-5 w-5 flex-shrink-0" />
-					<span class="sr-only">Home</span>
-				</a>
-			</div>
-		</li>
-		{
-			pages.map((page) => (
-				<li>
-					<div class="flex items-center">
-						<svg
-							fill="currentColor"
-							viewBox="0 0 20 20"
-							aria-hidden="true"
-							class="h-5 w-5 flex-shrink-0 text-gray-300"
-						>
-							<path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-						</svg>
-						<a
-							href={page.href}
-							class="ml-4 text-sm font-medium text-neutral-400 hover:text-vivid-700"
-						>
-							{page.name}
-						</a>
-					</div>
-				</li>
-			))
-		}
-	</ol> -->
-
-	<ol role="list" class="flex space-x-4 rounded-md bg-white px-6 shadow">
+<div class="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
+	<ol role="list" class="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">
 		<li class="flex">
 			<div class="flex items-center">
 				<a href="/" class="text-gray-400 hover:text-gray-500">
