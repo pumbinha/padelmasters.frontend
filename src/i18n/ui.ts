@@ -84,6 +84,9 @@ export enum TranslationKey {
 	LeaveSuccessful = "Leave.Successful",
 	WelcomeDescription = "Welcome.Description",
 	ProfileUpdatedSuccessfully = "ProfileUpdatedSuccessfully",
+	MatchStatusPlanned = "Match.Status.Planned",
+	MatchStatusPlayed = "Match.Status.Played",
+	MatchStatusCancelled = "Match.Status.Cancelled",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -186,6 +189,9 @@ export const ui: UI = {
 		[TranslationKey.WelcomeDescription]:
 			"Get ready to elevate your game. Join our Padel league where you can compete, connect, and conquer against other passionate players. Whether you're aiming for the top spot or just looking to enjoy the sport, our league offers a thrilling experience for all levels. Are you ready to take on the challenge?",
 		[TranslationKey.ProfileUpdatedSuccessfully]: "Profile updated successfully!",
+		[TranslationKey.MatchStatusPlanned]: "Planned",
+		[TranslationKey.MatchStatusPlayed]: "Played",
+		[TranslationKey.MatchStatusCancelled]: "Cancelled",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -274,6 +280,9 @@ export const ui: UI = {
 		[TranslationKey.WelcomeDescription]:
 			"Prepárate para llevar tu juego al siguiente nivel. Únete a nuestra liga de pádel, donde podrás competir, conectar y conquistar contra otros  apasionados jugadores. Ya sea que busques alcanzar la cima o simplemente disfrutar del deporte, nuestra liga ofrece una experiencia emocionante para todos los niveles. ¿Estás listo para este desafío?",
 		[TranslationKey.ProfileUpdatedSuccessfully]: "Perfil actualizado con éxito!",
+		[TranslationKey.MatchStatusPlanned]: "Planificado",
+		[TranslationKey.MatchStatusPlayed]: "Jugado",
+		[TranslationKey.MatchStatusCancelled]: "Cancelado",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -364,5 +373,8 @@ export const ui: UI = {
 		[TranslationKey.WelcomeDescription]:
 			"Bereit, dein Spiel auf das nächste Level zu bringen? Trete unserer  Padel-Liga bei und messe dich mit anderen leidenschaftlichen Spielern. Ob du die Spitze anvisierst oder einfach nur den Sport genießen möchtest – unsere Liga bietet ein aufregendes Erlebnis für jedes Niveau. Bist du bereit, die Herausforderung anzunehmen?",
 		[TranslationKey.ProfileUpdatedSuccessfully]: "Profil erfolgreich aktualisiert!",
+		[TranslationKey.MatchStatusPlanned]: "Geplant",
+		[TranslationKey.MatchStatusPlayed]: "Gespielt",
+		[TranslationKey.MatchStatusCancelled]: "Abgesagt",
 	},
 };
