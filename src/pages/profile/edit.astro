@@ -30,6 +30,7 @@ let locale: string = "";
 let locales: string[] = [];
 
 let errorMessage = "";
+let successMessage = "";
 
 if (Astro.request.method === "POST") {
 	try {
@@ -95,7 +96,7 @@ if (Astro.request.method === "POST") {
 			});
 
 			if (response.ok) {
-				Astro.redirect("/profile");
+				successMessage = t(TranslationKey.ProfileUpdatedSuccessfully);
 			}
 		} catch (e) {
 			console.log(e);
@@ -157,7 +158,7 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="Profile Edit">
-	<div class="flex h-full items-center justify-center py-36">
+	<div class="flex h-full items-center justify-center py-6">
 		<form method="POST">
 			<div class="space-y-12">
 				<div class="border-b border-gray-900/10 pb-12">
@@ -272,5 +273,10 @@ if (Astro.request.method === "POST") {
 			</div>
 		</form>
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+		{
+			successMessage && (
+				<Toast message={successMessage} type="success" urlRedirect="/profile" client:load />
+			)
+		}
 	</div>
 </Layout>

@@ -83,6 +83,7 @@ export enum TranslationKey {
 	EnrollSuccessful = "Enroll.Successful",
 	LeaveSuccessful = "Leave.Successful",
 	WelcomeDescription = "Welcome.Description",
+	ProfileUpdatedSuccessfully = "ProfileUpdatedSuccessfully",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -184,6 +185,7 @@ export const ui: UI = {
 		[TranslationKey.LeaveSuccessful]: "Leave successful!",
 		[TranslationKey.WelcomeDescription]:
 			"Get ready to elevate your game. Join our Padel league where you can compete, connect, and conquer against other passionate players. Whether you're aiming for the top spot or just looking to enjoy the sport, our league offers a thrilling experience for all levels. Are you ready to take on the challenge?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Profile updated successfully!",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -271,6 +273,7 @@ export const ui: UI = {
 		[TranslationKey.LeaveSuccessful]: "Abandonado con éxito!",
 		[TranslationKey.WelcomeDescription]:
 			"Prepárate para llevar tu juego al siguiente nivel. Únete a nuestra liga de pádel, donde podrás competir, conectar y conquistar contra otros  apasionados jugadores. Ya sea que busques alcanzar la cima o simplemente disfrutar del deporte, nuestra liga ofrece una experiencia emocionante para todos los niveles. ¿Estás listo para este desafío?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Perfil actualizado con éxito!",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -360,5 +363,6 @@ export const ui: UI = {
 		[TranslationKey.LeaveSuccessful]: "Erfolgreich aufgegeben!",
 		[TranslationKey.WelcomeDescription]:
 			"Bereit, dein Spiel auf das nächste Level zu bringen? Trete unserer  Padel-Liga bei und messe dich mit anderen leidenschaftlichen Spielern. Ob du die Spitze anvisierst oder einfach nur den Sport genießen möchtest – unsere Liga bietet ein aufregendes Erlebnis für jedes Niveau. Bist du bereit, die Herausforderung anzunehmen?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Profil erfolgreich aktualisiert!",
 	},
 };

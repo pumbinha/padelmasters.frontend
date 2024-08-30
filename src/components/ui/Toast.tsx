@@ -5,11 +5,20 @@ import "react-toastify/dist/ReactToastify.css";
 type ToastProps = {
 	message: string;
 	type: "success" | "error" | "info" | "warning";
+	urlRedirect?: string;
 };
-const Toast: React.FC<ToastProps> = ({ message, type }) => {
+const Toast: React.FC<ToastProps> = ({ message, type, urlRedirect }) => {
 	useEffect(() => {
 		if (message) {
-			toast(message, { type });
+			if (urlRedirect) {
+				toast(message, {
+					type,
+					autoClose: 750,
+					onClose: () => (window.location.href = urlRedirect),
+				});
+			} else {
+				toast(message, { type });
+			}
 		}
 	}, [message, type]);
 
