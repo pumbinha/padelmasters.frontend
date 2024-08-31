@@ -23,6 +23,7 @@ const t = useTranslations(session);
 const { id, groupId, matchId } = Astro.params;
 
 let errorMessage = "";
+let successMessage = "";
 interface EditFormData {
 	matchDate: string;
 	startDate: string;
@@ -107,7 +108,8 @@ if (Astro.request.method === "POST") {
 			);
 
 			if (postMatch.ok) {
-				return Astro.redirect(returnUrl);
+				successMessage = t(TranslationKey.MatchUpdated);
+				//return Astro.redirect(returnUrl);
 			}
 		} catch (e) {
 			if (isAPIError(e)) {
@@ -266,5 +268,10 @@ if (Astro.request.method === "POST") {
 			</div>
 		</form>
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+		{
+			successMessage && (
+				<Toast message={successMessage} type="success" client:load urlRedirect={returnUrl} />
+			)
+		}
 	</div>
 </Layout>

@@ -87,6 +87,9 @@ export enum TranslationKey {
 	MatchStatusPlanned = "Match.Status.Planned",
 	MatchStatusPlayed = "Match.Status.Played",
 	MatchStatusCancelled = "Match.Status.Cancelled",
+	MatchUpdated = "Match.Updated",
+	MatchRestartSuccess = "Match.RestartSuccess",
+	MatchRestartError = "Match.RestartError",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -192,6 +195,9 @@ export const ui: UI = {
 		[TranslationKey.MatchStatusPlanned]: "Planned",
 		[TranslationKey.MatchStatusPlayed]: "Played",
 		[TranslationKey.MatchStatusCancelled]: "Cancelled",
+		[TranslationKey.MatchUpdated]: "Match updated successfully!",
+		[TranslationKey.MatchRestartSuccess]: "Match restarted successfully!",
+		[TranslationKey.MatchRestartError]: "Sorry! There was an error restarting the match",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -283,6 +289,9 @@ export const ui: UI = {
 		[TranslationKey.MatchStatusPlanned]: "Planificado",
 		[TranslationKey.MatchStatusPlayed]: "Jugado",
 		[TranslationKey.MatchStatusCancelled]: "Cancelado",
+		[TranslationKey.MatchUpdated]: "Partido actualizado con éxito!",
+		[TranslationKey.MatchRestartSuccess]: "Partido reiniciado con éxito!",
+		[TranslationKey.MatchRestartError]: "Lo sentimos! Hubo un error al reiniciar el partido",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -376,5 +385,9 @@ export const ui: UI = {
 		[TranslationKey.MatchStatusPlanned]: "Geplant",
 		[TranslationKey.MatchStatusPlayed]: "Gespielt",
 		[TranslationKey.MatchStatusCancelled]: "Abgesagt",
+		[TranslationKey.MatchUpdated]: "Spiel erfolgreich aktualisiert!",
+		[TranslationKey.MatchRestartSuccess]: "Spiel erfolgreich zurückgesetzt!",
+		[TranslationKey.MatchRestartError]:
+			"Entschuldigung! Beim Zurücksetzen des Spiels ist ein Fehler aufgetreten",
 	},
 };

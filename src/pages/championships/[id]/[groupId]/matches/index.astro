@@ -173,6 +173,8 @@ const tabData = [
 												matchId={match.Id || ""}
 												url={`/championships/${id}/${groupId}/matches`}
 												client:load
+												successMessage={t(TranslationKey.MatchRestartSuccess)}
+												errorMessage={t(TranslationKey.MatchRestartError)}
 											/>
 										)}
 									</span>
