@@ -1,5 +1,6 @@
 ---
 import Tabs from "@/components/Tabs.astro";
+import Toast from "@/components/ui/Toast";
 import { getWinnerLoserSetClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
@@ -27,6 +28,7 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let user: UserDto = {};
 
@@ -54,6 +56,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -87,7 +90,7 @@ const tabData = [
 									<span
 										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
 									>
-										{match.Status}
+										{t(`Match.Status.${match.Status}`)}
 									</span>
 									<span class="ml-4 text-xs font-light text-neutral-500">
 										{getFormattedDate(match.Date, session)}
@@ -171,5 +174,6 @@ const tabData = [
 				}
 			</div>
 		</div>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

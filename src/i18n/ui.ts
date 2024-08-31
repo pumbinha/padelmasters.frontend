@@ -79,6 +79,17 @@ export enum TranslationKey {
 	PointsLost = "Points.Lost",
 	Set = "Set",
 	MatchDate = "Match.Date",
+	ErrorLoadingData = "Error.Loading.Data",
+	EnrollSuccessful = "Enroll.Successful",
+	LeaveSuccessful = "Leave.Successful",
+	WelcomeDescription = "Welcome.Description",
+	ProfileUpdatedSuccessfully = "ProfileUpdatedSuccessfully",
+	MatchStatusPlanned = "Match.Status.Planned",
+	MatchStatusPlayed = "Match.Status.Played",
+	MatchStatusCancelled = "Match.Status.Cancelled",
+	MatchUpdated = "Match.Updated",
+	MatchRestartSuccess = "Match.RestartSuccess",
+	MatchRestartError = "Match.RestartError",
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
@@ -175,6 +186,18 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: "Points Lost",
 		[TranslationKey.Set]: "Set",
 		[TranslationKey.MatchDate]: "Match Date",
+		[TranslationKey.ErrorLoadingData]: "Oops! Something went wrong. Please try again later.",
+		[TranslationKey.EnrollSuccessful]: "Enroll successful!",
+		[TranslationKey.LeaveSuccessful]: "Leave successful!",
+		[TranslationKey.WelcomeDescription]:
+			"Get ready to elevate your game. Join our Padel league where you can compete, connect, and conquer against other passionate players. Whether you're aiming for the top spot or just looking to enjoy the sport, our league offers a thrilling experience for all levels. Are you ready to take on the challenge?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Profile updated successfully!",
+		[TranslationKey.MatchStatusPlanned]: "Planned",
+		[TranslationKey.MatchStatusPlayed]: "Played",
+		[TranslationKey.MatchStatusCancelled]: "Cancelled",
+		[TranslationKey.MatchUpdated]: "Match updated successfully!",
+		[TranslationKey.MatchRestartSuccess]: "Match restarted successfully!",
+		[TranslationKey.MatchRestartError]: "Sorry! There was an error restarting the match",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -256,6 +279,19 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: " Puntos Perdidos",
 		[TranslationKey.Set]: "Set",
 		[TranslationKey.MatchDate]: "Fecha del partido",
+		[TranslationKey.ErrorLoadingData]:
+			"Oops! Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+		[TranslationKey.EnrollSuccessful]: "Apuntado con éxito!",
+		[TranslationKey.LeaveSuccessful]: "Abandonado con éxito!",
+		[TranslationKey.WelcomeDescription]:
+			"Prepárate para llevar tu juego al siguiente nivel. Únete a nuestra liga de pádel, donde podrás competir, conectar y conquistar contra otros  apasionados jugadores. Ya sea que busques alcanzar la cima o simplemente disfrutar del deporte, nuestra liga ofrece una experiencia emocionante para todos los niveles. ¿Estás listo para este desafío?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Perfil actualizado con éxito!",
+		[TranslationKey.MatchStatusPlanned]: "Planificado",
+		[TranslationKey.MatchStatusPlayed]: "Jugado",
+		[TranslationKey.MatchStatusCancelled]: "Cancelado",
+		[TranslationKey.MatchUpdated]: "Partido actualizado con éxito!",
+		[TranslationKey.MatchRestartSuccess]: "Partido reiniciado con éxito!",
+		[TranslationKey.MatchRestartError]: "Lo sentimos! Hubo un error al reiniciar el partido",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -275,7 +311,8 @@ export const ui: UI = {
 		[TranslationKey.ChampionshipsStatus]: "Status",
 		[TranslationKey.ChampionshipsType]: "Typ",
 		[TranslationKey.ChampionshipsAdd]: "Meisterschaft hinzufügen",
-		[TranslationKey.ChampionshipsNoChampionshipsDescription]: "Wie wäre es mit der Erstellung einer?",
+		[TranslationKey.ChampionshipsNoChampionshipsDescription]:
+			"Wie wäre es mit der Erstellung einer?",
 		[TranslationKey.ChampionshipsNoChampionshipstitle]: "Es gibt keine erstellten Meisterschaften!",
 		[TranslationKey.ActionEnroll]: "Einschreiben",
 		[TranslationKey.ActionLeave]: "Verlassen",
@@ -316,7 +353,8 @@ export const ui: UI = {
 		[TranslationKey.ProfileUsername]: "Benutzername",
 		[TranslationKey.MatchesTitle]: "Spiele",
 		[TranslationKey.MatchRestartTitle]: "Spiel zurücksetzen",
-		[TranslationKey.MatchRestartMessage]: "Bist du sicher, dass du das Spiel zurücksetzten möchtest?",
+		[TranslationKey.MatchRestartMessage]:
+			"Bist du sicher, dass du das Spiel zurücksetzten möchtest?",
 		[TranslationKey.Restart]: "Zurücksetzen",
 		[TranslationKey.GroupsTitle]: "Gruppen",
 		[TranslationKey.RulesTitle]: "Regeln",
@@ -337,5 +375,19 @@ export const ui: UI = {
 		[TranslationKey.PointsLost]: "Verlorene Punkte",
 		[TranslationKey.Set]: "Satz",
 		[TranslationKey.MatchDate]: "Datum des Spiels",
-	},	
+		[TranslationKey.ErrorLoadingData]:
+			"Ups, da ist etwas schief gelaufen. Bitte versuche es später noch einmal.",
+		[TranslationKey.EnrollSuccessful]: "Erfolgreich eingeschrieben!",
+		[TranslationKey.LeaveSuccessful]: "Erfolgreich aufgegeben!",
+		[TranslationKey.WelcomeDescription]:
+			"Bereit, dein Spiel auf das nächste Level zu bringen? Trete unserer  Padel-Liga bei und messe dich mit anderen leidenschaftlichen Spielern. Ob du die Spitze anvisierst oder einfach nur den Sport genießen möchtest – unsere Liga bietet ein aufregendes Erlebnis für jedes Niveau. Bist du bereit, die Herausforderung anzunehmen?",
+		[TranslationKey.ProfileUpdatedSuccessfully]: "Profil erfolgreich aktualisiert!",
+		[TranslationKey.MatchStatusPlanned]: "Geplant",
+		[TranslationKey.MatchStatusPlayed]: "Gespielt",
+		[TranslationKey.MatchStatusCancelled]: "Abgesagt",
+		[TranslationKey.MatchUpdated]: "Spiel erfolgreich aktualisiert!",
+		[TranslationKey.MatchRestartSuccess]: "Spiel erfolgreich zurückgesetzt!",
+		[TranslationKey.MatchRestartError]:
+			"Entschuldigung! Beim Zurücksetzen des Spiels ist ein Fehler aufgetreten",
+	},
 };

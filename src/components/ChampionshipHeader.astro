@@ -2,19 +2,20 @@
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { getFormattedDate } from "@/services/utils";
-import { UserCircleIcon } from "@heroicons/react/20/solid";
+import { CalendarDateRangeIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 import BreadCrumb from "./BreadCrumb.astro";
 import Enroll from "./ui/Enroll";
 import Leave from "./ui/Leave";
-import { getStatusClass } from "./ui/utils";
+import { getChampionshipMetricStatusClass, getStatusClass } from "./ui/utils";
 
-const { id, championship, userProfile, session } = Astro.props;
+const { id, championship, userProfile, championshipDetail, session } = Astro.props;
 
 const t = useTranslations(session);
 ---
 
 <div class="overflow-hidden rounded-lg bg-background shadow-md">
-	<div class="px-4">
+	<div class="">
 		<BreadCrumb pages={[{ name: "Championships", href: "/championships" }]} />
 	</div>
 	<div class="p-4">
@@ -47,13 +48,41 @@ const t = useTranslations(session);
 				</p>
 			</div>
 		</div>
+		<div class="my-5 grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-1">
+				<div class="inline-block">
+					<CalendarDateRangeIcon
+						aria-hidden="true"
+						className={`inline-block h-5 w-5 text-gray-600 ${getChampionshipMetricStatusClass(championshipDetail.NumberOfPlayedMatches, championshipDetail.NumberMatches)}`}
+					/>
+					<span
+						class={`text-sm inline-block align-middle ${getChampionshipMetricStatusClass(championshipDetail.NumberOfPlayedMatches, championshipDetail.NumberMatches)}`}
+						>{championshipDetail.NumberOfPlayedMatches} / {championshipDetail.NumberMatches}</span
+					>
+				</div>
+			</div>
+			<div class="flex flex-col gap-1">
+				<div class="inline-block">
+					<UsersIcon
+						aria-hidden="true"
+						className={`inline-block h-5 w-5 text-primary-600 ${getChampionshipMetricStatusClass(championshipDetail.NumberEnrolledPlayers, championshipDetail.NumberTotalPlayers)}`}
+					/>
+					<span
+						class={`text-sm inline-block align-middle ${getChampionshipMetricStatusClass(championshipDetail.NumberEnrolledPlayers, championshipDetail.NumberTotalPlayers)}`}
+						>{championshipDetail.NumberEnrolledPlayers} / {
+							championshipDetail.NumberTotalPlayers
+						}</span
+					>
+				</div>
+			</div>
+		</div>
 
 		<div class="mt-4 flex items-center justify-between">
-			<span
+			<div
 				class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
 			>
 				{t(`Championships.Status.${championship.Status}`)}
-			</span>
+			</div>
 		</div>
 	</div>
 	<div class="w-full rounded-lg bg-background md:w-auto">

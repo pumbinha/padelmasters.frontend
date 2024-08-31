@@ -9,9 +9,3 @@ declare module "@auth/core/types" {
 		locale: string;
 	}
 }
-
-export type APIError = {
-	StatusCode: number;
-	Message: string;
-	Errors: { GeneralErrors: string[] };
-};

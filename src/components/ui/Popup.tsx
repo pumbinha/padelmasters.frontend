@@ -11,6 +11,7 @@ import {
 	XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
+import { toast, ToastContainer } from "react-toastify";
 
 type PopupProps = {
 	title: string;
@@ -19,6 +20,8 @@ type PopupProps = {
 	textCancelButton: string;
 	matchId: string;
 	url: string;
+	successMessage: string;
+	errorMessage: string;
 };
 const Popup: React.FC<PopupProps> = ({
 	title,
@@ -27,6 +30,8 @@ const Popup: React.FC<PopupProps> = ({
 	textCancelButton,
 	matchId,
 	url,
+	successMessage,
+	errorMessage,
 }) => {
 	const [open, setOpen] = useState(false);
 
@@ -42,9 +47,17 @@ const Popup: React.FC<PopupProps> = ({
 		});
 
 		if (response.ok) {
-			window.location.href = url;
+			toast(successMessage, {
+				type: "success",
+				autoClose: 750,
+				onClose: () => (window.location.href = url),
+			});
 		} else {
 			console.error("Failed to process data");
+			toast(errorMessage, {
+				type: "success",
+				autoClose: 5000,
+			});
 		}
 
 		setOpen(false);
@@ -58,6 +71,19 @@ const Popup: React.FC<PopupProps> = ({
 			<button type="button" onClick={showPopup}>
 				<ArrowUturnLeftIcon className="h-4 w-4" />
 			</button>
+			<ToastContainer
+				position="top-center"
+				autoClose={750}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="colored"
+				draggablePercent={60}
+			/>
 			<Dialog open={open} onClose={setOpen} className="relative z-10">
 				<DialogBackdrop
 					transition

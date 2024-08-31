@@ -9,11 +9,9 @@ type ProfileEditProps = {};
 const ProfileEdit: React.FC<ProfileEditProps> = ({}) => {
 	const iCartOpen = useStore(isCartOpen);
 
-	console.log("isCartOpen", isCartOpen);
-
 	const handleOnSubmit = (event: any) => {
 		event.preventDefault();
-		// console.log("Form submitted");
+
 		isCartOpen.set(!iCartOpen);
 	};
 

@@ -32,6 +32,10 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 	}
 };
 
+export const getChampionshipMetricStatusClass = (available: number, total: number) => {
+	return available === total ? "text-primary-600" : "text-gray-500";
+};
+
 export const getStandingRowClass = (
 	groupType: GroupType,
 	index: number,

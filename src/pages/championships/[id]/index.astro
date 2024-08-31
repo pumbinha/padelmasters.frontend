@@ -2,10 +2,12 @@
 import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
 import Tabs from "@/components/Tabs.astro";
 import GroupItemLink from "@/components/ui/GroupItemLink";
+import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import {
+	type ChampionshipDetailDto,
 	type ChampionshipDto,
 	type ChampionshipUserProfileDto,
 	type GroupDto,
@@ -21,8 +23,10 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let championship: ChampionshipDto = {};
+let championshipDetail: ChampionshipDetailDto = {};
 let userProfile: ChampionshipUserProfileDto = {};
 let groups: GroupDto[] = [];
 
@@ -39,6 +43,7 @@ try {
 
 	if (championshipResponse.ok) {
 		championship = championshipResponse.data.Championship?.Championship || {};
+		championshipDetail = championshipResponse.data.Championship?.ChampionshipDetail || {};
 		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 		groups = championshipResponse.data.Groups || [];
 		groups = orderGroupsByName(groups);
@@ -48,6 +53,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -72,6 +78,7 @@ const tabData = [
 			id={id}
 			championship={championship}
 			userProfile={userProfile}
+			championshipDetail={championshipDetail}
 			session={session}
 		/>
 		<Tabs tabData={tabData} />
@@ -90,5 +97,6 @@ const tabData = [
 				}
 			</ol>
 		</div>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

@@ -2,6 +2,7 @@
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
 import Popup from "@/components/ui/Popup";
+import Toast from "@/components/ui/Toast";
 import { getWinnerLoserSetClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
@@ -13,15 +14,9 @@ import {
 	type GroupDetailDto,
 	type GroupDto,
 	type GroupMatchDto,
-	type PlayerStandingDto,
 } from "@/services/api";
 
-import {
-	getApi,
-	getFormattedDate,
-	getRequestParams,
-	orderGroupMatchSearchDtoByDate,
-} from "@/services/utils";
+import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
 import { PencilIcon } from "@heroicons/react/20/solid";
 import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
@@ -32,11 +27,11 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const api = getApi();
+let errorMessage = "";
 
 let group: GroupDto = {};
 let championship: ChampionshipDto = {};
 let groupDetail: GroupDetailDto = {};
-let playerStandings: PlayerStandingDto[] = [];
 let matches: GroupMatchDto[] = [];
 
 try {
@@ -74,7 +69,7 @@ try {
 				return group.Match || [];
 			});
 
-			matches = orderGroupMatchSearchDtoByDate(matches);
+			//matches = orderGroupMatchSearchDtoByDate(matches);
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -82,6 +77,7 @@ try {
 	}
 } catch (e) {
 	console.error(e);
+	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 
 const tabData = [
@@ -103,7 +99,7 @@ const tabData = [
 <Layout title=`Group ${group.Name} `>
 	<section class="w-full pt-2 md:pt-2 lg:pt-2">
 		<div class="overflow-hidden rounded-lg bg-background shadow-md">
-			<div class="px-4">
+			<div class="">
 				<BreadCrumb
 					pages={[
 						{ name: "Championships", href: "/championships" },
@@ -162,7 +158,7 @@ const tabData = [
 									<span
 										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
 									>
-										{match.Status}
+										{t(`Match.Status.${match.Status}`)}
 									</span>
 									<span class="ml-4 text-xs font-light text-neutral-500">
 										{getFormattedDate(match.Date, session)}
@@ -177,6 +173,8 @@ const tabData = [
 												matchId={match.Id || ""}
 												url={`/championships/${id}/${groupId}/matches`}
 												client:load
+												successMessage={t(TranslationKey.MatchRestartSuccess)}
+												errorMessage={t(TranslationKey.MatchRestartError)}
 											/>
 										)}
 									</span>
@@ -267,5 +265,6 @@ const tabData = [
 				}
 			</div>
 		</div>
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>
