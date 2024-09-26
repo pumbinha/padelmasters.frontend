@@ -28,7 +28,6 @@ export enum TranslationKey {
 	ChampionshipsStatusStarted = "Championships.Status.Started",
 	ChampionshipsStatusCancelled = "Championships.Status.Cancelled",
 	ChampionshipsStatusFinished = "Championships.Status.Finished",
-
 	PlayedMatches = "PlayedMatches",
 	PendingMatches = "PendingMatches",
 	NumberOfPlayers = "NumberOfPlayers",
