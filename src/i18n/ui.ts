@@ -91,8 +91,6 @@ export enum TranslationKey {
 	MatchRestartError = "Match.RestartError",
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages
-
 export type SupportedLanguages = "en" | "es" | "de";
 export const defaultLang: SupportedLanguages = "en";
 
