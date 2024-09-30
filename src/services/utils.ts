@@ -80,19 +80,6 @@ export const orderGroupsByName = (groups: GroupDto[]): GroupDto[] => {
 	return groups.sort((a, b) => (a.Name ?? "").localeCompare(b.Name ?? ""));
 };
 
-export const orderPlayerStandingDtoByPts = (
-	playerStandings: PlayerStandingDto[]
-): PlayerStandingDto[] => {
-	return playerStandings
-		.filter((item) => item.Points !== undefined)
-		.sort(
-			(a, b) =>
-				b.Points! - a.Points! ||
-				(b.PlayedMatches ?? 0) - (a.PlayedMatches ?? 0) ||
-				(a.LostMatches ?? 0) - (a.LostMatches ?? 0)
-		);
-};
-
 export async function parseFormData<T extends object>(request: Request): Promise<Partial<T>> {
 	const formData = await request.formData();
 
