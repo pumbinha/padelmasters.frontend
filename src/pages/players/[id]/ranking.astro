@@ -10,7 +10,6 @@ import {
 	distinctGroupMatchSearchDtos,
 	getApi,
 	getRequestParams,
-	orderPlayerStandingDtoByPts,
 	type ChampionshipAndGroupDto,
 	type GroupMatchSearchDtoWithPosition,
 } from "@/services/utils";
@@ -82,7 +81,6 @@ try {
 					);
 				if (standingsResponse.ok) {
 					let allPlayerStandings = standingsResponse.data.PlayerStandings || [];
-					allPlayerStandings = orderPlayerStandingDtoByPts(allPlayerStandings);
 					const position =
 						allPlayerStandings.findIndex((playerStanding) => playerStanding.UserId === id) + 1;
 					const thisPlayerStanding = allPlayerStandings.find(

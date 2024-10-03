@@ -15,7 +15,7 @@ import {
 	type GroupMatchDto,
 	type PlayerStandingDto,
 } from "@/services/api";
-import { getApi, getRequestParams, orderPlayerStandingDtoByPts } from "@/services/utils";
+import { getApi, getRequestParams } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
 import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
@@ -62,7 +62,6 @@ try {
 		);
 		if (standingsResponse.ok) {
 			playerStandings = standingsResponse.data.PlayerStandings || [];
-			playerStandings = orderPlayerStandingDtoByPts(playerStandings);
 		} else {
 			// 404
 			Astro.redirect("/not-found");
