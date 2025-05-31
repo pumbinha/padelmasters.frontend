@@ -1,8 +1,4 @@
-import {
-	ChampionshipStatus,
-	type ChampionshipDto,
-	type ChampionshipUserProfileDto,
-} from "@/services/api";
+import { type ChampionshipDto, type ChampionshipUserProfileDto } from "@/services/api";
 
 export type NavigationLink = {
 	group: number;

@@ -5,9 +5,12 @@
 		"astrojs",
 		"clsx",
 		"headlessui",
+		"heroicons",
 		"lucide",
 		"openapi",
+		"padelmasters",
 		"propos",
+		"Unplan",
 		"vercel"
 	],
 	"cSpell.ignoreWords": ["tailwindcss"]

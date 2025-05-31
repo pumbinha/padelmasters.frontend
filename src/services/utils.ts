@@ -12,7 +12,6 @@ import {
 import { verifyAuth } from "@/middleware";
 
 const apiURL = import.meta.env.API_BASE_URL;
-const authURL = import.meta.env.KEYCLOAK_ISSUER;
 
 export const getApi = (): Api<unknown> => {
 	const apiConfig: ApiConfig = {
@@ -114,7 +113,12 @@ export const distinctGroupMatchSearchDtos = (
 		}
 	});
 
-	return result;
+	// Sort results by championship start date in descending order (newest first)
+	return result.sort((a, b) => {
+		const startDateA = a.Championship?.StartDate ? new Date(a.Championship.StartDate).getTime() : 0;
+		const startDateB = b.Championship?.StartDate ? new Date(b.Championship.StartDate).getTime() : 0;
+		return startDateB - startDateA;
+	});
 };
 
 // this type is useful for filtering at player level

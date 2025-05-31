@@ -42,7 +42,7 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 					<div className="mt-4 flow-root">
 						<div className="space-y-2 py-4">
 							<div className="divide-y divide-gray-500/10">
-								{navigationLinks.map((group, index) => (
+								{navigationLinks.map((group) => (
 									<div key={group.group}>
 										<div className="space-y-2 py-4">
 											{group.links.map((link) => (

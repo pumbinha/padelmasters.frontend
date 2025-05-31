@@ -9,7 +9,6 @@ import {
 	type ChampionshipDetailDto,
 	type ChampionshipDto,
 	type ChampionshipUserProfileDto,
-	type GroupDto,
 } from "@/services/api";
 
 import { getApi, getRequestParams } from "@/services/utils";
@@ -27,7 +26,6 @@ let errorMessage = "";
 let championship: ChampionshipDto = {};
 let championshipDetail: ChampionshipDetailDto = {};
 let userProfile: ChampionshipUserProfileDto = {};
-let groups: GroupDto[] = [];
 
 try {
 	if (!id) {

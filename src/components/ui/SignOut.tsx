@@ -7,7 +7,7 @@ type SignOutProps = {
 
 const SignOut: React.FC<SignOutProps> = ({ text }) => {
 	const handle = () => {
-		signOut({ callbackUrl: "/" });
+		signOut({ callbackUrl: "/" } as any);
 	};
 
 	return (
@@ -15,7 +15,7 @@ const SignOut: React.FC<SignOutProps> = ({ text }) => {
 			onClick={handle}
 			className="rounded-md bg-supporting-red-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-supporting-red-800"
 		>
-			<ArrowRightStartOnRectangleIcon className="w-6 h-6 mr-4 inline-block" />
+			<ArrowRightStartOnRectangleIcon className="mr-4 inline-block h-6 w-6" />
 			{text}
 		</button>
 	);

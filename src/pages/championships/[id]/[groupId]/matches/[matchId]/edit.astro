@@ -3,7 +3,6 @@ import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
 import ReturnButton from "@/components/ui/ReturnButton ";
 import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
-
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { isAPIError, type APIError } from "@/services/types.ts";
@@ -21,6 +20,8 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const { id, groupId, matchId } = Astro.params;
+const searchParams = Astro.url.searchParams;
+const customReturnUrl = searchParams.get("returnUrl");
 
 let errorMessage = "";
 let successMessage = "";
@@ -54,7 +55,8 @@ let team2set3 = 0;
 let startDate = "";
 let endDate = "";
 
-const returnUrl = `/championships/${id}/${groupId}/matches`;
+// Use custom return URL if provided, otherwise default to the championship matches page
+const returnUrl = customReturnUrl || `/championships/${id}/${groupId}/matches`;
 
 const api = getApi();
 
@@ -79,37 +81,74 @@ if (Astro.request.method === "POST") {
 		team2set3 = Number(formData["team2set3"]) || 0;
 
 		try {
-			const model = {
+			interface MatchResultModel {
+				Date: string;
+				MatchResult1?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+				MatchResult2?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+				MatchResult3?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+			}
+
+			const model: MatchResultModel = {
 				Date: matchDate,
-				MatchResult1: {
-					MatchSet: 1,
-
-					ResultTeam1: team1set1,
-					ResultTeam2: team2set1,
-				},
-				MatchResult2: {
-					MatchSet: 2,
-
-					ResultTeam1: team1set2,
-					ResultTeam2: team2set2,
-				},
-				MatchResult3: {
-					MatchSet: 3,
-
-					ResultTeam1: team1set3,
-					ResultTeam2: team2set3,
-				},
 			};
 
-			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesCreateChampionship(
-				matchId || "",
-				model,
-				getRequestParams(session)
-			);
+			if (
+				team1set1 > 0 ||
+				team2set1 > 0 ||
+				team1set2 > 0 ||
+				team2set2 > 0 ||
+				team1set3 > 0 ||
+				team2set3 > 0
+			) {
+				model.MatchResult1 = {
+					MatchSet: 1,
+					ResultTeam1: team1set1,
+					ResultTeam2: team2set1,
+				};
 
-			if (postMatch.ok) {
-				successMessage = t(TranslationKey.MatchUpdated);
-				//return Astro.redirect(returnUrl);
+				model.MatchResult2 = {
+					MatchSet: 2,
+					ResultTeam1: team1set2,
+					ResultTeam2: team2set2,
+				};
+
+				model.MatchResult3 = {
+					MatchSet: 3,
+					ResultTeam1: team1set3,
+					ResultTeam2: team2set3,
+				};
+
+				const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesSaveMatchResult(
+					matchId || "",
+					model,
+					getRequestParams(session)
+				);
+
+				if (postMatch.ok) {
+					successMessage = t(TranslationKey.MatchUpdated);
+				}
+			} else {
+				const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesPlanMatch(
+					matchId || "",
+					model,
+					getRequestParams(session)
+				);
+
+				if (postMatch.ok) {
+					successMessage = t(TranslationKey.MatchUpdated);
+				}
 			}
 		} catch (e) {
 			if (isAPIError(e)) {
@@ -275,3 +314,12 @@ if (Astro.request.method === "POST") {
 		}
 	</div>
 </Layout>
+
+{
+	successMessage && (
+		<script
+			is:inline
+			set:html={`setTimeout(function () { window.location.href = "${returnUrl}"; }, 500);`}
+		/>
+	)
+}

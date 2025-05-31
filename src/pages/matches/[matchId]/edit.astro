@@ -1,0 +1,57 @@
+---
+import { getApi, getRequestParams } from "@/services/utils";
+import { getSession } from "auth-astro/server";
+
+// Get the match ID from the URL
+const { matchId } = Astro.params;
+// Get any query parameters including potential returnUrl
+const searchParams = Astro.url.searchParams;
+const returnUrl = searchParams.get("returnUrl");
+
+const session = await getSession(Astro.request);
+const api = getApi();
+
+// Fetch the match details to get championship and group IDs
+try {
+	if (!matchId) {
+		return Astro.redirect("/not-found");
+	}
+
+	// Get match details - You'll need an API endpoint that can fetch a match by ID
+	const matchResponse = await api.api.padelmastersApiDomainEndpointsMatchesGetMatch(
+		matchId,
+		getRequestParams(session)
+	);
+
+	if (matchResponse.ok && matchResponse.data) {
+		// Use SearchMatches API to find the championship and group for this match
+		const searchMatchesRequest = {
+			MatchId: matchId,
+		} as any;
+		const searchResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+			searchMatchesRequest,
+			getRequestParams(session)
+		);
+
+		if (searchResponse.ok && searchResponse.data && searchResponse.data.length > 0) {
+			const matchData = searchResponse.data[0];
+			const championshipId = matchData?.Championship?.Id || "";
+			const groupId = matchData?.Group?.Id || "";
+
+			// Redirect to the edit page with proper championship and group IDs
+			// If we have a returnUrl, pass it along
+			return Astro.redirect(
+				returnUrl
+					? `/championships/${championshipId}/${groupId}/matches/${matchId}/edit?returnUrl=${encodeURIComponent(returnUrl)}`
+					: `/championships/${championshipId}/${groupId}/matches/${matchId}/edit`
+			);
+		}
+	}
+
+	// If we couldn't find the match details, redirect to not found
+	return Astro.redirect("/not-found");
+} catch (error) {
+	console.error("Error fetching match:", error);
+	return Astro.redirect("/not-found");
+}
+---

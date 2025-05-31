@@ -51,11 +51,9 @@ if (Astro.request.method === "POST") {
 		if (typeof lastName !== "string" || lastName.length < 1) {
 			errors.lastName += "Please enter a lastName. ";
 		}
-
 		if (typeof username !== "string" || username.length < 1) {
 			errors.username += "Please enter a username. ";
 		}
-		const hasErrors = Object.values(errors).some((msg) => msg);
 
 		const localeUrl = `${issuerUrl}/account/supportedLocales`;
 
