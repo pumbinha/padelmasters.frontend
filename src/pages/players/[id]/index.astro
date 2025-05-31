@@ -1,18 +1,13 @@
 ---
 import Tabs from "@/components/Tabs.astro";
 import Toast from "@/components/ui/Toast";
-import { getWinnerLoserSetClass } from "@/components/ui/utils";
+import { getMatchStatusClass, getWinnerLoserSetClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import PlayerHeader from "@/sections/PlayerHeader.astro";
-import {
-	MatchStatus,
-	type GroupMatchDto,
-	type UserDto,
-	type UserStatisticsDto,
-} from "@/services/api";
+import { type GroupMatchDto, type UserDto, type UserStatisticsDto } from "@/services/api";
 import {
 	getApi,
 	getFormattedDate,
@@ -88,7 +83,7 @@ const tabData = [
 							<div>
 								<div>
 									<span
-										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
+										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMatchStatusClass(match.Status)}`}
 									>
 										{t(`Match.Status.${match.Status}`)}
 									</span>

@@ -10,10 +10,12 @@ import {
 	XCircleIcon,
 	XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
+import { ArrowUturnLeftIcon, CalendarIcon } from "@heroicons/react/20/solid";
 import { toast, ToastContainer } from "react-toastify";
+import { MatchStatus } from "@/services/api";
 
 type PopupProps = {
+	matchAction: string;
 	title: string;
 	text: string;
 	textActionButton: string;
@@ -24,6 +26,7 @@ type PopupProps = {
 	errorMessage: string;
 };
 const Popup: React.FC<PopupProps> = ({
+	matchAction,
 	title,
 	text,
 	textActionButton,
@@ -38,8 +41,16 @@ const Popup: React.FC<PopupProps> = ({
 	const handleClick = async () => {
 		const data = { matchId };
 
-		const response = await fetch("/api/matches/result", {
-			method: "DELETE",
+		let urlAPI = "/api/matches/result";
+		let method = "DELETE";
+
+		if (matchAction === "Unplan") {
+			urlAPI = "/api/matches/result";
+			method = "PATCH";
+		}
+
+		const response = await fetch(urlAPI, {
+			method: method,
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -62,6 +73,7 @@ const Popup: React.FC<PopupProps> = ({
 
 		setOpen(false);
 	};
+
 	const showPopup = () => {
 		setOpen(true);
 	};

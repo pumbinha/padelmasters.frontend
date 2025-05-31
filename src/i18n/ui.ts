@@ -90,6 +90,11 @@ export enum TranslationKey {
 	MatchUpdated = "Match.Updated",
 	MatchRestartSuccess = "Match.RestartSuccess",
 	MatchRestartError = "Match.RestartError",
+	MatchUnplanTitle = "Match.Unplan.Title",
+	MatchUnplanMessage = "Match.Unplan.Message",
+	Unplan = "Unplan",
+	MatchUnplanSuccess = "Match.Unplan.Success",
+	MatchUnplanError = "Match.Unplan.Error",
 }
 
 export type SupportedLanguages = "en" | "es" | "de";
@@ -197,6 +202,11 @@ export const ui: UI = {
 		[TranslationKey.MatchUpdated]: "Match updated successfully!",
 		[TranslationKey.MatchRestartSuccess]: "Match restarted successfully!",
 		[TranslationKey.MatchRestartError]: "Sorry! There was an error restarting the match",
+		[TranslationKey.MatchUnplanTitle]: "Unplan Match",
+		[TranslationKey.MatchUnplanMessage]: "Continuing will remove the assigned date of the match",
+		[TranslationKey.Unplan]: "Unplan",
+		[TranslationKey.MatchUnplanSuccess]: "Match successfully unplanned!",
+		[TranslationKey.MatchUnplanError]: " Sorry, an error occurred while unplanning the match.",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -292,6 +302,12 @@ export const ui: UI = {
 		[TranslationKey.MatchUpdated]: "Partido actualizado con éxito!",
 		[TranslationKey.MatchRestartSuccess]: "Partido reiniciado con éxito!",
 		[TranslationKey.MatchRestartError]: "Lo sentimos! Hubo un error al reiniciar el partido",
+		[TranslationKey.MatchUnplanTitle]: "Desplanificar partido",
+		[TranslationKey.MatchUnplanMessage]: "Al continuar, se eliminará la fecha asignada al partido.",
+		[TranslationKey.Unplan]: "Desplanificar",
+		[TranslationKey.MatchUnplanSuccess]: "Partido desplanificado correctamente",
+		[TranslationKey.MatchUnplanError]:
+			" Lo lamentamos, se ha producido un error desplanificando el partido.",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -390,5 +406,11 @@ export const ui: UI = {
 		[TranslationKey.MatchRestartSuccess]: "Spiel erfolgreich zurückgesetzt!",
 		[TranslationKey.MatchRestartError]:
 			"Entschuldigung! Beim Zurücksetzen des Spiels ist ein Fehler aufgetreten",
+		[TranslationKey.MatchUnplanTitle]: "Spielplanung aufheben",
+		[TranslationKey.MatchUnplanMessage]:
+			"Wenn Sie fortfahren, wird das festgelegte Spieldatum gelöscht.",
+		[TranslationKey.Unplan]: "Spielplanung aufheben",
+		[TranslationKey.MatchUnplanSuccess]: "Spiel erfolgreich zurückgesetzt",
+		[TranslationKey.MatchUnplanError]: "Beim Aufheben der Spielplanung ist ein Fehler aufgetreten",
 	},
 };

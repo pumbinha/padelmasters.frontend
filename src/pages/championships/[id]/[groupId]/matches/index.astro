@@ -3,13 +3,12 @@ import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
 import Popup from "@/components/ui/Popup";
 import Toast from "@/components/ui/Toast";
-import { getWinnerLoserSetClass } from "@/components/ui/utils";
+import { getMatchStatusClass, getWinnerLoserSetClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import {
-	MatchStatus,
 	type ChampionshipDto,
 	type GroupDetailDto,
 	type GroupDto,
@@ -156,7 +155,7 @@ const tabData = [
 							<div>
 								<div>
 									<span
-										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${match.Status === MatchStatus.Played ? "bg-green-50 text-green-600 ring-gray-600/20" : "bg-gray-50 text-neutral-600 ring-gray-600/20"}`}
+										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMatchStatusClass(match.Status)} `}
 									>
 										{t(`Match.Status.${match.Status}`)}
 									</span>
@@ -164,8 +163,25 @@ const tabData = [
 										{getFormattedDate(match.Date, session)}
 									</span>
 									<span class="float-right ml-4 text-xs font-light text-neutral-500">
+										{match.CurrentUserCanUnplan && (
+											<Popup
+												matchAction="Unplan"
+												title={t(TranslationKey.MatchUnplanTitle)}
+												text={t(TranslationKey.MatchUnplanMessage)}
+												textActionButton={t(TranslationKey.Unplan)}
+												textCancelButton={t(TranslationKey.Cancel)}
+												matchId={match.Id || ""}
+												url={`/championships/${id}/${groupId}/matches`}
+												client:load
+												successMessage={t(TranslationKey.MatchUnplanSuccess)}
+												errorMessage={t(TranslationKey.MatchUnplanError)}
+											/>
+										)}
+									</span>
+									<span class="float-right ml-4 text-xs font-light text-neutral-500">
 										{match.CurrentUserCanDelete && (
 											<Popup
+												matchAction="Delete"
 												title={t(TranslationKey.MatchRestartTitle)}
 												text={t(TranslationKey.MatchRestartMessage)}
 												textActionButton={t(TranslationKey.Restart)}

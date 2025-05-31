@@ -57,6 +57,8 @@ export interface GroupMatchDto {
   CurrentUserIsPlayer?: boolean;
   CurrentUserCanEdit?: boolean;
   CurrentUserCanDelete?: boolean;
+  CurrentUserCanPlan?: boolean;
+  CurrentUserCanUnplan?: boolean;
   /** @format date-time */
   StartDate?: string;
   /** @format date-time */

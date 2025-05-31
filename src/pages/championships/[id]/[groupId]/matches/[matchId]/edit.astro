@@ -79,27 +79,6 @@ if (Astro.request.method === "POST") {
 		team2set3 = Number(formData["team2set3"]) || 0;
 
 		try {
-			// const model = {
-			// 	Date: matchDate,
-			// 	MatchResult1: {
-			// 		MatchSet: 1,
-
-			// 		ResultTeam1: team1set1,
-			// 		ResultTeam2: team2set1,
-			// 	},
-			// 	MatchResult2: {
-			// 		MatchSet: 2,
-
-			// 		ResultTeam1: team1set2,
-			// 		ResultTeam2: team2set2,
-			// 	},
-			// 	MatchResult3: {
-			// 		MatchSet: 3,
-
-			// 		ResultTeam1: team1set3,
-			// 		ResultTeam2: team2set3,
-			// 	},
-			// };
 			interface MatchResultModel {
 				Date: string;
 				MatchResult1?: {
@@ -123,41 +102,51 @@ if (Astro.request.method === "POST") {
 				Date: matchDate,
 			};
 
-			// Only include match results if they are provided
-			if (team1set1 > 0 || team2set1 > 0) {
+			if (
+				team1set1 > 0 ||
+				team2set1 > 0 ||
+				team1set2 > 0 ||
+				team2set2 > 0 ||
+				team1set3 > 0 ||
+				team2set3 > 0
+			) {
 				model.MatchResult1 = {
 					MatchSet: 1,
 					ResultTeam1: team1set1,
 					ResultTeam2: team2set1,
 				};
-			}
 
-			if (team1set2 > 0 || team2set2 > 0) {
 				model.MatchResult2 = {
 					MatchSet: 2,
 					ResultTeam1: team1set2,
 					ResultTeam2: team2set2,
 				};
-			}
 
-			if (team1set3 > 0 || team2set3 > 0) {
 				model.MatchResult3 = {
 					MatchSet: 3,
 					ResultTeam1: team1set3,
 					ResultTeam2: team2set3,
 				};
-			}
 
-			console.log(model);
+				const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesSaveMatchResult(
+					matchId || "",
+					model,
+					getRequestParams(session)
+				);
 
-			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesSaveMatchResult(
-				matchId || "",
-				model,
-				getRequestParams(session)
-			);
+				if (postMatch.ok) {
+					successMessage = t(TranslationKey.MatchUpdated);
+				}
+			} else {
+				const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesPlanMatch(
+					matchId || "",
+					model,
+					getRequestParams(session)
+				);
 
-			if (postMatch.ok) {
-				successMessage = t(TranslationKey.MatchUpdated);
+				if (postMatch.ok) {
+					successMessage = t(TranslationKey.MatchUpdated);
+				}
 			}
 		} catch (e) {
 			if (isAPIError(e)) {

@@ -1,4 +1,9 @@
-import { ChampionshipStatus, GroupType, type GroupMatchResultDto } from "@/services/api";
+import {
+	ChampionshipStatus,
+	GroupType,
+	MatchStatus,
+	type GroupMatchResultDto,
+} from "@/services/api";
 import type { NavigationLink } from "./types";
 
 export const setLinkActive = (
@@ -27,6 +32,21 @@ export const getStatusClass = (status: ChampionshipStatus | null | undefined) =>
 			return "bg-red-200 text-red-800";
 		case ChampionshipStatus.Finished:
 			return "bg-blue-200 text-blue-800";
+		default:
+			return "";
+	}
+};
+
+export const getMatchStatusClass = (status: MatchStatus | null | undefined) => {
+	switch (status) {
+		case MatchStatus.Created:
+			return "bg-gray-50 text-neutral-600 ring-gray-600/20";
+		case MatchStatus.Planned:
+			return "bg-orange-50 text-orange-800 ring-gray-600/20 ";
+		case MatchStatus.Played:
+			return "bg-green-50 text-green-600 ring-gray-600/20";
+		case MatchStatus.Cancelled:
+			return "bg-red-50 text-red-800 ring-gray-600/20";
 		default:
 			return "";
 	}
