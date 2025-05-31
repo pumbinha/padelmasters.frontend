@@ -82,6 +82,11 @@ const tabData = [
 				<div set:html={championship.Rules} />
 			</div>
 		</div>
+		{
+			(championship.Rules == null || championship.Rules?.length === 0) &&
+				t(TranslationKey.NoRulesMessage)
+		}
+
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

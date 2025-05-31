@@ -95,6 +95,7 @@ const tabData = [
 						/>
 					))
 				}
+				{groups.length === 0 && t(TranslationKey.NoGroupsMessage)}
 			</ol>
 		</div>
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
