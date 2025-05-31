@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -82,6 +83,11 @@ export interface GroupMatchResultDto {
   ResultTeam1?: number;
   /** @format int32 */
   ResultTeam2?: number;
+}
+
+export interface PlanMatchRequest {
+  /** @format date-time */
+  Date?: string;
 }
 
 export interface DefaultCreatedResponse {
@@ -171,18 +177,25 @@ export interface PlayerStandingDto {
   /** @format int32 */
   LostMatches?: number;
   /** @format int32 */
+  TiedMatches?: number;
+  /** @format int32 */
   PlayedMatches?: number;
 }
 
 export interface CreateChampionshipRequest {
-  Name?: string;
-  Description?: string | null;
+  LocalizedNameDescriptions?: LocalizedNameDescriptionDto[];
   /** @format date-time */
   StartDate?: string;
   /** @format date-time */
   EndDate?: string;
   ChampionshipType?: ChampionshipType | null;
   Configurations?: ChampionshipConfigurationItemDto[];
+}
+
+export interface LocalizedNameDescriptionDto {
+  Language?: Language | null;
+  Name?: string;
+  Description?: string;
 }
 
 export interface ChampionshipConfigurationItemDto {
@@ -237,7 +250,15 @@ export interface ChampionshipConfigurationDto {
   Value?: string;
 }
 
+export interface ReplacePlayerRequest {
+  /** @format guid */
+  PlayerId?: string;
+  /** @format guid */
+  NewPlayerId?: string;
+}
+
 export enum MatchStatus {
+  Created = "Created",
   Planned = "Planned",
   Played = "Played",
   Cancelled = "Cancelled",
@@ -263,6 +284,12 @@ export enum ChampionshipType {
 export enum GroupType {
   League = "League",
   Americano = "Americano",
+}
+
+export enum Language {
+  EnUS = "en-US",
+  DeDE = "de-DE",
+  EsES = "es-ES",
 }
 
 export enum ChampionshipConfigurationKey {
@@ -374,9 +401,9 @@ export class HttpClient<SecurityDataType = unknown> {
     [ContentType.Json]: (input: any) =>
       input !== null && (typeof input === "object" || typeof input === "string") ? JSON.stringify(input) : input,
     [ContentType.Text]: (input: any) => (input !== null && typeof input !== "string" ? JSON.stringify(input) : input),
-    [ContentType.FormData]: (input: FormData) =>
-      (Array.from(input.keys()) || []).reduce((formData, key) => {
-        const property = input.get(key);
+    [ContentType.FormData]: (input: any) =>
+      Object.keys(input || {}).reduce((formData, key) => {
+        const property = input[key];
         formData.append(
           key,
           property instanceof Blob
@@ -548,11 +575,34 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Api
-     * @name PadelmastersApiDomainEndpointsMatchesCreateChampionship
+     * @name PadelmastersApiDomainEndpointsMatchesPlanMatch
+     * @request PATCH:/api/matches/{matchId}/plan
+     * @secure
+     */
+    padelmastersApiDomainEndpointsMatchesPlanMatch: (
+      matchId: string,
+      data: PlanMatchRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<any, void>({
+        path: `/api/matches/${matchId}/plan`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsMatchesSaveMatchResult
      * @request POST:/api/matches/{matchId}/results
      * @secure
      */
-    padelmastersApiDomainEndpointsMatchesCreateChampionship: (
+    padelmastersApiDomainEndpointsMatchesSaveMatchResult: (
       matchId: string,
       data: SaveMatchResultRequest,
       params: RequestParams = {},
@@ -582,6 +632,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsMatchesUnPlanMatch
+     * @request PATCH:/api/matches/{matchId}/unplan
+     * @secure
+     */
+    padelmastersApiDomainEndpointsMatchesUnPlanMatch: (matchId: string, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/api/matches/${matchId}/unplan`,
+        method: "PATCH",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -732,6 +799,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/api/championships/${championshipId}/open`,
         method: "POST",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsChampionshipsReplacePlayer
+     * @request POST:/api/championships/{championshipId}/replacePlayer
+     * @secure
+     */
+    padelmastersApiDomainEndpointsChampionshipsReplacePlayer: (
+      championshipId: string,
+      data: ReplacePlayerRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<DefaultCreatedResponse, void>({
+        path: `/api/championships/${championshipId}/replacePlayer`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

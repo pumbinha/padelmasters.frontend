@@ -79,29 +79,78 @@ if (Astro.request.method === "POST") {
 		team2set3 = Number(formData["team2set3"]) || 0;
 
 		try {
-			const model = {
+			// const model = {
+			// 	Date: matchDate,
+			// 	MatchResult1: {
+			// 		MatchSet: 1,
+
+			// 		ResultTeam1: team1set1,
+			// 		ResultTeam2: team2set1,
+			// 	},
+			// 	MatchResult2: {
+			// 		MatchSet: 2,
+
+			// 		ResultTeam1: team1set2,
+			// 		ResultTeam2: team2set2,
+			// 	},
+			// 	MatchResult3: {
+			// 		MatchSet: 3,
+
+			// 		ResultTeam1: team1set3,
+			// 		ResultTeam2: team2set3,
+			// 	},
+			// };
+			interface MatchResultModel {
+				Date: string;
+				MatchResult1?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+				MatchResult2?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+				MatchResult3?: {
+					MatchSet: number;
+					ResultTeam1: number;
+					ResultTeam2: number;
+				};
+			}
+
+			const model: MatchResultModel = {
 				Date: matchDate,
-				MatchResult1: {
-					MatchSet: 1,
-
-					ResultTeam1: team1set1,
-					ResultTeam2: team2set1,
-				},
-				MatchResult2: {
-					MatchSet: 2,
-
-					ResultTeam1: team1set2,
-					ResultTeam2: team2set2,
-				},
-				MatchResult3: {
-					MatchSet: 3,
-
-					ResultTeam1: team1set3,
-					ResultTeam2: team2set3,
-				},
 			};
 
-			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesCreateChampionship(
+			// Only include match results if they are provided
+			if (team1set1 > 0 || team2set1 > 0) {
+				model.MatchResult1 = {
+					MatchSet: 1,
+					ResultTeam1: team1set1,
+					ResultTeam2: team2set1,
+				};
+			}
+
+			if (team1set2 > 0 || team2set2 > 0) {
+				model.MatchResult2 = {
+					MatchSet: 2,
+					ResultTeam1: team1set2,
+					ResultTeam2: team2set2,
+				};
+			}
+
+			if (team1set3 > 0 || team2set3 > 0) {
+				model.MatchResult3 = {
+					MatchSet: 3,
+					ResultTeam1: team1set3,
+					ResultTeam2: team2set3,
+				};
+			}
+
+			console.log(model);
+
+			const postMatch = await api.api.padelmastersApiDomainEndpointsMatchesSaveMatchResult(
 				matchId || "",
 				model,
 				getRequestParams(session)
@@ -109,7 +158,6 @@ if (Astro.request.method === "POST") {
 
 			if (postMatch.ok) {
 				successMessage = t(TranslationKey.MatchUpdated);
-				//return Astro.redirect(returnUrl);
 			}
 		} catch (e) {
 			if (isAPIError(e)) {
