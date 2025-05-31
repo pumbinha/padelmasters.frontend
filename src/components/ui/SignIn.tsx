@@ -6,7 +6,7 @@ type SignInComponentProps = {
 
 const SignInComponent: React.FC<SignInComponentProps> = ({ children }) => {
 	const handleLogin = () => {
-		signIn("keycloak", { callbackUrl: "/profile" });
+		signIn("keycloak", { callbackUrl: "/profile" } as any);
 	};
 
 	return (

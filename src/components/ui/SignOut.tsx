@@ -7,7 +7,7 @@ type SignOutProps = {
 
 const SignOut: React.FC<SignOutProps> = ({ text }) => {
 	const handle = () => {
-		signOut({ callbackUrl: "/" });
+		signOut({ callbackUrl: "/" } as any);
 	};
 
 	return (
