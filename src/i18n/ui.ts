@@ -98,6 +98,8 @@ export enum TranslationKey {
 	Filter = "Filter",
 	All = "All",
 	NoMatchesFound = "NoMatchesFound",
+	NoGroupsMessage = "NoGroupsMessage",
+	NoRulesMessage = "NoRulesMessage",
 }
 
 export type SupportedLanguages = "en" | "es" | "de";
@@ -213,6 +215,8 @@ export const ui: UI = {
 		[TranslationKey.Filter]: "Filter",
 		[TranslationKey.All]: "All",
 		[TranslationKey.NoMatchesFound]: "No matches found",
+		[TranslationKey.NoGroupsMessage]: "There are no groups in the selected championship.",
+		[TranslationKey.NoRulesMessage]: "There are no rules in the selected championship.",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -317,6 +321,8 @@ export const ui: UI = {
 		[TranslationKey.Filter]: "Filtrar",
 		[TranslationKey.All]: "Todos",
 		[TranslationKey.NoMatchesFound]: "No se encontraron partidos",
+		[TranslationKey.NoGroupsMessage]: "No existen grupos en el campeonato seleccionado.",
+		[TranslationKey.NoRulesMessage]: "No existen reglas en el campeonato seleccionado.",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -424,5 +430,7 @@ export const ui: UI = {
 		[TranslationKey.Filter]: "Filter",
 		[TranslationKey.All]: "Alle",
 		[TranslationKey.NoMatchesFound]: "Keine Spiele gefunden",
+		[TranslationKey.NoGroupsMessage]: "Im ausgewählten Turnier sind keine Gruppen vorhanden.",
+		[TranslationKey.NoRulesMessage]: "Im ausgewählten Turnier sind keine Regeln vorhanden.",
 	},
 };
