@@ -3,7 +3,6 @@ import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
 import ReturnButton from "@/components/ui/ReturnButton ";
 import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
-
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { isAPIError, type APIError } from "@/services/types.ts";
@@ -21,6 +20,8 @@ const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
 const { id, groupId, matchId } = Astro.params;
+const searchParams = Astro.url.searchParams;
+const customReturnUrl = searchParams.get("returnUrl");
 
 let errorMessage = "";
 let successMessage = "";
@@ -54,7 +55,8 @@ let team2set3 = 0;
 let startDate = "";
 let endDate = "";
 
-const returnUrl = `/championships/${id}/${groupId}/matches`;
+// Use custom return URL if provided, otherwise default to the championship matches page
+const returnUrl = customReturnUrl || `/championships/${id}/${groupId}/matches`;
 
 const api = getApi();
 
@@ -312,3 +314,12 @@ if (Astro.request.method === "POST") {
 		}
 	</div>
 </Layout>
+
+{
+	successMessage && (
+		<script
+			is:inline
+			set:html={`setTimeout(function () { window.location.href = "${returnUrl}"; }, 500);`}
+		/>
+	)
+}

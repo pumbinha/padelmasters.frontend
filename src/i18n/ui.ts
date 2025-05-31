@@ -95,6 +95,9 @@ export enum TranslationKey {
 	Unplan = "Unplan",
 	MatchUnplanSuccess = "Match.Unplan.Success",
 	MatchUnplanError = "Match.Unplan.Error",
+	Filter = "Filter",
+	All = "All",
+	NoMatchesFound = "NoMatchesFound",
 }
 
 export type SupportedLanguages = "en" | "es" | "de";
@@ -207,6 +210,9 @@ export const ui: UI = {
 		[TranslationKey.Unplan]: "Unplan",
 		[TranslationKey.MatchUnplanSuccess]: "Match successfully unplanned!",
 		[TranslationKey.MatchUnplanError]: " Sorry, an error occurred while unplanning the match.",
+		[TranslationKey.Filter]: "Filter",
+		[TranslationKey.All]: "All",
+		[TranslationKey.NoMatchesFound]: "No matches found",
 	},
 	es: {
 		[TranslationKey.SignIn]: "Entrar",
@@ -308,6 +314,9 @@ export const ui: UI = {
 		[TranslationKey.MatchUnplanSuccess]: "Partido desplanificado correctamente",
 		[TranslationKey.MatchUnplanError]:
 			" Lo lamentamos, se ha producido un error desplanificando el partido.",
+		[TranslationKey.Filter]: "Filtrar",
+		[TranslationKey.All]: "Todos",
+		[TranslationKey.NoMatchesFound]: "No se encontraron partidos",
 	},
 	de: {
 		[TranslationKey.SignIn]: "Anmelden",
@@ -412,5 +421,8 @@ export const ui: UI = {
 		[TranslationKey.Unplan]: "Spielplanung aufheben",
 		[TranslationKey.MatchUnplanSuccess]: "Spiel erfolgreich zurückgesetzt",
 		[TranslationKey.MatchUnplanError]: "Beim Aufheben der Spielplanung ist ein Fehler aufgetreten",
+		[TranslationKey.Filter]: "Filter",
+		[TranslationKey.All]: "Alle",
+		[TranslationKey.NoMatchesFound]: "Keine Spiele gefunden",
 	},
 };

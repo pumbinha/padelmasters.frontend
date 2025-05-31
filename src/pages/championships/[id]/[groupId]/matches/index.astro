@@ -13,6 +13,7 @@ import {
 	type GroupDetailDto,
 	type GroupDto,
 	type GroupMatchDto,
+	MatchStatus,
 } from "@/services/api";
 
 import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
@@ -21,6 +22,9 @@ import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id, groupId } = Astro.params;
+// Get the status filter from URL parameters
+const { searchParams } = Astro.url;
+const statusFilter = searchParams.get("status");
 
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
@@ -68,7 +72,10 @@ try {
 				return group.Match || [];
 			});
 
-			//matches = orderGroupMatchSearchDtoByDate(matches);
+			// Filter matches if a status filter is provided
+			if (statusFilter && statusFilter !== "All") {
+				matches = matches.filter((match) => match.Status === statusFilter);
+			}
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -148,7 +155,66 @@ const tabData = [
 
 		<Tabs tabData={tabData} />
 		<div class="p-4">
-			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
+			<div class="mb-2">
+				<div class="flex items-center justify-between">
+					<div class="flex flex-wrap gap-2">
+						<a
+							href={Astro.url.pathname}
+							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
+								!statusFilter || statusFilter === "All"
+									? "bg-primary-600 text-white shadow-sm"
+									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+							}`}
+						>
+							{t(TranslationKey.All)}
+						</a>
+						<a
+							href={`${Astro.url.pathname}?status=${MatchStatus.Created}`}
+							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
+								statusFilter === MatchStatus.Created
+									? "bg-primary-600 text-white shadow-sm"
+									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+							}`}
+						>
+							{t("Match.Status.Created")}
+						</a>
+						<a
+							href={`${Astro.url.pathname}?status=${MatchStatus.Planned}`}
+							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
+								statusFilter === MatchStatus.Planned
+									? "bg-primary-600 text-white shadow-sm"
+									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+							}`}
+						>
+							{t("Match.Status.Planned")}
+						</a>
+						<a
+							href={`${Astro.url.pathname}?status=${MatchStatus.Played}`}
+							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
+								statusFilter === MatchStatus.Played
+									? "bg-primary-600 text-white shadow-sm"
+									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+							}`}
+						>
+							{t("Match.Status.Played")}
+						</a>
+						<a
+							href={`${Astro.url.pathname}?status=${MatchStatus.Cancelled}`}
+							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
+								statusFilter === MatchStatus.Cancelled
+									? "bg-primary-600 text-white shadow-sm"
+									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+							}`}
+						>
+							{t("Match.Status.Cancelled")}
+						</a>
+					</div>
+				</div>
+				<!-- Visual separator line -->
+				<div class="mt-4 border-b border-gray-200"></div>
+			</div>
+
+			<div class="inline-block min-w-full divide-y py-0 align-middle sm:px-6 lg:px-8">
 				{
 					matches.map((match) => (
 						<div class="py-4">
@@ -171,7 +237,7 @@ const tabData = [
 												textActionButton={t(TranslationKey.Unplan)}
 												textCancelButton={t(TranslationKey.Cancel)}
 												matchId={match.Id || ""}
-												url={`/championships/${id}/${groupId}/matches`}
+												url={`/championships/${id}/${groupId}/matches${statusFilter ? `?status=${statusFilter}` : ""}`}
 												client:load
 												successMessage={t(TranslationKey.MatchUnplanSuccess)}
 												errorMessage={t(TranslationKey.MatchUnplanError)}
@@ -187,7 +253,7 @@ const tabData = [
 												textActionButton={t(TranslationKey.Restart)}
 												textCancelButton={t(TranslationKey.Cancel)}
 												matchId={match.Id || ""}
-												url={`/championships/${id}/${groupId}/matches`}
+												url={`/championships/${id}/${groupId}/matches${statusFilter ? `?status=${statusFilter}` : ""}`}
 												client:load
 												successMessage={t(TranslationKey.MatchRestartSuccess)}
 												errorMessage={t(TranslationKey.MatchRestartError)}
@@ -280,6 +346,12 @@ const tabData = [
 					))
 				}
 			</div>
+
+			{
+				matches.length === 0 && (
+					<div class="py-4 text-center text-gray-500">{t(TranslationKey.NoMatchesFound)}</div>
+				)
+			}
 		</div>
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
