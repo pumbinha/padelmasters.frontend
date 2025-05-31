@@ -9,7 +9,6 @@ interface MatchEditLinkProps {
 export default function MatchEditLink({ matchId, returnUrl }: MatchEditLinkProps) {
 	const [editUrl, setEditUrl] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchMatchDetails = async () => {
@@ -41,7 +40,6 @@ export default function MatchEditLink({ matchId, returnUrl }: MatchEditLinkProps
 				}
 			} catch (err) {
 				console.error("Error fetching match details:", err);
-				setError("Could not get match details");
 				// Fallback to our redirect endpoint
 				setEditUrl(`/matches/${matchId}/edit`);
 			} finally {

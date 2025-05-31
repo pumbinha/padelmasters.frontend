@@ -24,7 +24,7 @@ try {
 	);
 
 	if (matchResponse.ok && matchResponse.data) {
-		const match = matchResponse.data; // Use SearchMatches API to find the championship and group for this match
+		// Use SearchMatches API to find the championship and group for this match
 		const searchMatchesRequest = {
 			MatchId: matchId,
 		} as any;
@@ -40,11 +40,11 @@ try {
 
 			// Redirect to the edit page with proper championship and group IDs
 			// If we have a returnUrl, pass it along
-			const editUrl = `/championships/${championshipId}/${groupId}/matches/${matchId}/edit`;
-			const finalUrl = returnUrl
-				? `${editUrl}?returnUrl=${encodeURIComponent(returnUrl)}`
-				: editUrl;
-			return Astro.redirect(finalUrl);
+			return Astro.redirect(
+				returnUrl
+					? `/championships/${championshipId}/${groupId}/matches/${matchId}/edit?returnUrl=${encodeURIComponent(returnUrl)}`
+					: `/championships/${championshipId}/${groupId}/matches/${matchId}/edit`
+			);
 		}
 	}
 

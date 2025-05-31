@@ -12,7 +12,6 @@ import {
 import { verifyAuth } from "@/middleware";
 
 const apiURL = import.meta.env.API_BASE_URL;
-const authURL = import.meta.env.KEYCLOAK_ISSUER;
 
 export const getApi = (): Api<unknown> => {
 	const apiConfig: ApiConfig = {

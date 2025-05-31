@@ -1,8 +1,6 @@
-import { UserCircleIcon, PhotoIcon } from "@heroicons/react/24/solid";
-import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { TranslationKey } from "@/i18n/ui";
-import { getTranslation, isCartOpen, translationStore } from "@/stores/translationStore";
+import { getTranslation, isCartOpen } from "@/stores/translationStore";
 
 type ProfileEditProps = {};
 

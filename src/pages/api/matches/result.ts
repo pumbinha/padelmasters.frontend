@@ -18,19 +18,12 @@ export const DELETE: APIRoute = async ({ request }) => {
 		const session = await getSession(request);
 
 		const api = getApi();
-
 		const response = await api.api.padelmastersApiDomainEndpointsMatchesDeleteMatchResult(
 			data.matchId,
 			getRequestParams(session)
 		);
 
 		return response;
-		return new Response(JSON.stringify("deleted"), {
-			status: 200,
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
 	} catch (error) {
 		return new Response(JSON.stringify({ error: "Failed to process data" }), {
 			status: 500,
@@ -57,19 +50,12 @@ export const PATCH: APIRoute = async ({ request }) => {
 		const session = await getSession(request);
 
 		const api = getApi();
-
 		const response = await api.api.padelmastersApiDomainEndpointsMatchesUnPlanMatch(
 			data.matchId,
 			getRequestParams(session)
 		);
 
 		return response;
-		return new Response(JSON.stringify("deleted"), {
-			status: 200,
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
 	} catch (error) {
 		return new Response(JSON.stringify({ error: "Failed to process data" }), {
 			status: 500,

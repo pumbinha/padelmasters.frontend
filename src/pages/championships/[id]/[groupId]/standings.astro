@@ -12,7 +12,6 @@ import {
 	type ChampionshipDto,
 	type GroupDetailDto,
 	type GroupDto,
-	type GroupMatchDto,
 	type PlayerStandingDto,
 } from "@/services/api";
 import { getApi, getRequestParams } from "@/services/utils";
@@ -32,7 +31,6 @@ let group: GroupDto = {};
 let championship: ChampionshipDto = {};
 let groupDetail: GroupDetailDto = {};
 let playerStandings: PlayerStandingDto[] = [];
-let matches: GroupMatchDto[] = [];
 
 try {
 	if (!id) {

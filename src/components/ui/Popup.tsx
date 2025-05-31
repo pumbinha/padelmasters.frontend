@@ -2,17 +2,9 @@
 
 import { useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
-import {
-	ArrowPathIcon,
-	ExclamationTriangleIcon,
-	NoSymbolIcon,
-	TrashIcon,
-	XCircleIcon,
-	XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { ArrowUturnLeftIcon, CalendarIcon } from "@heroicons/react/20/solid";
+import { ExclamationTriangleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
 import { toast, ToastContainer } from "react-toastify";
-import { MatchStatus } from "@/services/api";
 
 type PopupProps = {
 	matchAction: string;
