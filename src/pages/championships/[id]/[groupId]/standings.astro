@@ -2,7 +2,7 @@
 import BreadCrumb from "@/components/BreadCrumb.astro";
 import Tabs from "@/components/Tabs.astro";
 import Toast from "@/components/ui/Toast";
-import { getStandingRowClass } from "@/components/ui/utils";
+import { getPositionTextClass, getStandingRowClass } from "@/components/ui/utils";
 import UsersLink from "@/components/UsersLink.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -98,38 +98,57 @@ const tabData = [
 				/>
 			</div>
 
-			<div class="p-4">
-				<div class="mb-2 flex items-center">
-					<h2 class="mb-2 text-xl font-bold">
-						{group.Name}
-					</h2>
+			<div class="p-6">
+				<div class="mb-4 flex items-center gap-3">
+					<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
+						<span class="text-2xl">🏆</span>
+					</div>
+					<div>
+						<h2 class="text-2xl font-bold text-gray-900">
+							{group.Name}
+						</h2>
+						<p class="text-gray-600">{group.Description}</p>
+					</div>
 				</div>
-				<p class="mb-4 text-muted-foreground">{group.Description}</p>
 
-				<div class="grid grid-cols-2 gap-4">
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">{t(TranslationKey.NumberOfPlayers)}</p>
-						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberPlayers}</p>
+				<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+					<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">👥</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+								{t(TranslationKey.NumberOfPlayers)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-blue-800">{groupDetail.NumberPlayers}</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.NumberMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberMatches}</p>
+					<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">🎾</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+								{t(TranslationKey.NumberMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-green-800">{groupDetail.NumberMatches}</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.PlayedMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">
+					<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">✅</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+								{t(TranslationKey.PlayedMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-purple-800">
 							{groupDetail.NumberOfPlayedMatches}
 						</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.PendingMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">
+					<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">⏳</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+								{t(TranslationKey.PendingMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-orange-800">
 							{groupDetail.NumberOfPendingMatches}
 						</p>
 					</div>
@@ -138,101 +157,95 @@ const tabData = [
 		</div>
 
 		<Tabs tabData={tabData} />
+
 		<div class="p-4">
 			<div class="inline-block min-w-full divide-y py-2 align-middle sm:px-6 lg:px-8">
 				<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 					<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-						<table class="min-w-full divide-y divide-gray-300">
-							<thead>
-								<tr>
-									<th
-										scope="col"
-										class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-									>
-										<div>{t(TranslationKey.StandingsName)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
-									</th>
-									<th
-										scope="col"
-										class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900"
-									>
-										<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
-										<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
-									</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y">
-								{
-									playerStandings.map((player, index) => (
-										<tr
-											class={`${getStandingRowClass(group.GroupType || GroupType.League, index, groupDetail.NumberOfFinalists)}`}
+						<div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+							<table class="min-w-full divide-y divide-gray-200">
+								<thead>
+									<tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+										<th
+											scope="col"
+											class="py-4 pl-4 pr-3 text-left text-sm font-bold text-gray-700 sm:pl-0"
 										>
-											<td
-												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
+											<div class="flex items-center gap-2">
+												<span class="text-lg">👤</span>
+												{t(TranslationKey.StandingsName)}
+											</div>
+										</th>
+										<th scope="col" class="px-3 py-4 text-right text-sm font-bold text-gray-700">
+											<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+											<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
+										</th>
+										<th scope="col" class="px-3 py-4 text-right text-sm font-bold text-gray-700">
+											<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+											<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
+										</th>
+										<th scope="col" class="px-3 py-4 text-right text-sm font-bold text-gray-700">
+											<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+											<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
+										</th>
+										<th scope="col" class="px-3 py-4 text-right text-sm font-bold text-gray-700">
+											<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+											<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y">
+									{
+										playerStandings.map((player, index) => (
+											<tr
+												class={`${getStandingRowClass(group.GroupType || GroupType.League, index, groupDetail.NumberOfFinalists)} transition-all duration-200`}
 											>
-												<span class="inline-block align-middle">
-													<UsersLink
-														userId={player.UserId}
-														displayName={`${index + 1}. ${player.DisplayName}`}
-													/>
-												</span>
-												{(group.GroupType || GroupType.League) === GroupType.Americano &&
-													((index === 0 && (
-														<StarIcon
-															aria-hidden="true"
-															className="ml-auto h-4 w-4 text-yellow-400  inline-block align-middle"
+												<td
+													class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0 ${getPositionTextClass(index, groupDetail.NumberOfFinalists)}`}
+												>
+													<span class="inline-block align-middle">
+														<UsersLink
+															userId={player.UserId}
+															displayName={`${index + 1}. ${player.DisplayName}`}
 														/>
-													)) ||
-														(index === 1 && (
+													</span>
+													{(group.GroupType || GroupType.League) === GroupType.Americano &&
+														((index === 0 && (
 															<StarIcon
 																aria-hidden="true"
-																className="ml-auto h-4 w-4 text-gray-400 inline-block align-middle "
+																className="ml-auto h-4 w-4 text-yellow-400 inline-block align-middle"
 															/>
 														)) ||
-														(index === 2 && (
-															<StarIcon
-																aria-hidden="true"
-																className="ml-auto h-4 w-4 text-orange-700 inline-block align-middle"
-															/>
-														)))}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.PlayedMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.WonMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-												{player.LostMatches}
-											</td>
-											<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
-												{player.Points}
-											</td>
-										</tr>
-									))
-								}
-							</tbody>
-						</table>
+															(index === 1 && (
+																<StarIcon
+																	aria-hidden="true"
+																	className="ml-auto h-4 w-4 text-gray-400 inline-block align-middle"
+																/>
+															)) ||
+															(index === 2 && (
+																<StarIcon
+																	aria-hidden="true"
+																	className="ml-auto h-4 w-4 text-orange-700 inline-block align-middle"
+																/>
+															)))}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-medium text-gray-600">
+													{player.PlayedMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-medium text-green-600">
+													{player.WonMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-medium text-red-600">
+													{player.LostMatches}
+												</td>
+												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-bold text-primary-600">
+													{player.Points}
+												</td>
+											</tr>
+										))
+									}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>

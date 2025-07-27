@@ -62,9 +62,11 @@ export const getStandingRowClass = (
 	numberOfFinalists?: number
 ) => {
 	if (groupType === GroupType.League) {
-		return index < (numberOfFinalists || 0)
-			? `bg-supporting-red-100 ${getSelectedItemHoverClass()}`
-			: `bg-white ${getSelectedItemHoverClass()}`;
+		// Top 4 finalists get the same highlighting
+		if (index < (numberOfFinalists || 0)) {
+			return `bg-gradient-to-r from-vivid-100 to-vivid-200 border-l-4 border-vivid-500 shadow-sm ${getSelectedItemHoverClass()}`;
+		}
+		return `bg-white ${getSelectedItemHoverClass()}`;
 	}
 	return "";
 };
@@ -91,4 +93,15 @@ export const getWinnerLoserSetClass = (
 	}
 
 	return loserSet;
+};
+
+export const getPositionTextClass = (index: number, numberOfFinalists?: number) => {
+	if (index < (numberOfFinalists || 0)) {
+		return "font-bold text-vivid-700";
+	}
+	return "text-gray-900";
+};
+
+export const getPositionIcon = (index: number) => {
+	return "";
 };

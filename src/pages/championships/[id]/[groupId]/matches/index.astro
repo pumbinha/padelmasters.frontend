@@ -114,38 +114,57 @@ const tabData = [
 				/>
 			</div>
 
-			<div class="p-4">
-				<div class="mb-2 flex items-center">
-					<h2 class="mb-2 text-xl font-bold">
-						{group.Name}
-					</h2>
+			<div class="p-6">
+				<div class="mb-4 flex items-center gap-3">
+					<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
+						<span class="text-2xl">🏆</span>
+					</div>
+					<div>
+						<h2 class="text-2xl font-bold text-gray-900">
+							{group.Name}
+						</h2>
+						<p class="text-gray-600">{group.Description}</p>
+					</div>
 				</div>
-				<p class="mb-4 text-muted-foreground">{group.Description}</p>
 
-				<div class="grid grid-cols-2 gap-4">
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">{t(TranslationKey.NumberOfPlayers)}</p>
-						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberPlayers}</p>
+				<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+					<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">👥</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+								{t(TranslationKey.NumberOfPlayers)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-blue-800">{groupDetail.NumberPlayers}</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.NumberMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">{groupDetail.NumberMatches}</p>
+					<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">🎾</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+								{t(TranslationKey.NumberMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-green-800">{groupDetail.NumberMatches}</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.PlayedMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">
+					<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">✅</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+								{t(TranslationKey.PlayedMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-purple-800">
 							{groupDetail.NumberOfPlayedMatches}
 						</p>
 					</div>
-					<div class="flex flex-col gap-1">
-						<p class="text-xs font-normal text-neutral-600">
-							{t(TranslationKey.PendingMatches)}
-						</p>
-						<p class="text-sm font-medium text-neutral-800">
+					<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-lg">⏳</span>
+							<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+								{t(TranslationKey.PendingMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-orange-800">
 							{groupDetail.NumberOfPendingMatches}
 						</p>
 					</div>
