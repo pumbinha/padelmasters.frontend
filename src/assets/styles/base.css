@@ -1,3 +1,6 @@
+/* Flag Icons */
+@import "flag-icons/css/flag-icons.min.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -75,6 +78,7 @@
 		--supporting-red-800: 360, 79%, 32%;
 		--supporting-red-900: 360, 85%, 25%;
 		--supporting-red-1000: 360, 92%, 20%;
+		--page-background: 210, 14%, 94%; /* #ECEEF0 */
 	}
 
 	.dark {

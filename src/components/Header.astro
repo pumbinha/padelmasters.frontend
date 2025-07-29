@@ -1,6 +1,5 @@
 ---
 import NavLink from "@/components/NavLink.astro";
-import MobileNav from "@/components/ui/MobileNav.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { isUserLoggedIn } from "@/services/utils";
@@ -51,21 +50,30 @@ navigationLinks = navigationLinks.map((group) => ({
 navigationLinks = setLinkActive(navigationLinks, currentPath);
 ---
 
-<header class="flex items-center justify-between bg-primary-600 px-6 py-4 text-primary-foreground">
-	<div class="flex items-center gap-4">
-		<a href="/" class="logo text-2xl font-bold">Padel Masters</a>
-	</div>
-	<nav class="ml-auto hidden items-center gap-6 md:flex">
-		<div>
-			{
-				navigationLinks.map((group) => {
-					return group.links.map((element) => {
-						return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
-					});
-				})
-			}
-		</div>
-	</nav>
+<header class="relative overflow-hidden bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-b border-neutral-600">
+	<div class="relative px-6 py-8">
+		<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+			<!-- Logo and brand section -->
+			<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500/20 backdrop-blur-sm">
+					<span class="text-lg">🎾</span>
+				</div>
+				<div class="flex flex-col">
+					<span class="text-lg font-bold text-white">Padel Masters</span>
+					<span class="text-xs text-neutral-300">Championship Management System</span>
+				</div>
+			</a>
 
-	<MobileNav client:load {navigationLinks} />
+			<!-- Navigation section -->
+			<nav class="flex items-center gap-6 text-sm">
+				{
+					navigationLinks.map((group) => {
+						return group.links.map((element) => {
+							return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
+						});
+					})
+				}
+			</nav>
+		</div>
+	</div>
 </header>

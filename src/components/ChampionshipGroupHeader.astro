@@ -1,0 +1,37 @@
+---
+interface Props {
+	championshipId: string;
+	championshipName: string;
+	groupName: string;
+	groupDescription?: string;
+	icon?: string;
+}
+
+const { championshipId, championshipName, groupName, groupDescription, icon = "🏆" } = Astro.props;
+---
+
+<!-- Header Section -->
+<div class="bg-white p-6 mb-1 border-b border-gray-300">
+	<div class="flex items-center gap-3">
+		<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
+			<span class="text-2xl">{icon}</span>
+		</div>
+		<div class="flex-1">
+			<div class="flex items-center gap-2 mb-1">
+				<a 
+					href={`/championships/${championshipId}`}
+					class="text-lg font-semibold text-[#1F3851] hover:text-[#152F47] transition-colors"
+				>
+					{championshipName}
+				</a>
+				<span class="text-[#1F3851]">/</span>
+				<h1 class="text-lg font-semibold text-[#1F3851]">
+					{groupName}
+				</h1>
+			</div>
+			{groupDescription && (
+				<p class="text-sm text-gray-600">{groupDescription}</p>
+			)}
+		</div>
+	</div>
+</div> 

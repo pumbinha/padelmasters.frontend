@@ -8,7 +8,7 @@ export interface UserLinkProps {
 const props = Astro.props as UserLinkProps;
 const { userId, displayName } = props;
 
-const classes = props.class || "text-primary-700";
+const classes = props.class || "text-primary-600 hover:text-primary-800 transition-colors underline decoration-primary-300 hover:decoration-primary-500";
 ---
 
 <a href={`/players/${userId}`} class={classes}>

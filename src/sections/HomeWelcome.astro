@@ -5,6 +5,7 @@ import { useTranslations } from "@/i18n/utils";
 import { isUserLoggedIn } from "@/services/utils";
 import { Image } from "astro:assets";
 import { getSession } from "auth-astro/server";
+import { TrophyIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 const session = await getSession(Astro.request);
 
@@ -12,40 +13,61 @@ const t = useTranslations(session);
 
 const isLogged = await isUserLoggedIn(session);
 
-const link = isLogged ? "/championships" : "/sign-in";
 const titleText = isLogged ? t(TranslationKey.WelcomeTitle) : t(TranslationKey.WelcomeJoin);
 const descriptionText = t(TranslationKey.WelcomeDescription);
-const buttonText = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.WelcomeJoin);
 ---
 
-<section class="w-full pt-12 md:pt-24 lg:pt-32">
-	<div class="container space-y-10 xl:space-y-16">
-		<div class="grid gap-4 px-10 md:grid-cols-2 md:gap-16">
-			<div>
-				<Image
-					src={homeNet}
-					alt="Welcome to Padel Masters"
-					width="800"
-					height="600"
-					widths={[240, 540, 720, homeNet.width]}
-					sizes={`(max-width: 360px) 240px, (max-width: 720px) 540px, (max-width: 1600px) 720px, ${homeNet.width}px`}
-				/>
-			</div>
-			<div class="flex flex-col items-start space-y-4">
-				<h1
-					class="lg:leading-tighter text-4xl font-bold tracking-tighter sm:text-3xl md:text-5xl xl:text-[1.4rem] 2xl:text-[1.75rem]"
-				>
-					{titleText}
-				</h1>
-				<p class="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-					{descriptionText}
-				</p>
-				<a
-					href={link}
-					class="inline-flex h-9 items-center justify-center rounded-md bg-primary-800 px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-				>
-					{buttonText}
-				</a>
+<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
+	<!-- Hero Section -->
+	<div class="relative overflow-hidden bg-gradient-to-br from-neutral-50 to-white">
+		<div class="container mx-auto px-6 py-8 md:py-12">
+			<div class="grid gap-8 lg:grid-cols-2 lg:gap-16 lg:items-center">
+				<!-- Content -->
+				<div class="space-y-6">
+					<div class="space-y-4">
+						<div class="flex items-center gap-3 mb-4">
+							<div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 shadow-lg">
+								<TrophyIcon className="h-6 w-6 text-primary-600" />
+							</div>
+							<div>
+								<h1 class="text-2xl font-bold text-gray-900 md:text-3xl lg:text-4xl">
+									{titleText}
+								</h1>
+								<p class="text-sm text-gray-600 mt-1">#Championship Management System</p>
+							</div>
+						</div>
+						
+						<p class="text-base text-gray-600 leading-relaxed max-w-2xl">
+							{descriptionText}
+						</p>
+					</div>
+
+					<div class="flex flex-col sm:flex-row gap-4">
+						<a
+							href="/sign-in"
+							class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-2 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105"
+						>
+							<UsersIcon className="h-4 w-4" />
+							{t(TranslationKey.SignIn)}
+						</a>
+					</div>
+				</div>
+
+				<!-- Image -->
+				<div class="relative">
+					<div class="relative rounded-xl overflow-hidden shadow-lg">
+						<Image
+							src={homeNet}
+							alt="Welcome to Padel Masters"
+							width="800"
+							height="600"
+							widths={[240, 540, 720, homeNet.width]}
+							sizes={`(max-width: 360px) 240px, (max-width: 720px) 540px, (max-width: 1600px) 720px, ${homeNet.width}px`}
+							class="w-full h-auto"
+						/>
+						<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

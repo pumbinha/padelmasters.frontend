@@ -9,7 +9,7 @@ let pages: BreadCrumbProps = Astro.props.pages;
 	<ol role="list" class="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">
 		<li class="flex">
 			<div class="flex items-center">
-				<a href="/" class="text-gray-400 hover:text-gray-500">
+				<a href="/" class="text-gray-400 hover:text-gray-600 transition-colors">
 					<HomeIcon className="h-5 w-5" />
 					<span class="sr-only">Home</span>
 				</a>
@@ -30,7 +30,7 @@ let pages: BreadCrumbProps = Astro.props.pages;
 						</svg>
 						<a
 							href={page.href}
-							class="gray-red-500 ml-4 text-sm font-medium text-neutral-400 hover:text-gray-700"
+							class="ml-4 text-sm font-medium text-neutral-400 hover:text-gray-700 transition-colors underline decoration-gray-300 hover:decoration-gray-500"
 						>
 							{page.name}
 						</a>

@@ -2,12 +2,7 @@
 import { getApi, getRequestParams } from "@/services/utils";
 import { getSession } from "auth-astro/server";
 
-// Get the match ID from the URL
-const { matchId } = Astro.params;
-// Get any query parameters including potential returnUrl
-const searchParams = Astro.url.searchParams;
-const returnUrl = searchParams.get("returnUrl");
-
+const matchId = Astro.params.matchId;
 const session = await getSession(Astro.request);
 const api = getApi();
 
@@ -34,16 +29,9 @@ try {
 		);
 
 		if (searchResponse.ok && searchResponse.data && searchResponse.data.length > 0) {
-			const matchData = searchResponse.data[0];
-			const championshipId = matchData?.Championship?.Id || "";
-			const groupId = matchData?.Group?.Id || "";
-
 			// Redirect to the edit page with proper championship and group IDs
-			// If we have a returnUrl, pass it along
 			return Astro.redirect(
-				returnUrl
-					? `/championships/${championshipId}/${groupId}/matches/${matchId}/edit?returnUrl=${encodeURIComponent(returnUrl)}`
-					: `/championships/${championshipId}/${groupId}/matches/${matchId}/edit`
+				`/championships/${searchResponse.data[0]?.Championship?.Id || ""}/${searchResponse.data[0]?.Group?.Id || ""}/matches/${matchId}/edit`
 			);
 		}
 	}

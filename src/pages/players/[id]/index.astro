@@ -85,7 +85,7 @@ const tabData = [
 ---
 
 <Layout title=`Player - ${user.FirstName} ${user.LastName} `>
-	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
 		<PlayerHeader user={user} userStatistics={userStatistics} />
 		<Tabs tabData={tabData} />
 		<div class="p-4">
@@ -158,7 +158,7 @@ const tabData = [
 							<div>
 								<div>
 									<span
-										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMatchStatusClass(match.Status)}`}
+										class={`rounded-lg px-2 py-1 text-xs font-medium ${getMatchStatusClass(match.Status)}`}
 									>
 										{t(`Match.Status.${match.Status}`)}
 									</span>

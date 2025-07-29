@@ -50,95 +50,112 @@ try {
 ---
 
 <Layout title="Championships">
-	<section class="w-full pt-2 md:pt-2 lg:pt-2">
-		<div class="w-full rounded-lg bg-background p-6">
-			<div class="mb-6 flex items-center justify-between">
-				<h1 class="text-base font-semibold text-foreground text-gray-600">
-					{t(TranslationKey.ChampionshipsTitle)}
-				</h1>
-			</div>
-			{
-				championships.length === 0 && (
-					<div class="w-full max-w-md rounded-lg bg-background p-6 text-center shadow-md">
-						<h2 class="mb-2 text-xl font-bold">
-							{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
-						</h2>
-						<p class="text-muted-foreground">
-							{t(TranslationKey.ChampionshipsNoChampionshipsDescription)}
-						</p>
-					</div>
-				)
-			}
-
-			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-				{
-					championships.map((championship) => {
-						return (
-							<div
-								class="championship-card cursor-pointer overflow-hidden rounded-lg bg-background shadow-md"
-								data-url={`/championships/${championship.Id}`}
-							>
-								<div class="p-4">
-									<div class="mb-2 flex items-center">
-										<h2 class="mb-2 text-xl font-bold text-gray-700">{championship.Name}</h2>
-										{championship.UserIsRegistered && (
-											<UserCircleIcon
-												aria-hidden="true"
-												className="ml-auto h-8 w-8 text-primary-600"
-											/>
-										)}
-									</div>
-									<p class="mb-4 text-muted-foreground">{championship.Description}</p>
-									<div class="mb-4 flex items-center justify-between">
-										<div>
-											<span class="text-xs font-light">
-												{t(TranslationKey.ChampionshipsStartDate)}
-											</span>
-											<span class="block text-sm font-semibold">
-												{getFormattedDate(championship.StartDate, session)}
-											</span>
-										</div>
-										<div>
-											<span class="text-xs font-light">
-												{t(TranslationKey.ChampionshipsEndDate)}:
-											</span>
-											<span class="block text-sm font-semibold">
-												{getFormattedDate(championship.EndDate, session)}
-											</span>
-										</div>
-									</div>
-									<div class="flex items-center justify-between">
-										<span
-											class={`rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
-										>
-											{t(`Championships.Status.${championship.Status}`)}
-										</span>
-									</div>
-								</div>
-							</div>
-						);
-					})
-				}
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
+		<!-- Header Section -->
+		<div class="bg-primary-200 p-6 mb-4 border-b border-primary-800">
+			<div class="flex items-center gap-3">
+				<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-200">
+					<span class="text-lg">🏆</span>
+				</div>
+				<div>
+					<h1 class="text-2xl font-bold text-primary-800">
+						{t(TranslationKey.ChampionshipsTitle)}
+					</h1>
+					<p class="text-sm text-primary-600 mt-1">#Browse and join exciting padel tournaments</p>
+				</div>
 			</div>
 		</div>
+
+		<!-- Championships Grid -->
+		{
+			championships.length === 0 ? (
+				<div class="w-full rounded-lg bg-white border border-gray-200 p-8 text-center">
+					<div class="flex flex-col items-center gap-4">
+						<div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
+							<span class="text-2xl">🏆</span>
+						</div>
+						<div>
+							<h2 class="text-lg font-semibold text-gray-900">
+								{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
+							</h2>
+							<p class="mt-2 text-sm text-gray-500">{t(TranslationKey.ChampionshipsNoChampionshipsDescription)}</p>
+						</div>
+					</div>
+				</div>
+			) : (
+				<div class="px-4 sm:px-6 lg:px-8 mb-8">
+					<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+					{
+						championships.map((championship) => {
+							return (
+								<a
+									href={`/championships/${championship.Id}`}
+									class="championship-card group cursor-pointer overflow-hidden rounded-lg bg-gray-50 border border-gray-400 transition-all duration-200 hover:bg-gray-100 hover:border-primary-600 block"
+									onclick={`console.log('Clicking championship: ${championship.Id}'); return true;`}
+								>
+									<!-- Header with status -->
+									<div class="p-2 border-b border-gray-400">
+										<div class="flex items-start justify-between mb-3">
+											<h2 class="text-lg font-bold text-gray-900 group-hover:text-primary-700 transition-colors">
+												{championship.Name}
+											</h2>
+											{championship.UserIsRegistered && (
+												<div class="flex items-center gap-1">
+													<UserCircleIcon className="h-5 w-5 text-primary-600" />
+													<span class="text-xs text-primary-600 font-medium">#Enrolled</span>
+												</div>
+											)}
+										</div>
+										
+										<p class="text-sm text-gray-600 mb-3 line-clamp-2">
+											{championship.Description}
+										</p>
+										
+										<div class="flex items-center justify-between mb-3">
+											<span
+												class={`rounded-lg px-3 py-1 text-xs font-medium ${getStatusClass(championship.Status)}`}
+											>
+												{t(`Championships.Status.${championship.Status}`)}
+											</span>
+										</div>
+									</div>
+
+									<!-- Dates and details -->
+									<div class="p-4">
+										<div class="grid grid-cols-2 gap-3">
+											<div class="group-hover:bg-gray-100 bg-gray-50 rounded-lg p-3 transition-colors duration-200">
+												<div class="flex items-center gap-2 mb-1">
+													<span class="text-xs">📅</span>
+													<span class="text-xs font-medium uppercase tracking-wide text-gray-600">
+														{t(TranslationKey.ChampionshipsStartDate)}
+													</span>
+												</div>
+												<span class="text-sm font-semibold text-gray-700">
+													{getFormattedDate(championship.StartDate, session)}
+												</span>
+											</div>
+											
+											<div class="group-hover:bg-gray-100 bg-gray-50 rounded-lg p-3 transition-colors duration-200">
+												<div class="flex items-center gap-2 mb-1">
+													<span class="text-xs">🏁</span>
+													<span class="text-xs font-medium uppercase tracking-wide text-gray-600">
+														{t(TranslationKey.ChampionshipsEndDate)}
+													</span>
+												</div>
+												<span class="text-sm font-semibold text-gray-700">
+													{getFormattedDate(championship.EndDate, session)}
+												</span>
+											</div>
+										</div>
+									</div>
+								</a>
+							);
+						})
+					}
+					</div>
+				</div>
+			)
+		}
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>
-
-<script>
-	const cards = document.querySelectorAll(".championship-card");
-
-	cards.forEach((card) => {
-		card.addEventListener("click", (event) => {
-			if (!event.currentTarget) {
-				return;
-			}
-			const target = event.currentTarget as HTMLElement;
-			const url = target.getAttribute("data-url");
-
-			if (url) {
-				window.location.href = url;
-			}
-		});
-	});
-</script>

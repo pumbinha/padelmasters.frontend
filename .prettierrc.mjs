@@ -11,17 +11,9 @@ export default {
 	endOfLine: "lf",
 	arrowParens: "always",
 	plugins: [
-		"prettier-plugin-astro",
 		"prettier-plugin-tailwindcss",
-		"prettier-plugin-astro-organize-imports",
 	],
 	overrides: [
-		{
-			files: "*.astro",
-			options: {
-				parser: "astro",
-			},
-		},
 		{
 			files: "*.ts",
 			options: {

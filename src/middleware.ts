@@ -46,12 +46,18 @@ export const verifyAuth = async (session?: Session | null) => {
 export const onRequest = defineMiddleware(async (context, next) => {
 	const urlPath = context.url.pathname;
 
+	// Check if the request is for an allowed image path
+	if (ASSET_PATHS.some((path) => urlPath.startsWith(path))) {
+		return next();
+	}
+
+	// Check if it's a public route
 	if (PUBLIC_ROUTES.includes(context.url.pathname)) {
 		return next();
 	}
 
-	// Check if the request is for an allowed image path
-	if (ASSET_PATHS.some((path) => urlPath.startsWith(path))) {
+	// Check if it's a championship route (allow access to championship pages)
+	if (urlPath.startsWith("/championships/")) {
 		return next();
 	}
 

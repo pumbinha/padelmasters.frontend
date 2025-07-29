@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ExclamationTriangleIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { toast, ToastContainer } from "react-toastify";
+import { ClockIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 type PopupProps = {
 	matchAction: string;
@@ -17,6 +17,7 @@ type PopupProps = {
 	successMessage: string;
 	errorMessage: string;
 };
+
 const Popup: React.FC<PopupProps> = ({
 	matchAction,
 	title,
@@ -41,24 +42,46 @@ const Popup: React.FC<PopupProps> = ({
 			method = "PATCH";
 		}
 
-		const response = await fetch(urlAPI, {
-			method: method,
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-
-		if (response.ok) {
-			toast(successMessage, {
-				type: "success",
-				autoClose: 750,
-				onClose: () => (window.location.href = url),
+		try {
+			const response = await fetch(urlAPI, {
+				method: method,
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
 			});
-		} else {
-			console.error("Failed to process data");
+
+			if (response.ok) {
+				toast(successMessage, {
+					type: "success",
+					autoClose: 750,
+					onClose: () => (window.location.href = url),
+				});
+			} else {
+				// Check for 401 error and redirect to home page
+				if (response.status === 401) {
+					console.warn("Token expired, redirecting to home page");
+					window.location.href = '/';
+					return;
+				}
+				
+				console.error("Failed to process data");
+				toast(errorMessage, {
+					type: "error",
+					autoClose: 5000,
+				});
+			}
+		} catch (error: any) {
+			// Handle 401 errors
+			if (error?.status === 401 || error?.error?.status === 401) {
+				console.warn("Token expired, redirecting to home page");
+				window.location.href = '/';
+				return;
+			}
+			
+			console.error("Failed to process data", error);
 			toast(errorMessage, {
-				type: "success",
+				type: "error",
 				autoClose: 5000,
 			});
 		}
@@ -72,8 +95,19 @@ const Popup: React.FC<PopupProps> = ({
 
 	return (
 		<>
-			<button type="button" onClick={showPopup}>
-				<ArrowUturnLeftIcon className="h-4 w-4" />
+			<button 
+				type="button" 
+				onClick={showPopup}
+				className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#1F3851] bg-[#1F3851]/10 border border-[#1F3851]/20 rounded-lg hover:bg-[#1F3851]/20 hover:border-[#1F3851]/30 transition-all duration-200 shadow-sm"
+			>
+				{matchAction === "Unplan" ? (
+					<ClockIcon className="h-3.5 w-3.5" />
+				) : (
+					<ArrowPathIcon className="h-3.5 w-3.5" />
+				)}
+				<span className="hidden sm:inline">
+					{matchAction === "Unplan" ? "Unplan" : "Restart"}
+				</span>
 			</button>
 			<ToastContainer
 				position="top-center"

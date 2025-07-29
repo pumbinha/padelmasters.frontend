@@ -1,24 +1,28 @@
 ---
-import BreadCrumb from "@/components/BreadCrumb.astro";
-import Tabs from "@/components/Tabs.astro";
-import Popup from "@/components/ui/Popup";
+import ChampionshipGroupHeader from "@/components/ChampionshipGroupHeader.astro";
 import Toast from "@/components/ui/Toast";
-import { getMatchStatusClass, getWinnerLoserSetClass } from "@/components/ui/utils";
+import Popup from "@/components/ui/Popup";
 import UsersLink from "@/components/UsersLink.astro";
+import CountryFlag from "@/components/CountryFlag.astro";
+import Tabs from "@/components/Tabs.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
+import { type GroupMatchDto, MatchStatus, type GroupDto, type ChampionshipDto, type GroupDetailDto } from "@/services/api";
 import {
-	type ChampionshipDto,
-	type GroupDetailDto,
-	type GroupDto,
-	type GroupMatchDto,
-	MatchStatus,
-} from "@/services/api";
-
-import { getApi, getFormattedDate, getRequestParams } from "@/services/utils";
-import { PencilIcon } from "@heroicons/react/20/solid";
-import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+	getApi,
+	getRequestParams,
+	getFormattedDate,
+} from "@/services/utils";
+import {
+	CalendarDaysIcon,
+	ChartBarIcon,
+	CheckCircleIcon,
+	XCircleIcon,
+	PlayIcon,
+	PencilIcon,
+	ClockIcon,
+} from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id, groupId } = Astro.params;
@@ -29,6 +33,47 @@ const statusFilter = searchParams.get("status");
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
+// Function to get status icon and text
+const getStatusInfo = (status: MatchStatus) => {
+	switch (status) {
+		case MatchStatus.Created:
+			return {
+				icon: PlayIcon,
+				text: t("Match.Status.Created"),
+				textColor: "text-gray-600",
+				iconColor: "text-gray-500"
+			};
+		case MatchStatus.Planned:
+			return {
+				icon: ClockIcon,
+				text: t("Match.Status.Planned"),
+				textColor: "text-orange-600",
+				iconColor: "text-orange-500"
+			};
+		case MatchStatus.Played:
+			return {
+				icon: CheckCircleIcon,
+				text: t("Match.Status.Played"),
+				textColor: "text-green-600",
+				iconColor: "text-green-500"
+			};
+		case MatchStatus.Cancelled:
+			return {
+				icon: XCircleIcon,
+				text: t("Match.Status.Cancelled"),
+				textColor: "text-red-600",
+				iconColor: "text-red-500"
+			};
+		default:
+			return {
+				icon: PlayIcon,
+				text: t("Match.Status.Created"),
+				textColor: "text-gray-600",
+				iconColor: "text-gray-500"
+			};
+	}
+};
+
 const api = getApi();
 let errorMessage = "";
 
@@ -36,6 +81,12 @@ let group: GroupDto = {};
 let championship: ChampionshipDto = {};
 let groupDetail: GroupDetailDto = {};
 let matches: GroupMatchDto[] = [];
+let matchCounts = {
+	all: 0,
+	created: 0,
+	planned: 0,
+	played: 0,
+};
 
 try {
 	if (!id) {
@@ -57,25 +108,66 @@ try {
 		Astro.redirect("/group/not-found");
 	}
 
-	// ========= get matches
-	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
-		const SearchMatchesRequest = {
-			GroupId: groupId || "",
-		};
-		const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
-			SearchMatchesRequest,
-			getRequestParams(session)
-		);
-		if (standingsResponse.ok) {
-			const searchData = standingsResponse.data || [];
-			matches = searchData.flatMap((group) => {
-				return group.Match || [];
-			});
+			// ========= get matches
+		if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+			const SearchMatchesRequest = {
+				GroupId: groupId || "",
+			};
+			const standingsResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+				SearchMatchesRequest,
+				getRequestParams(session)
+			);
+			if (standingsResponse.ok) {
+				const searchData = standingsResponse.data || [];
+				matches = searchData.flatMap((group) => {
+					return group.Match || [];
+				});
 
-			// Filter matches if a status filter is provided
-			if (statusFilter && statusFilter !== "All") {
-				matches = matches.filter((match) => match.Status === statusFilter);
-			}
+				// Calculate match counts for each status
+				const allMatches = [...matches];
+				matchCounts = {
+					all: allMatches.length,
+					created: allMatches.filter(match => match.Status === MatchStatus.Created).length,
+					planned: allMatches.filter(match => match.Status === MatchStatus.Planned).length,
+					played: allMatches.filter(match => match.Status === MatchStatus.Played).length,
+				};
+
+				// Filter matches if a status filter is provided
+				if (statusFilter && statusFilter !== "All") {
+					matches = matches.filter((match) => match.Status === statusFilter);
+				}
+
+			// Sort matches according to the specified order:
+			// 1. Cancelados - at the bottom
+			// 2. Creados - after cancelled
+			// 3. Planificados and Jugados - by date descending (most recent first)
+			matches.sort((a, b) => {
+				// First, sort by status priority
+				const statusPriority = {
+					[MatchStatus.Cancelled]: 3, // Lowest priority (bottom)
+					[MatchStatus.Created]: 2,    // Medium priority
+					[MatchStatus.Planned]: 1,    // High priority
+					[MatchStatus.Played]: 1,     // High priority
+				};
+
+				const aPriority = statusPriority[a.Status || MatchStatus.Created] || 2;
+				const bPriority = statusPriority[b.Status || MatchStatus.Created] || 2;
+
+				// If different status priorities, sort by priority
+				if (aPriority !== bPriority) {
+					return aPriority - bPriority;
+				}
+
+				// If same status priority, sort by date (descending for Planned/Played)
+				if (aPriority === 1) { // Planned or Played
+					const aDate = new Date(a.Date || 0);
+					const bDate = new Date(b.Date || 0);
+					return bDate.getTime() - aDate.getTime(); // Descending order
+				}
+
+				// For Created and Cancelled, maintain original order
+				return 0;
+			});
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -102,152 +194,170 @@ const tabData = [
 ];
 ---
 
-<Layout title=`Group ${group.Name} `>
-	<section class="w-full pt-2 md:pt-2 lg:pt-2">
-		<div class="overflow-hidden rounded-lg bg-background shadow-md">
-			<div class="">
-				<BreadCrumb
-					pages={[
-						{ name: "Championships", href: "/championships" },
-						{ name: championship.Name, href: `/championships/${id}` },
-					]}
-				/>
-			</div>
+<Layout title={`Group ${group.Name} `}>
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
+		<ChampionshipGroupHeader
+			championshipId={id || ""}
+			championshipName={championship.Name || ""}
+			groupName={group.Name || ""}
+			groupDescription={group.Description || undefined}
+			icon="🏆"
+		/>
 
-			<div class="p-6">
-				<div class="mb-4 flex items-center gap-3">
-					<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-						<span class="text-2xl">🏆</span>
+		<!-- Statistics Cards -->
+		<div class="p-2 mb-4">
+			<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+				<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4 border border-blue-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<span class="text-lg">👥</span>
+						<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+							{t(TranslationKey.NumberOfPlayers)}
+						</p>
 					</div>
-					<div>
-						<h2 class="text-2xl font-bold text-gray-900">
-							{group.Name}
-						</h2>
-						<p class="text-gray-600">{group.Description}</p>
-					</div>
+					<p class="text-2xl font-bold text-blue-800">{groupDetail.NumberPlayers}</p>
 				</div>
-
-				<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
-					<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-lg">👥</span>
-							<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
-								{t(TranslationKey.NumberOfPlayers)}
-							</p>
-						</div>
-						<p class="text-2xl font-bold text-blue-800">{groupDetail.NumberPlayers}</p>
-					</div>
-					<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-lg">🎾</span>
-							<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
-								{t(TranslationKey.NumberMatches)}
-							</p>
-						</div>
-						<p class="text-2xl font-bold text-green-800">{groupDetail.NumberMatches}</p>
-					</div>
-					<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-lg">✅</span>
-							<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
-								{t(TranslationKey.PlayedMatches)}
-							</p>
-						</div>
-						<p class="text-2xl font-bold text-purple-800">
-							{groupDetail.NumberOfPlayedMatches}
+				<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4 border border-green-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<span class="text-lg">🎾</span>
+						<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+							{t(TranslationKey.NumberMatches)}
 						</p>
 					</div>
-					<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-lg">⏳</span>
-							<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
-								{t(TranslationKey.PendingMatches)}
-							</p>
-						</div>
-						<p class="text-2xl font-bold text-orange-800">
-							{groupDetail.NumberOfPendingMatches}
+					<p class="text-2xl font-bold text-green-800">{groupDetail.NumberMatches}</p>
+				</div>
+				<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4 border border-purple-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<span class="text-lg">✅</span>
+						<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+							{t(TranslationKey.PlayedMatches)}
 						</p>
 					</div>
+					<p class="text-2xl font-bold text-purple-800">
+						{groupDetail.NumberOfPlayedMatches}
+					</p>
+				</div>
+				<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4 border border-orange-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<span class="text-lg">⏳</span>
+						<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+							{t(TranslationKey.PendingMatches)}
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-orange-800">
+						{groupDetail.NumberOfPendingMatches}
+					</p>
 				</div>
 			</div>
 		</div>
 
+		<!-- Separator between statistics and tabs -->
+		<div class="border-b border-[hsl(var(--page-background))]"></div>
+
 		<Tabs tabData={tabData} />
+		
 		<div class="p-4">
-			<div class="mb-2">
-				<div class="flex items-center justify-between">
-					<div class="flex flex-wrap gap-2">
-						<a
-							href={Astro.url.pathname}
-							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
-								!statusFilter || statusFilter === "All"
-									? "bg-primary-600 text-white shadow-sm"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-							}`}
-						>
-							{t(TranslationKey.All)}
-						</a>
-						<a
-							href={`${Astro.url.pathname}?status=${MatchStatus.Created}`}
-							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
-								statusFilter === MatchStatus.Created
-									? "bg-primary-600 text-white shadow-sm"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-							}`}
-						>
-							{t("Match.Status.Created")}
-						</a>
-						<a
-							href={`${Astro.url.pathname}?status=${MatchStatus.Planned}`}
-							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
-								statusFilter === MatchStatus.Planned
-									? "bg-primary-600 text-white shadow-sm"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-							}`}
-						>
-							{t("Match.Status.Planned")}
-						</a>
-						<a
-							href={`${Astro.url.pathname}?status=${MatchStatus.Played}`}
-							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
-								statusFilter === MatchStatus.Played
-									? "bg-primary-600 text-white shadow-sm"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-							}`}
-						>
-							{t("Match.Status.Played")}
-						</a>
-						<a
-							href={`${Astro.url.pathname}?status=${MatchStatus.Cancelled}`}
-							class={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md ${
-								statusFilter === MatchStatus.Cancelled
-									? "bg-primary-600 text-white shadow-sm"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-							}`}
-						>
-							{t("Match.Status.Cancelled")}
-						</a>
-					</div>
+			<div class="mb-4">
+				<!-- Filter Buttons - Tennis Style -->
+				<div class="flex flex-wrap gap-2">
+					<a
+						href={Astro.url.pathname}
+						class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+							!statusFilter || statusFilter === "All"
+								? "bg-[#1F3851] text-white shadow-md"
+								: "bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300 shadow-sm"
+						}`}
+					>
+						{t(TranslationKey.All)} ({matchCounts.all})
+					</a>
+					<a
+						href={`${Astro.url.pathname}?status=${MatchStatus.Created}`}
+						class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+							statusFilter === MatchStatus.Created
+								? "bg-[#1F3851] text-white shadow-md"
+								: "bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300 shadow-sm"
+						}`}
+					>
+						{t("Match.Status.Created")} ({matchCounts.created})
+					</a>
+					<a
+						href={`${Astro.url.pathname}?status=${MatchStatus.Planned}`}
+						class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+							statusFilter === MatchStatus.Planned
+								? "bg-[#1F3851] text-white shadow-md"
+								: "bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300 shadow-sm"
+						}`}
+					>
+						{t("Match.Status.Planned")} ({matchCounts.planned})
+					</a>
+					<a
+						href={`${Astro.url.pathname}?status=${MatchStatus.Played}`}
+						class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+							statusFilter === MatchStatus.Played
+								? "bg-[#1F3851] text-white shadow-md"
+								: "bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300 shadow-sm"
+						}`}
+					>
+						{t("Match.Status.Played")} ({matchCounts.played})
+					</a>
 				</div>
-				<!-- Visual separator line -->
-				<div class="mt-4 border-b border-gray-200"></div>
 			</div>
 
-			<div class="inline-block min-w-full divide-y py-0 align-middle sm:px-6 lg:px-8">
+			<!-- Matches List - Compact Design -->
+			<div class="space-y-3">
 				{
 					matches.map((match) => (
-						<div class="py-4">
-							<div>
-								<div>
-									<span
-										class={`rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getMatchStatusClass(match.Status)} `}
-									>
-										{t(`Match.Status.${match.Status}`)}
-									</span>
-									<span class="ml-4 text-xs font-light text-neutral-500">
-										{getFormattedDate(match.Date, session)}
-									</span>
-									<span class="float-right ml-4 text-xs font-light text-neutral-500">
+						<div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+							<!-- Match Header -->
+							<div class="px-4 py-3 border-b border-[hsl(var(--page-background))] bg-white rounded-t-lg">
+								<div class="flex items-center justify-between">
+									<!-- Left side: Status and Date -->
+									<div class="flex items-center gap-4">
+										<!-- Status with Icon -->
+										<div class="flex items-center gap-2">
+											{(() => {
+												const statusInfo = getStatusInfo(match.Status || MatchStatus.Created);
+												const StatusIcon = statusInfo.icon;
+												return (
+													<>
+														<StatusIcon className={`h-4 w-4 ${statusInfo.iconColor}`} />
+														<span class={`text-sm font-medium ${statusInfo.textColor}`}>
+															{statusInfo.text}
+														</span>
+													</>
+												);
+											})()}
+										</div>
+
+										<!-- Vertical Separator -->
+										<div class="w-px h-6 bg-gray-300"></div>
+
+										<!-- Date with Icon -->
+										<div class="flex items-center gap-2">
+											<CalendarDaysIcon className="h-4 w-4 text-gray-400" />
+											{match.Date ? (
+												<span class="text-sm text-gray-600">
+													{getFormattedDate(match.Date, session)}
+												</span>
+											) : (
+												<span class="text-sm text-gray-400 italic">
+													No date set
+												</span>
+											)}
+										</div>
+									</div>
+
+									<!-- Right side: Actions -->
+									<div class="flex items-center gap-2">
+										{match.CurrentUserCanEdit && (
+											<a 
+												href={`/championships/${id}/${groupId}/matches/${match.Id}/edit`}
+												class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#1F3851] bg-[#1F3851]/10 border border-[#1F3851]/20 rounded-lg hover:bg-[#1F3851]/20 hover:border-[#1F3851]/30 transition-all duration-200 shadow-sm"
+												title="Edit match"
+											>
+												<PencilIcon className="h-3.5 w-3.5" />
+												<span class="hidden sm:inline">Edit</span>
+											</a>
+										)}
 										{match.CurrentUserCanUnplan && (
 											<Popup
 												matchAction="Unplan"
@@ -262,8 +372,6 @@ const tabData = [
 												errorMessage={t(TranslationKey.MatchUnplanError)}
 											/>
 										)}
-									</span>
-									<span class="float-right ml-4 text-xs font-light text-neutral-500">
 										{match.CurrentUserCanDelete && (
 											<Popup
 												matchAction="Delete"
@@ -278,88 +386,151 @@ const tabData = [
 												errorMessage={t(TranslationKey.MatchRestartError)}
 											/>
 										)}
-									</span>
-
-									<span class="float-right ml-4 text-xs font-light text-neutral-500">
-										{match.CurrentUserCanEdit && (
-											<a href={`/championships/${id}/${groupId}/matches/${match.Id}/edit`}>
-												<PencilIcon className="h-4 w-4" />
-											</a>
-										)}
-									</span>
+									</div>
 								</div>
 							</div>
-							<div>
-								<table class="min-w-full">
-									<thead>
-										<tr>
-											<th
-												scope="col"
-												class="pl-4 pr-3 text-left text-sm font-medium text-gray-900 sm:pl-0"
-											/>
 
-											{match.MatchResults?.map(() => {
-												return (
-													<th class="w-1 px-3 text-right text-sm font-semibold text-gray-900" />
-												);
-											})}
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td
-												class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm ${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
-											>
-												<UsersLink
-													userId={match.Team1?.Team?.Player1?.Id || ""}
-													displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
-													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
-												/>
+							<!-- Match Content - Compact Layout -->
+							<div class="p-4 border-t border-[hsl(var(--page-background))]">
+								<div class="space-y-3">
+									<!-- Team 1 Row -->
+									<div class={`flex items-center justify-between p-3 rounded-lg ${match.Team1?.IsWinner ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
+										<!-- Team 1 Players -->
+										<div class="flex items-center gap-3 flex-1">
+											<div class="flex flex-col gap-1">
+												<CountryFlag countryCode={match.Team1?.Team?.Player1?.Country || "ES"} class="w-4 h-3" />
+												<CountryFlag countryCode={match.Team1?.Team?.Player2?.Country || "ES"} class="w-4 h-3" />
+											</div>
+											<div class="flex-1 min-w-0">
+												<div class={`text-sm ${match.Team1?.IsWinner ? 'text-green-800' : 'text-gray-900'}`}>
+													<div class="flex items-center gap-2">
+														<UsersLink
+															userId={match.Team1?.Team?.Player1?.Id || ""}
+															displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
+															class={`${match.Team1?.IsWinner ? 'text-green-800 hover:text-green-600' : 'text-gray-900 hover:text-gray-600'}`}
+														/>
+														<span class="text-xs text-gray-500">({match.Team1?.Team?.Player1?.Ranking || '-'})</span>
+													</div>
+												</div>
+												<div class={`text-sm ${match.Team1?.IsWinner ? 'text-green-700' : 'text-gray-600'}`}>
+													<div class="flex items-center gap-2">
+														<UsersLink
+															userId={match.Team1?.Team?.Player2?.Id || ""}
+															displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
+															class={`${match.Team1?.IsWinner ? 'text-green-700 hover:text-green-600' : 'text-gray-600 hover:text-gray-500'}`}
+														/>
+														<span class="text-xs text-gray-500">({match.Team1?.Team?.Player2?.Ranking || '-'})</span>
+													</div>
+												</div>
+											</div>
+										</div>
 
-												<br />
-												<UsersLink
-													userId={match.Team1?.Team?.Player2?.Id || ""}
-													displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
-													class={`${match.Team1?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
-												/>
-											</td>
+										<!-- Team 1 Results -->
+										<div class="flex items-center gap-4">
+											<!-- Overall Score -->
+											<div class="text-center">
+												<span class={`text-lg font-bold ${match.Team1?.IsWinner ? 'text-green-600' : 'text-gray-600'}`}>
+													{match.MatchResults && match.MatchResults.length > 0 
+														? match.MatchResults.filter(r => r && (r.ResultTeam1 || 0) > (r.ResultTeam2 || 0)).length
+														: '-'
+													}
+												</span>
+											</div>
 
-											{match.MatchResults?.map((result) => {
-												return (
-													<td class={`${getWinnerLoserSetClass(1, result)} border-b-2`}>
-														{result ? result.ResultTeam1 : ""}
-													</td>
-												);
-											})}
-										</tr>
-										<tr>
-											<td
-												class={`font-base whitespace-normal py-4 pb-2 pl-4 pr-3 text-sm ${match.Team2?.IsWinner ? "text-primary-600" : "text-gray-900 hover:text-gray-600"}`}
-											>
-												<UsersLink
-													userId={match.Team2?.Team?.Player1?.Id || ""}
-													displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
-													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
-												/>
+											<!-- Vertical Separator -->
+											<div class="w-px h-8 bg-gray-300"></div>
 
-												<br />
-												<UsersLink
-													userId={match.Team2?.Team?.Player2?.Id || ""}
-													displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
-													class={`${match.Team2?.IsWinner ? "font-semibold text-primary-600 hover:text-primary-400" : "text-gray-900 hover:text-gray-600"}`}
-												/>
-											</td>
+											<!-- Set Scores -->
+											<div class="flex gap-3">
+												{match.MatchResults && match.MatchResults.length > 0 ? (
+													match.MatchResults.map((result, _index) => (
+														<div class="text-center">
+															<span class={`text-sm font-medium ${result && (result.ResultTeam1 || 0) > (result.ResultTeam2 || 0) ? 'text-green-600' : 'text-gray-600'}`}>
+																{result ? (result.ResultTeam1 || 0) : '-'}
+															</span>
+														</div>
+													))
+												) : (
+													// Show 3 sets with "-" for non-played matches
+													Array.from({ length: 3 }, (_, _index) => (
+														<div class="text-center">
+															<span class="text-sm font-medium text-gray-400">-</span>
+														</div>
+													))
+												)}
+											</div>
+										</div>
+									</div>
 
-											{match.MatchResults?.map((result) => {
-												return (
-													<td class={`${getWinnerLoserSetClass(2, result)}`}>
-														{result ? result.ResultTeam2 : ""}
-													</td>
-												);
-											})}
-										</tr>
-									</tbody>
-								</table>
+									<!-- Team 2 Row -->
+									<div class={`flex items-center justify-between p-3 rounded-lg ${match.Team2?.IsWinner ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
+										<!-- Team 2 Players -->
+										<div class="flex items-center gap-3 flex-1">
+											<div class="flex flex-col gap-1">
+												<CountryFlag countryCode={match.Team2?.Team?.Player1?.Country || "ES"} class="w-4 h-3" />
+												<CountryFlag countryCode={match.Team2?.Team?.Player2?.Country || "ES"} class="w-4 h-3" />
+											</div>
+											<div class="flex-1 min-w-0">
+												<div class={`text-sm ${match.Team2?.IsWinner ? 'text-green-800' : 'text-gray-900'}`}>
+													<div class="flex items-center gap-2">
+														<UsersLink
+															userId={match.Team2?.Team?.Player1?.Id || ""}
+															displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
+															class={`${match.Team2?.IsWinner ? 'text-green-800 hover:text-green-600' : 'text-gray-900 hover:text-gray-600'}`}
+														/>
+														<span class="text-xs text-gray-500">({match.Team2?.Team?.Player1?.Ranking || '-'})</span>
+													</div>
+												</div>
+												<div class={`text-sm ${match.Team2?.IsWinner ? 'text-green-700' : 'text-gray-600'}`}>
+													<div class="flex items-center gap-2">
+														<UsersLink
+															userId={match.Team2?.Team?.Player2?.Id || ""}
+															displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
+															class={`${match.Team2?.IsWinner ? 'text-green-700 hover:text-green-600' : 'text-gray-600 hover:text-gray-500'}`}
+														/>
+														<span class="text-xs text-gray-500">({match.Team2?.Team?.Player2?.Ranking || '-'})</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- Team 2 Results -->
+										<div class="flex items-center gap-4">
+											<!-- Overall Score -->
+											<div class="text-center">
+												<span class={`text-lg font-bold ${match.Team2?.IsWinner ? 'text-green-600' : 'text-gray-600'}`}>
+													{match.MatchResults && match.MatchResults.length > 0 
+														? match.MatchResults.filter(r => r && (r.ResultTeam2 || 0) > (r.ResultTeam1 || 0)).length
+														: '-'
+													}
+												</span>
+											</div>
+
+											<!-- Vertical Separator -->
+											<div class="w-px h-8 bg-gray-300"></div>
+
+											<!-- Set Scores -->
+											<div class="flex gap-3">
+												{match.MatchResults && match.MatchResults.length > 0 ? (
+													match.MatchResults.map((result, _index) => (
+														<div class="text-center">
+															<span class={`text-sm font-medium ${result && (result.ResultTeam2 || 0) > (result.ResultTeam1 || 0) ? 'text-green-600' : 'text-gray-600'}`}>
+																{result ? (result.ResultTeam2 || 0) : '-'}
+															</span>
+														</div>
+													))
+												) : (
+													// Show 3 sets with "-" for non-played matches
+													Array.from({ length: 3 }, (_, _index) => (
+														<div class="text-center">
+															<span class="text-sm font-medium text-gray-400">-</span>
+														</div>
+													))
+												)}
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					))
