@@ -18,7 +18,7 @@ import {
 } from "@/services/api";
 import { getApi, getRequestParams } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
-import { CalendarDaysIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChartBarIcon, UsersIcon, CalendarDateRangeIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id, groupId } = Astro.params;
@@ -111,35 +111,37 @@ const tabData = [
 		<ChampionshipGroupHeader
 			championshipId={id || ""}
 			championshipName={championship.Name || ""}
+			groupId={groupId || ""}
 			groupName={group.Name || ""}
 			groupDescription={group.Description || undefined}
 			icon="🏆"
+			championshipsTitle={t(TranslationKey.ChampionshipsTitle)}
 		/>
 
 		<!-- Statistics Cards -->
 		<div class="p-2 mb-4">
 			<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
-				<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4 border border-blue-200 shadow-sm">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
 					<div class="mb-2 flex items-center gap-2">
-						<span class="text-lg">👥</span>
+						<UsersIcon className="h-5 w-5 text-blue-600" />
 						<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
 							{t(TranslationKey.NumberOfPlayers)}
 						</p>
 					</div>
 					<p class="text-2xl font-bold text-blue-800">{groupDetail.NumberPlayers}</p>
 				</div>
-				<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4 border border-green-200 shadow-sm">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
 					<div class="mb-2 flex items-center gap-2">
-						<span class="text-lg">🎾</span>
+						<CalendarDateRangeIcon className="h-5 w-5 text-green-600" />
 						<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
 							{t(TranslationKey.NumberMatches)}
 						</p>
 					</div>
 					<p class="text-2xl font-bold text-green-800">{groupDetail.NumberMatches}</p>
 				</div>
-				<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4 border border-purple-200 shadow-sm">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
 					<div class="mb-2 flex items-center gap-2">
-						<span class="text-lg">✅</span>
+						<CheckCircleIcon className="h-5 w-5 text-purple-600" />
 						<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
 							{t(TranslationKey.PlayedMatches)}
 						</p>
@@ -148,9 +150,9 @@ const tabData = [
 						{groupDetail.NumberOfPlayedMatches}
 					</p>
 				</div>
-				<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4 border border-orange-200 shadow-sm">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
 					<div class="mb-2 flex items-center gap-2">
-						<span class="text-lg">⏳</span>
+						<ClockIcon className="h-5 w-5 text-orange-600" />
 						<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
 							{t(TranslationKey.PendingMatches)}
 						</p>

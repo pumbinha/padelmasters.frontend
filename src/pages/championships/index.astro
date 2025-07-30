@@ -18,7 +18,8 @@ import {
 	ClockIcon,
 	PlayIcon,
 	XCircleIcon,
-	CalendarDaysIcon
+	CalendarDaysIcon,
+	CalendarDateRangeIcon
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
@@ -110,7 +111,7 @@ try {
 		<div class="bg-white p-6 mb-1 border-b border-gray-300">
 			<div class="flex items-center gap-3">
 				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
-					<span class="text-2xl">🏆</span>
+					<TrophyIcon className="h-6 w-6 text-gray-600" />
 				</div>
 				<div class="flex-1">
 					<div class="flex items-center gap-2 mb-1">
@@ -130,7 +131,7 @@ try {
 					<div class="w-full rounded-lg bg-white border border-gray-200 p-8 text-center">
 						<div class="flex flex-col items-center gap-4">
 							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-								<span class="text-2xl">🏆</span>
+								<TrophyIcon className="h-8 w-8 text-gray-400" />
 							</div>
 							<div>
 								<h2 class="text-lg font-semibold text-gray-900">
@@ -210,7 +211,7 @@ try {
 											
 											<div class="flex flex-col items-center gap-1 text-green-600">
 												<div class="flex items-center gap-2">
-													<TrophyIcon className="h-5 w-5" />
+													<CalendarDateRangeIcon className="h-5 w-5" />
 													<span class="text-sm font-semibold">
 														{championship.NumberMatches || 0}
 													</span>

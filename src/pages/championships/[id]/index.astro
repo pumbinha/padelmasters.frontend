@@ -15,6 +15,7 @@ import {
 
 import { getApi, getRequestParams, orderGroupsByName } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { CalendarDateRangeIcon, UsersIcon, CheckCircleIcon, ClockIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -72,15 +73,80 @@ const tabData = [
 ];
 ---
 
-<Layout title=`Championship ${championship.Name} `>
-	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen pt-2 md:pt-2 lg:pt-2">
-		<ChampionshipHeader
-			id={id}
-			championship={championship}
-			userProfile={userProfile}
-			championshipDetail={championshipDetail}
-			session={session}
-		/>
+<Layout title={`Championship ${championship.Name}`}>
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
+		<!-- Header Section -->
+		<div class="bg-white p-6 mb-1 border-b border-gray-300">
+			<div class="flex items-center gap-3">
+				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
+					<TrophyIcon className="h-6 w-6 text-gray-600" />
+				</div>
+				<div class="flex-1">
+					<div class="flex items-center gap-2 mb-1">
+						<a 
+							href="/championships"
+							class="text-lg font-semibold text-[#1F3851] hover:text-[#152F47] transition-colors"
+						>
+							{t(TranslationKey.ChampionshipsTitle)}
+						</a>
+						<span class="text-[#1F3851]">/</span>
+						<a 
+							href={`/championships/${id}`}
+							class="text-lg font-semibold text-[#1F3851] hover:text-[#152F47] transition-colors"
+						>
+							{championship.Name}
+						</a>
+					</div>
+					<p class="text-sm text-gray-600">{championship.Description}</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Statistics Cards -->
+		<div class="p-2 mb-4">
+			<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<UsersIcon className="h-5 w-5 text-blue-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+							Players
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-blue-800">{championshipDetail.NumberEnrolledPlayers || 0}/{championshipDetail.NumberTotalPlayers || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<CalendarDateRangeIcon className="h-5 w-5 text-green-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+							Matches
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-green-800">{championshipDetail.NumberOfPlayedMatches || 0}/{championshipDetail.NumberMatches || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<CheckCircleIcon className="h-5 w-5 text-purple-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+							Played
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-purple-800">{championshipDetail.NumberOfPlayedMatches || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<ClockIcon className="h-5 w-5 text-orange-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+							Pending
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-orange-800">{(championshipDetail.NumberMatches || 0) - (championshipDetail.NumberOfPlayedMatches || 0)}</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Separator between statistics and tabs -->
+		<div class="border-b border-[hsl(var(--page-background))]"></div>
+
 		<Tabs tabData={tabData} />
 		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
 			<ol class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">

@@ -13,6 +13,18 @@ import {
 
 import { getApi, getRequestParams } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { 
+	DocumentTextIcon, 
+	ClockIcon, 
+	TrophyIcon, 
+	UserGroupIcon as UserGroupIconOutline,
+	CalendarDaysIcon,
+	CalendarDateRangeIcon,
+	ExclamationTriangleIcon,
+	CheckCircleIcon,
+	InformationCircleIcon,
+	UsersIcon
+} from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -67,26 +79,203 @@ const tabData = [
 ];
 ---
 
-<Layout title=`Championship ${championship.Name} `>
-	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen pt-2 md:pt-2 lg:pt-2">
-		<ChampionshipHeader
-			id={id}
-			championship={championship}
-			userProfile={userProfile}
-			championshipDetail={championshipDetail}
-			session={session}
-		/>
-		<Tabs tabData={tabData} />
-		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
-			<div class="grid grid-cols-1 gap-4 text-gray-600 md:grid-cols-2 lg:grid-cols-1">
-				<div set:html={championship.Rules} />
+<Layout title={`Championship ${championship.Name}`}>
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
+		<!-- Header Section -->
+		<div class="bg-white p-6 mb-1 border-b border-gray-300">
+			<div class="flex items-center gap-3">
+				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
+					<TrophyIcon className="h-6 w-6 text-gray-600" />
+				</div>
+				<div class="flex-1">
+					<div class="flex items-center gap-2 mb-1">
+						<a 
+							href="/championships"
+							class="text-lg font-semibold text-[#1F3851] hover:text-[#152F47] transition-colors"
+						>
+							{t(TranslationKey.ChampionshipsTitle)}
+						</a>
+						<span class="text-[#1F3851]">/</span>
+						<a 
+							href={`/championships/${id}`}
+							class="text-lg font-semibold text-[#1F3851] hover:text-[#152F47] transition-colors"
+						>
+							{championship.Name}
+						</a>
+					</div>
+					<p class="text-sm text-gray-600">{championship.Description}</p>
+				</div>
 			</div>
 		</div>
-		{
-			(championship.Rules == null || championship.Rules?.length === 0) &&
-				t(TranslationKey.NoRulesMessage)
-		}
 
+		<!-- Statistics Cards -->
+		<div class="p-2 mb-4">
+			<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<UsersIcon className="h-5 w-5 text-blue-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+							Players
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-blue-800">{championshipDetail.NumberEnrolledPlayers || 0}/{championshipDetail.NumberTotalPlayers || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<CalendarDateRangeIcon className="h-5 w-5 text-green-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+							Matches
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-green-800">{championshipDetail.NumberOfPlayedMatches || 0}/{championshipDetail.NumberMatches || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<CheckCircleIcon className="h-5 w-5 text-purple-600" />
+						<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+							Played
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-purple-800">{championshipDetail.NumberOfPlayedMatches || 0}</p>
+				</div>
+				<div class="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
+					<div class="mb-2 flex items-center gap-2">
+						<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 border border-orange-200">
+							<ClockIcon className="h-4 w-4 text-orange-600" />
+						</div>
+						<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+							Pending
+						</p>
+					</div>
+					<p class="text-2xl font-bold text-orange-800">{(championshipDetail.NumberMatches || 0) - (championshipDetail.NumberOfPlayedMatches || 0)}</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Separator between statistics and tabs -->
+		<div class="border-b border-[hsl(var(--page-background))]"></div>
+
+		<Tabs tabData={tabData} />
+		
+		<div class="p-4">
+			{
+				championship.Rules && championship.Rules.length > 0 ? (
+					<div>
+						<!-- Rules Content -->
+						<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+							<!-- Rules Body -->
+							<div class="p-6">
+								<!-- Additional Information Cards -->
+								<div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+									<!-- Tournament Format -->
+									<div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+										<div class="flex items-center gap-3 mb-4">
+											<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 border border-green-200">
+												<TrophyIcon className="h-5 w-5 text-green-600" />
+											</div>
+											<h3 class="text-lg font-semibold text-gray-900">Tournament Format</h3>
+										</div>
+										<p class="text-gray-600 text-sm">
+											This tournament follows standard padel rules with league format. 
+											All matches are best of 3 sets with tie-break at 6-6.
+										</p>
+									</div>
+
+									<!-- Schedule -->
+									<div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+										<div class="flex items-center gap-3 mb-4">
+											<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 border border-orange-200">
+												<CalendarDaysIcon className="h-5 w-5 text-orange-600" />
+											</div>
+											<h3 class="text-lg font-semibold text-gray-900">Match Schedule</h3>
+										</div>
+										<p class="text-gray-600 text-sm">
+											Matches will be scheduled based on player availability. 
+											Check the matches tab for your upcoming games.
+										</p>
+									</div>
+
+									<!-- Players -->
+									<div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+										<div class="flex items-center gap-3 mb-4">
+											<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 border border-purple-200">
+												<UserGroupIconOutline className="h-5 w-5 text-purple-600" />
+											</div>
+											<h3 class="text-lg font-semibold text-gray-900">Player Information</h3>
+										</div>
+										<p class="text-gray-600 text-sm">
+											All players must be registered and confirmed before participating. 
+											Check your enrollment status in the groups section.
+										</p>
+									</div>
+								</div>
+
+								<!-- Tournament Rules Card -->
+								<div class="bg-gray-50 rounded-lg border border-gray-200 p-6 mb-6">
+									<div class="flex items-center gap-3 mb-4">
+										<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 border border-blue-200">
+											<DocumentTextIcon className="h-5 w-5 text-blue-600" />
+										</div>
+										<h3 class="text-lg font-semibold text-gray-900">Tournament Rules</h3>
+									</div>
+									<div class="text-gray-700 leading-relaxed [&_u]:no-underline [&_strong]:font-semibold [&_strong]:text-gray-900 [&_p]:mb-3 [&_p]:text-sm [&_p]:leading-relaxed [&_div]:text-sm [&_div]:leading-relaxed [&_br]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-2 [&_li]:text-sm [&_li]:leading-relaxed [&_li]:mb-2">
+										<div set:html={championship.Rules} />
+									</div>
+								</div>
+
+								<!-- Important Notes -->
+								<div class="bg-yellow-50 border border-yellow-200 rounded-lg px-6 py-2 mt-6 mb-0">
+									<div class="flex items-start gap-3">
+										<ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
+										<div>
+											<h3 class="text-lg font-semibold text-yellow-800 mb-1">Important Notes</h3>
+											<ul class="text-yellow-700 text-sm space-y-1">
+												<li class="flex items-start gap-2">
+													<CheckCircleIcon className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+													<span>All players must arrive 15 minutes before their scheduled match time</span>
+												</li>
+												<li class="flex items-start gap-2">
+													<CheckCircleIcon className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+													<span>Proper padel attire and non-marking shoes are required</span>
+												</li>
+												<li class="flex items-start gap-2">
+													<CheckCircleIcon className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+													<span>Results must be reported within 24 hours of match completion</span>
+												</li>
+												<li class="flex items-start gap-2">
+													<CheckCircleIcon className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+													<span>Any disputes will be resolved by the tournament director</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				) : (
+					<!-- No Rules Message -->
+					<div class="py-8">
+						<div class="w-full rounded-lg bg-white border border-gray-200 p-8 text-center shadow-sm">
+							<div class="flex flex-col items-center gap-4">
+								<div class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+									<DocumentTextIcon className="h-8 w-8 text-gray-400" />
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold text-gray-900 mb-2">
+										No rules available
+									</h3>
+									<p class="text-sm text-gray-500">
+										The tournament rules haven't been published yet. Check back later or contact the tournament organizer for more information.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				)
+			}
+		</div>
+		
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>
