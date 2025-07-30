@@ -539,7 +539,23 @@ const tabData = [
 
 			{
 				matches.length === 0 && (
-					<div class="py-4 text-center text-gray-500">{t(TranslationKey.NoMatchesFound)}</div>
+					<div class="py-8">
+						<div class="w-full rounded-lg bg-white border border-gray-200 p-8 text-center shadow-sm">
+							<div class="flex flex-col items-center gap-4">
+								<div class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+									<span class="text-2xl">🎾</span>
+								</div>
+								<div>
+									<h3 class="text-lg font-semibold text-gray-900 mb-2">
+										No matches available
+									</h3>
+									<p class="text-sm text-gray-500">
+										No matches found with the selected filter. Try changing the filter or check back later.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
 				)
 			}
 		</div>

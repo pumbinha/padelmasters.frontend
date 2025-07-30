@@ -1,4 +1,4 @@
-import { type ChampionshipDto, type ChampionshipUserProfileDto } from "@/services/api";
+import { type ChampionshipDto, type ChampionshipUserProfileDto, type ChampionshipDetailDto } from "@/services/api";
 
 export type NavigationLink = {
 	group: number;
@@ -14,4 +14,4 @@ export type BreadCrumbProps = {
 	href: string;
 }[];
 
-export interface ExtendedChampionshipDto extends ChampionshipDto, ChampionshipUserProfileDto {}
+export interface ExtendedChampionshipDto extends ChampionshipDto, ChampionshipUserProfileDto, ChampionshipDetailDto {}
