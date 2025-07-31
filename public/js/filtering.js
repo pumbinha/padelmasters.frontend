@@ -27,26 +27,36 @@ function initializeFiltering() {
 			// Update active button
 			freshFilterButtons.forEach((btn) => {
 				if (btn) {
-					btn.classList.remove("bg-[#1F3851]", "text-white", "shadow-md");
+					btn.classList.remove(
+						"bg-white/60",
+						"text-black",
+						"border-white/70",
+						"shadow-xl",
+						"font-semibold"
+					);
 					btn.classList.add(
-						"bg-gray-200",
-						"text-gray-700",
-						"hover:bg-gray-300",
-						"border",
-						"border-gray-300",
+						"bg-white/10",
+						"text-white/80",
+						"hover:bg-white/20",
+						"border-white/20",
 						"shadow-sm"
 					);
 				}
 			});
 			target.classList.remove(
-				"bg-gray-200",
-				"text-gray-700",
-				"hover:bg-gray-300",
-				"border",
-				"border-gray-300",
+				"bg-white/10",
+				"text-white/80",
+				"hover:bg-white/20",
+				"border-white/20",
 				"shadow-sm"
 			);
-			target.classList.add("bg-[#1F3851]", "text-white", "shadow-md");
+			target.classList.add(
+				"bg-white/60",
+				"text-black",
+				"border-white/70",
+				"shadow-xl",
+				"font-semibold"
+			);
 
 			// Show/hide matches based on filter
 			const matchElements = matchesContainer.querySelectorAll("[data-match]");
@@ -57,19 +67,76 @@ function initializeFiltering() {
 				const isVisible = filter === "All" || matchStatus === filter;
 
 				if (isVisible) {
-					matchElement.style.display = "block";
+					matchElement.style.opacity = "1";
+					matchElement.style.transform = "scale(1)";
+					matchElement.style.height = "";
+					matchElement.style.maxHeight = "";
+					matchElement.style.marginTop = "";
+					matchElement.style.marginBottom = "";
+					matchElement.style.paddingTop = "";
+					matchElement.style.paddingBottom = "";
+					matchElement.style.pointerEvents = "auto";
+					matchElement.style.overflow = "";
 					visibleCount++;
 				} else {
-					matchElement.style.display = "none";
+					matchElement.style.opacity = "0";
+					matchElement.style.transform = "scaleY(0)";
+					matchElement.style.height = "0";
+					matchElement.style.maxHeight = "0";
+					matchElement.style.marginTop = "0";
+					matchElement.style.marginBottom = "0";
+					matchElement.style.paddingTop = "0";
+					matchElement.style.paddingBottom = "0";
+					matchElement.style.pointerEvents = "none";
+					matchElement.style.overflow = "hidden";
 				}
 			});
+
+			// Collapse/expand matches container based on visible count
+			if (visibleCount === 0) {
+				matchesContainer.style.height = "0";
+				matchesContainer.style.maxHeight = "0";
+				matchesContainer.style.overflow = "hidden";
+				matchesContainer.style.marginTop = "0";
+				matchesContainer.style.marginBottom = "0";
+				matchesContainer.style.paddingTop = "0";
+				matchesContainer.style.paddingBottom = "0";
+			} else {
+				matchesContainer.style.height = "";
+				matchesContainer.style.maxHeight = "";
+				matchesContainer.style.overflow = "";
+				matchesContainer.style.marginTop = "";
+				matchesContainer.style.marginBottom = "";
+				matchesContainer.style.paddingTop = "";
+				matchesContainer.style.paddingBottom = "";
+			}
 
 			// Show/hide no matches message
 			if (noMatchesMessage) {
 				if (visibleCount === 0) {
-					noMatchesMessage.style.display = "block";
+					noMatchesMessage.style.display = "";
+					noMatchesMessage.style.opacity = "1";
+					noMatchesMessage.style.transform = "scale(1)";
+					noMatchesMessage.style.height = "";
+					noMatchesMessage.style.maxHeight = "";
+					noMatchesMessage.style.marginTop = "";
+					noMatchesMessage.style.marginBottom = "";
+					noMatchesMessage.style.paddingTop = "";
+					noMatchesMessage.style.paddingBottom = "";
+					noMatchesMessage.style.pointerEvents = "auto";
+					noMatchesMessage.style.overflow = "";
 				} else {
 					noMatchesMessage.style.display = "none";
+					noMatchesMessage.style.opacity = "0";
+					noMatchesMessage.style.transform = "scaleY(0)";
+					noMatchesMessage.style.height = "0";
+					noMatchesMessage.style.maxHeight = "0";
+					noMatchesMessage.style.marginTop = "0";
+					noMatchesMessage.style.marginBottom = "0";
+					noMatchesMessage.style.paddingTop = "0";
+					noMatchesMessage.style.paddingBottom = "0";
+					noMatchesMessage.style.pointerEvents = "none";
+					noMatchesMessage.style.overflow = "hidden";
 				}
 			}
 

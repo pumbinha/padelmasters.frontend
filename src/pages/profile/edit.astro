@@ -68,7 +68,7 @@ if (Astro.request.method === "POST") {
 				locales = data;
 			});
 		} catch (e) {
-			console.log(e);
+			// Error loading data
 			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
 
@@ -95,7 +95,7 @@ if (Astro.request.method === "POST") {
 				successMessage = t(TranslationKey.ProfileUpdatedSuccessfully);
 			}
 		} catch (e) {
-			console.log(e);
+			// Error loading data
 			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
 	} catch (error) {
@@ -128,7 +128,7 @@ if (Astro.request.method === "POST") {
 			locale = data.attributes.locale[0];
 		});
 	} catch (e) {
-		console.log(e);
+		// Error loading data
 		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 
@@ -147,7 +147,7 @@ if (Astro.request.method === "POST") {
 			locales = data;
 		});
 	} catch (e) {
-		console.log(e);
+		// Error loading data
 		errorMessage = t(TranslationKey.ErrorLoadingData);
 	}
 }

@@ -24,12 +24,12 @@ const { title } = Astro.props;
 		<title>{title}</title>
 		<ViewTransitions />
 	</head>
-	<body class={`flex min-h-screen flex-col ${Astro.url.pathname === '/' || Astro.url.pathname === '/championships' ? 'bg-gray-900' : ''}`}>
+	<body class={`flex min-h-screen flex-col ${Astro.url.pathname === '/' || Astro.url.pathname === '/championships' || (Astro.url.pathname.includes('/championships/') && Astro.url.pathname.split('/').filter(Boolean).length === 3 && !Astro.url.pathname.includes('/rules')) ? 'bg-gray-900' : ''}`}>
 		<Header />
-		<main class={`flex-1 ${Astro.url.pathname === '/' || Astro.url.pathname === '/championships' ? '' : ''}`}>
+		<main class={`flex-1 ${Astro.url.pathname === '/' || Astro.url.pathname === '/championships' || (Astro.url.pathname.includes('/championships/') && Astro.url.pathname.split('/').filter(Boolean).length === 3 && !Astro.url.pathname.includes('/rules')) ? '' : ''}`}>
 			<slot />
 		</main>
 		<SpeedInsights />
-		{Astro.url.pathname !== '/' && Astro.url.pathname !== '/championships' && <Footer />}
+		{Astro.url.pathname !== '/' && Astro.url.pathname !== '/championships' && !(Astro.url.pathname.includes('/championships/') && Astro.url.pathname.split('/').filter(Boolean).length === 3 && !Astro.url.pathname.includes('/rules')) && <Footer />}
 	</body>
 </html>
