@@ -172,9 +172,7 @@ export interface StandingDto {
 }
 
 export interface PlayerStandingDto {
-  /** @format guid */
-  UserId?: string;
-  DisplayName?: string;
+  User?: UserDto;
   /** @format int32 */
   Points?: number;
   /** @format int32 */

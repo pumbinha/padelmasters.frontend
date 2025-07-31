@@ -1,29 +1,21 @@
 ---
-import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
+import Layout from "@/layouts/Layout.astro";
 import Tabs from "@/components/Tabs.astro";
 import Toast from "@/components/ui/Toast";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import Layout from "@/layouts/Layout.astro";
-import {
-	type ChampionshipDetailDto,
-	type ChampionshipDto,
-	type ChampionshipUserProfileDto,
-} from "@/services/api";
-
+import { type ChampionshipDto, type ChampionshipDetailDto } from "@/services/api";
 import { getApi, getRequestParams } from "@/services/utils";
-import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 import { 
-	DocumentTextIcon, 
-	ClockIcon, 
 	TrophyIcon, 
+	UsersIcon, 
+	CalendarDateRangeIcon, 
+	CheckCircleIcon, 
+	ClockIcon,
+	DocumentTextIcon,
+	ExclamationTriangleIcon,
 	UserGroupIcon as UserGroupIconOutline,
 	CalendarDaysIcon,
-	CalendarDateRangeIcon,
-	ExclamationTriangleIcon,
-	CheckCircleIcon,
-	InformationCircleIcon,
-	UsersIcon
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
@@ -37,7 +29,6 @@ let errorMessage = "";
 
 let championship: ChampionshipDto = {};
 let championshipDetail: ChampionshipDetailDto = {};
-let userProfile: ChampionshipUserProfileDto = {};
 
 try {
 	if (!id) {
@@ -53,7 +44,6 @@ try {
 	if (championshipResponse.ok) {
 		championship = championshipResponse.data.Championship?.Championship || {};
 		championshipDetail = championshipResponse.data.Championship?.ChampionshipDetail || {};
-		userProfile = championshipResponse.data.Championship?.UserProfile || {};
 	} else {
 		// 404
 		Astro.redirect("/championships/not-found");
@@ -67,13 +57,13 @@ const tabData = [
 	{
 		name: t(TranslationKey.GroupsTitle),
 		url: `/championships/${id}`,
-		icon: UserGroupIcon,
+		icon: UsersIcon,
 		isCurrent: false,
 	},
 	{
 		name: t(TranslationKey.RulesTitle),
 		url: `/championships/${id}/rules`,
-		icon: BookOpenIcon,
+		icon: TrophyIcon,
 		isCurrent: true,
 	},
 ];

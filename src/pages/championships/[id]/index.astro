@@ -1,5 +1,4 @@
 ---
-import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
 import Tabs from "@/components/Tabs.astro";
 import GroupItemLink from "@/components/ui/GroupItemLink";
 import Toast from "@/components/ui/Toast";
@@ -15,7 +14,7 @@ import {
 
 import { getApi, getRequestParams, orderGroupsByName } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
-import { CalendarDateRangeIcon, UsersIcon, CheckCircleIcon, ClockIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { CalendarDateRangeIcon, UsersIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -79,7 +78,7 @@ const tabData = [
 		<div class="bg-white p-6 mb-1 border-b border-gray-300">
 			<div class="flex items-center gap-3">
 				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
-					<TrophyIcon className="h-6 w-6 text-gray-600" />
+					<CalendarDateRangeIcon className="h-6 w-6 text-gray-600" />
 				</div>
 				<div class="flex-1">
 					<div class="flex items-center gap-2 mb-1">
@@ -153,7 +152,7 @@ const tabData = [
 				{
 					groups.map((group) => (
 						<GroupItemLink
-							url={`/championships/${id}/${group.Id}/matches`}
+							url={`/championships/${id}/${group.Id}`}
 							name={group.Name || ""}
 							description={group.Description || ""}
 							currentUserIsRegistered={group.Id === userProfile.CurrentGroupId}

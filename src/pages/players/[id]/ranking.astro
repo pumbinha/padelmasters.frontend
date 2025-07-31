@@ -82,9 +82,9 @@ try {
 				if (standingsResponse.ok) {
 					let allPlayerStandings = standingsResponse.data.PlayerStandings || [];
 					const position =
-						allPlayerStandings.findIndex((playerStanding) => playerStanding.UserId === id) + 1;
+						allPlayerStandings.findIndex((playerStanding) => playerStanding.User?.Id === id) + 1;
 					const thisPlayerStanding = allPlayerStandings.find(
-						(playerStanding) => playerStanding.UserId === id
+						(playerStanding) => playerStanding.User?.Id === id
 					);
 
 					const one: GroupMatchSearchDtoWithPosition = {

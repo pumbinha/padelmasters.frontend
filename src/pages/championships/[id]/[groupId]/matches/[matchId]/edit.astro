@@ -58,8 +58,8 @@ let team2set3 = 0;
 let startDate = "";
 let endDate = "";
 
-// Use custom return URL if provided, otherwise default to the championship matches page
-const returnUrl = customReturnUrl || `/championships/${id}/${groupId}/matches`;
+// Use custom return URL if provided, otherwise default to the championship group page
+const returnUrl = customReturnUrl || `/championships/${id}/${groupId}`;
 
 const api = getApi();
 
@@ -222,12 +222,12 @@ if (Astro.request.method === "POST") {
 
 <Layout title="Match Edit">
 	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
-		<ChampionshipGroupHeader 
+		<ChampionshipGroupHeader
 			championshipId={id || ""}
 			championshipName={championshipName}
+			groupId={groupId || ""}
 			groupName={groupName}
 			groupDescription={groupDescription}
-			icon="🎾"
 		/>
 		
 		<div class="mx-auto max-w-sm px-2 py-6 sm:max-w-md sm:px-4 sm:py-8">
@@ -346,7 +346,7 @@ if (Astro.request.method === "POST") {
 							{t(TranslationKey.Save)}
 						</button>
 						<a
-							href={`/championships/${id}/${groupId}/matches`}
+							href={`/championships/${id}/${groupId}`}
 							class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
 						>
 							{t(TranslationKey.Cancel)}

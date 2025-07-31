@@ -28,3 +28,4 @@ pnpm-debug.log*
 
 # Claude Code configuration
 CLAUDE.md
+.claude/

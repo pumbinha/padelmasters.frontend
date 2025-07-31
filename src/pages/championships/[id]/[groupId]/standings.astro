@@ -14,7 +14,6 @@ import {
 	type GroupDetailDto,
 	type GroupDto,
 	type PlayerStandingDto,
-	type UserDto,
 } from "@/services/api";
 import { getApi, getRequestParams } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
@@ -33,7 +32,7 @@ let group: GroupDto = {};
 let championship: ChampionshipDto = {};
 let groupDetail: GroupDetailDto = {};
 let playerStandings: PlayerStandingDto[] = [];
-let userDetails: Record<string, UserDto> = {};
+
 
 try {
 	if (!id) {
@@ -63,23 +62,6 @@ try {
 		);
 		if (standingsResponse.ok) {
 			playerStandings = standingsResponse.data.PlayerStandings || [];
-			
-			// Get user details for each player to display country and ranking
-			for (const player of playerStandings) {
-				if (player.UserId) {
-					try {
-						const userResponse = await api.api.padelmastersApiDomainEndpointsUsersGetUser(
-							player.UserId,
-							getRequestParams(session)
-						);
-						if (userResponse.ok && userResponse.data.User) {
-							userDetails[player.UserId] = userResponse.data.User;
-						}
-					} catch (e) {
-						console.error(`Error fetching user ${player.UserId}:`, e);
-					}
-				}
-			}
 		} else {
 			// 404
 			Astro.redirect("/not-found");
@@ -114,8 +96,6 @@ const tabData = [
 			groupId={groupId || ""}
 			groupName={group.Name || ""}
 			groupDescription={group.Description || undefined}
-			icon="🏆"
-			championshipsTitle={t(TranslationKey.ChampionshipsTitle)}
 		/>
 
 		<!-- Statistics Cards -->
@@ -212,19 +192,19 @@ const tabData = [
 														
 														<!-- Country Flag -->
 														<CountryFlag 
-															countryCode={userDetails[player.UserId || ""]?.Country || "ES"} 
+															countryCode={player.User?.Country || "ES"} 
 															class="w-4 h-3" 
 														/>
 														
 														<!-- Player Name -->
 														<UsersLink
-															userId={player.UserId || ""}
-															displayName={player.DisplayName}
+															userId={player.User?.Id || ""}
+															displayName={`${player.User?.FirstName || ''} ${player.User?.LastName || ''}`}
 															class="text-primary-600 hover:text-primary-800 transition-colors"
 														/>
 														
 														<!-- Ranking -->
-														<span class="text-xs text-gray-500">({userDetails[player.UserId || ""]?.Ranking || '-'})</span>
+														<span class="text-xs text-gray-500">({player.User?.Ranking || '-'})</span>
 														
 														<!-- Americano Stars -->
 														{(group.GroupType || GroupType.League) === GroupType.Americano &&
