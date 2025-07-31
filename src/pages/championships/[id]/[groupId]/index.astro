@@ -216,7 +216,7 @@ try {
 		<div class="fixed inset-0 -z-10 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
 		<!-- Content -->
-		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-8">
+		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
 			<ChampionshipGroupHeader
 				championshipId={id || ""}
 				championshipName={championship.Name || ""}
@@ -738,7 +738,7 @@ try {
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 
 		<!-- Integrated Footer Section - Full Width -->
-		<div class="relative z-10 w-full py-8 mt-12">
+		<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
 			<!-- Features Section -->
 			<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
 				<div class="flex items-center gap-2 text-sm text-white/70">
