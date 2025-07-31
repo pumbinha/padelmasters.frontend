@@ -24,7 +24,7 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 			</div>
 			<Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
 				<div className="fixed inset-0 z-50" />
-				<DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 py-4 sm:max-w-sm shadow-2xl">
+				<DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 py-4 shadow-2xl sm:max-w-sm">
 					<div className="flex items-center justify-between px-6">
 						<a href="/" className="flex items-center gap-3">
 							<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500/20 backdrop-blur-sm">
@@ -38,7 +38,7 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 						<button
 							type="button"
 							onClick={() => setMobileMenuOpen(false)}
-							className="-m-2.5 rounded-md p-2.5 text-neutral-300 hover:text-white hover:bg-white/10 transition-colors"
+							className="-m-2.5 rounded-md p-2.5 text-neutral-300 transition-colors hover:bg-white/10 hover:text-white"
 						>
 							<span className="sr-only">Close menu</span>
 							<XMarkIcon aria-hidden="true" className="h-6 w-6" />
@@ -51,17 +51,17 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 									<div key={group.group}>
 										<div className="space-y-2 py-4">
 											{group.links.map((link) => (
-																							<a
-												key={link.href}
-												href={link.href}
-												className={`block cursor-pointer py-3 pl-4 pr-4 text-sm transition-colors duration-200 ${
-													link.isActive 
-														? "text-white font-medium" 
-														: "text-neutral-300 hover:text-white"
-												}`}
-											>
-												{link.name}
-											</a>
+												<a
+													key={link.href}
+													href={link.href}
+													className={`block cursor-pointer py-3 pl-4 pr-4 text-sm transition-colors duration-200 ${
+														link.isActive
+															? "font-medium text-white"
+															: "text-neutral-300 hover:text-white"
+													}`}
+												>
+													{link.name}
+												</a>
 											))}
 										</div>
 									</div>

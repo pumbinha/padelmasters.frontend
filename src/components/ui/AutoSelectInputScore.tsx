@@ -42,13 +42,8 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 	return (
 		<div className="flex items-center gap-1">
 			{/* Hidden input for form submission */}
-			<input
-				type="hidden"
-				name={id}
-				ref={hiddenInputRef}
-				value={value}
-			/>
-			
+			<input type="hidden" name={id} ref={hiddenInputRef} value={value} />
+
 			<button
 				type="button"
 				onClick={decrement}
@@ -59,7 +54,7 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
 				</svg>
 			</button>
-			
+
 			<input
 				id={id}
 				type="number"
@@ -73,7 +68,7 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 				onClick={handleFocusOrClick}
 				onChange={handleChange}
 			/>
-			
+
 			<button
 				type="button"
 				onClick={increment}

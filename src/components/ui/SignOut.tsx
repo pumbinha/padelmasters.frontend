@@ -13,7 +13,7 @@ const SignOut: React.FC<SignOutProps> = ({ text }) => {
 	return (
 		<button
 			onClick={handle}
-			className="flex items-center gap-2 rounded-lg bg-supporting-red-600 px-4 py-2 text-sm font-medium text-primary-foreground transition-all duration-200 hover:bg-supporting-red-800 hover:scale-105 shadow-lg"
+			className="flex items-center gap-2 rounded-lg bg-supporting-red-600 px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg transition-all duration-200 hover:scale-105 hover:bg-supporting-red-800"
 		>
 			<ArrowRightStartOnRectangleIcon className="h-4 w-4" />
 			{text}

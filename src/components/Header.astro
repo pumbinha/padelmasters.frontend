@@ -50,30 +50,69 @@ navigationLinks = navigationLinks.map((group) => ({
 navigationLinks = setLinkActive(navigationLinks, currentPath);
 ---
 
-<header class="relative overflow-hidden bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-b border-neutral-600">
-	<div class="relative px-6 py-8">
-		<div class="flex flex-col md:flex-row items-center justify-between gap-6">
-			<!-- Logo and brand section -->
-			<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
-				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500/20 backdrop-blur-sm">
-					<span class="text-lg">🎾</span>
-				</div>
-				<div class="flex flex-col">
-					<span class="text-lg font-bold text-white">Padel Masters</span>
-					<span class="text-xs text-neutral-300">Championship Management System</span>
-				</div>
-			</a>
+{currentPath === '/' ? (
+	<!-- Minimal Header for Homepage -->
+	<header class="absolute top-0 left-0 right-0 z-20 bg-transparent">
+		<div class="px-6 py-6">
+			<div class="flex items-center justify-between">
+				<!-- Logo section -->
+				<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+					<div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+						<span class="text-lg">🎾</span>
+					</div>
+					<div class="flex flex-col">
+						<span class="text-lg font-bold text-white">Padel Masters</span>
+						<span class="text-xs text-white/70">Championship Management System</span>
+					</div>
+				</a>
 
-			<!-- Navigation section -->
-			<nav class="flex items-center gap-6 text-sm">
-				{
-					navigationLinks.map((group) => {
-						return group.links.map((element) => {
-							return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
-						});
-					})
-				}
-			</nav>
+				<!-- Navigation section -->
+				<nav class="flex items-center gap-4 text-sm">
+					{
+						navigationLinks.map((group) => {
+							return group.links.map((element) => {
+								return (
+									<a
+										href={element.href}
+										class="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+									>
+										{element.name}
+									</a>
+								);
+							});
+						})
+					}
+				</nav>
+			</div>
 		</div>
-	</div>
-</header>
+	</header>
+) : (
+	<!-- Regular Header for Other Pages -->
+	<header class="relative overflow-hidden bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-b border-neutral-600">
+		<div class="relative px-6 py-8">
+			<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+				<!-- Logo and brand section -->
+				<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+					<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500/20 backdrop-blur-sm">
+						<span class="text-lg">🎾</span>
+					</div>
+					<div class="flex flex-col">
+						<span class="text-lg font-bold text-white">Padel Masters</span>
+						<span class="text-xs text-neutral-300">Championship Management System</span>
+					</div>
+				</a>
+
+				<!-- Navigation section -->
+				<nav class="flex items-center gap-6 text-sm">
+					{
+						navigationLinks.map((group) => {
+							return group.links.map((element) => {
+								return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
+							});
+						})
+					}
+				</nav>
+			</div>
+		</div>
+	</header>
+)}

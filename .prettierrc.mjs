@@ -10,9 +10,7 @@ export default {
 	useTabs: true,
 	endOfLine: "lf",
 	arrowParens: "always",
-	plugins: [
-		"prettier-plugin-tailwindcss",
-	],
+	plugins: ["prettier-plugin-tailwindcss"],
 	overrides: [
 		{
 			files: "*.ts",

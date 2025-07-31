@@ -61,10 +61,10 @@ const Popup: React.FC<PopupProps> = ({
 				// Check for 401 error and redirect to home page
 				if (response.status === 401) {
 					console.warn("Token expired, redirecting to home page");
-					window.location.href = '/';
+					window.location.href = "/";
 					return;
 				}
-				
+
 				console.error("Failed to process data");
 				toast(errorMessage, {
 					type: "error",
@@ -75,10 +75,10 @@ const Popup: React.FC<PopupProps> = ({
 			// Handle 401 errors
 			if (error?.status === 401 || error?.error?.status === 401) {
 				console.warn("Token expired, redirecting to home page");
-				window.location.href = '/';
+				window.location.href = "/";
 				return;
 			}
-			
+
 			console.error("Failed to process data", error);
 			toast(errorMessage, {
 				type: "error",
@@ -95,19 +95,17 @@ const Popup: React.FC<PopupProps> = ({
 
 	return (
 		<>
-			<button 
-				type="button" 
+			<button
+				type="button"
 				onClick={showPopup}
-				className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#1F3851] bg-[#1F3851]/10 border border-[#1F3851]/20 rounded-lg hover:bg-[#1F3851]/20 hover:border-[#1F3851]/30 transition-all duration-200 shadow-sm"
+				className="inline-flex items-center gap-1.5 rounded-lg border border-[#1F3851]/20 bg-[#1F3851]/10 px-3 py-2 text-xs font-medium text-[#1F3851] shadow-sm transition-all duration-200 hover:border-[#1F3851]/30 hover:bg-[#1F3851]/20"
 			>
 				{matchAction === "Unplan" ? (
 					<ClockIcon className="h-3.5 w-3.5" />
 				) : (
 					<ArrowPathIcon className="h-3.5 w-3.5" />
 				)}
-				<span className="hidden sm:inline">
-					{matchAction === "Unplan" ? "Unplan" : "Restart"}
-				</span>
+				<span className="hidden sm:inline">{matchAction === "Unplan" ? "Unplan" : "Restart"}</span>
 			</button>
 			<ToastContainer
 				position="top-center"
