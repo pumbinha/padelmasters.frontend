@@ -22,6 +22,8 @@ import {
 	CalendarDateRangeIcon
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
+import homeNet from "@/assets/images/home-net.jpg";
+import { Image } from "astro:assets";
 
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
@@ -106,72 +108,90 @@ try {
 ---
 
 <Layout title="Championships">
-	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen">
-		<!-- Header Section -->
-		<div class="bg-white p-6 mb-1 border-b border-gray-300">
-			<div class="flex items-center gap-3">
-				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-[hsl(var(--page-background))] border border-gray-300">
-					<TrophyIcon className="h-6 w-6 text-gray-600" />
-				</div>
-				<div class="flex-1">
-					<div class="flex items-center gap-2 mb-1">
-						<h1 class="text-lg font-semibold text-[#1F3851]">
-							{t(TranslationKey.ChampionshipsTitle)}
-						</h1>
-					</div>
-					<p class="text-sm text-gray-600">Browse and join exciting padel tournaments</p>
-				</div>
-			</div>
+	<section class="relative w-full min-h-screen overflow-hidden">
+		<!-- Background Image -->
+		<div class="absolute inset-0">
+			<Image
+				src={homeNet}
+				alt="Padel Court Background"
+				width="1920"
+				height="1080"
+				widths={[640, 1024, 1280, 1920, homeNet.width]}
+				sizes={`(max-width: 640px) 640px, (max-width: 1024px) 1024px, (max-width: 1280px) 1280px, (max-width: 1920px) 1920px, ${homeNet.width}px`}
+				class="w-full h-full object-cover"
+			/>
+			<!-- Gradient Overlay -->
+			<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+			<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 		</div>
 
-		<!-- Championships Grid -->
-		{
-			championships.length === 0 ? (
-				<div class="p-4">
-					<div class="w-full rounded-lg bg-white border border-gray-200 p-8 text-center">
-						<div class="flex flex-col items-center gap-4">
-							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-								<TrophyIcon className="h-8 w-8 text-gray-400" />
-							</div>
-							<div>
-								<h2 class="text-lg font-semibold text-gray-900">
-									{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
-								</h2>
-								<p class="mt-2 text-sm text-gray-500">{t(TranslationKey.ChampionshipsNoChampionshipsDescription)}</p>
+		<!-- Content -->
+		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
+			<!-- Header Section with Glassmorphism -->
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6 shadow-2xl">
+				<div class="flex items-center gap-3">
+					<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20 border border-white/30 shadow-lg">
+						<TrophyIcon className="h-6 w-6 text-white" />
+					</div>
+					<div class="flex-1">
+						<div class="flex items-center gap-2 mb-1">
+							<h1 class="text-lg font-semibold text-white">
+								{t(TranslationKey.ChampionshipsTitle)}
+							</h1>
+						</div>
+						<p class="text-sm text-white/80">Browse and join exciting padel tournaments</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Championships Grid -->
+			{
+				championships.length === 0 ? (
+					<div class="max-w-7xl mx-auto">
+						<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-center shadow-2xl">
+							<div class="flex flex-col items-center gap-4">
+								<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 border border-white/30">
+									<TrophyIcon className="h-8 w-8 text-white/80" />
+								</div>
+								<div>
+									<h2 class="text-lg font-semibold text-white">
+										{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
+									</h2>
+									<p class="mt-2 text-sm text-white/70">{t(TranslationKey.ChampionshipsNoChampionshipsDescription)}</p>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			) : (
-				<div class="p-4">
-					<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+				) : (
+					<div class="max-w-7xl mx-auto">
+						<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{
 						championships.map((championship) => {
 							const statusInfo = getChampionshipStatusInfo(championship.Status || "Created");
 							return (
 								<a
 									href={`/championships/${championship.Id}`}
-									class="group cursor-pointer overflow-hidden rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#1F3851]/30"
+									class="group cursor-pointer overflow-hidden rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-105"
 								>
 									<!-- Header similar to matches -->
-									<div class="px-4 py-3 border-b border-[hsl(var(--page-background))] bg-white rounded-t-lg">
+									<div class="px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-xl">
 										<div class="flex items-center justify-between">
 											<!-- Left side: Status and Title -->
 											<div class="flex items-center gap-4">
 												<!-- Status with Icon -->
 												<div class="flex items-center gap-2">
-													<statusInfo.icon className={`h-4 w-4 ${statusInfo.iconColor}`} />
-													<span class={`text-sm font-medium ${statusInfo.textColor}`}>
+													<statusInfo.icon className="h-4 w-4 text-white/90" />
+													<span class="text-sm font-medium text-white/90">
 														{statusInfo.text}
 													</span>
 												</div>
 
 												<!-- Vertical Separator -->
-												<div class="w-px h-6 bg-gray-300"></div>
+												<div class="w-px h-6 bg-white/30"></div>
 
 												<!-- Title -->
 												<div class="flex-1">
-													<h2 class="text-lg font-semibold text-gray-900 group-hover:text-[#1F3851] transition-colors">
+													<h2 class="text-lg font-semibold text-white group-hover:text-blue-200 transition-colors">
 														{championship.Name}
 													</h2>
 												</div>
@@ -179,99 +199,99 @@ try {
 
 											<!-- Right side: Enrollment status -->
 											{championship.UserIsRegistered && (
-												<div class="flex items-center gap-1 px-2 py-1 bg-green-50 border border-green-200 rounded-lg">
+												<div class="flex items-center gap-1 px-2 py-1 bg-green-500/20 border border-green-400/30 rounded-lg backdrop-blur-sm">
 													<span class="text-xs">✅</span>
-													<span class="text-xs text-green-700 font-medium">Enrolled</span>
+													<span class="text-xs text-green-200 font-medium">Enrolled</span>
 												</div>
 											)}
 										</div>
 									</div>
 
 									<!-- Content similar to matches -->
-									<div class="p-4 border-t border-[hsl(var(--page-background))]">
+									<div class="p-4 border-t border-white/20">
 										<!-- Description -->
-										<p class="text-sm text-gray-600 mb-4 line-clamp-2">
+										<p class="text-sm text-white/80 mb-4 line-clamp-2">
 											{championship.Description}
 										</p>
 
 										<!-- Separator between description and statistics -->
-										<div class="border-b border-gray-200 mb-4"></div>
+										<div class="border-b border-white/20 mb-4"></div>
 
 										<!-- Statistics Row -->
 										<div class="grid grid-cols-4 gap-4 mb-4">
-											<div class="flex flex-col items-center gap-1 text-blue-600">
+											<div class="flex flex-col items-center gap-1">
 												<div class="flex items-center gap-2">
-													<UsersIcon className="h-5 w-5" />
-													<span class="text-sm font-semibold">
+													<UsersIcon className="h-5 w-5 text-blue-400" />
+													<span class="text-sm font-semibold text-white">
 														{championship.NumberEnrolledPlayers || 0}/{championship.NumberTotalPlayers || 0}
 													</span>
 												</div>
-												<span class="text-xs text-blue-600">Players</span>
+												<span class="text-xs text-blue-300">Players</span>
 											</div>
 											
-											<div class="flex flex-col items-center gap-1 text-green-600">
+											<div class="flex flex-col items-center gap-1">
 												<div class="flex items-center gap-2">
-													<CalendarDateRangeIcon className="h-5 w-5" />
-													<span class="text-sm font-semibold">
+													<CalendarDateRangeIcon className="h-5 w-5 text-green-400" />
+													<span class="text-sm font-semibold text-white">
 														{championship.NumberMatches || 0}
 													</span>
 												</div>
-												<span class="text-xs text-green-600">Matches</span>
+												<span class="text-xs text-green-300">Matches</span>
 											</div>
 											
-											<div class="flex flex-col items-center gap-1 text-purple-600">
+											<div class="flex flex-col items-center gap-1">
 												<div class="flex items-center gap-2">
-													<CheckCircleIcon className="h-5 w-5" />
-													<span class="text-sm font-semibold">
+													<CheckCircleIcon className="h-5 w-5 text-purple-400" />
+													<span class="text-sm font-semibold text-white">
 														{championship.NumberOfPlayedMatches || 0}
 													</span>
 												</div>
-												<span class="text-xs text-purple-600">Played</span>
+												<span class="text-xs text-purple-300">Played</span>
 											</div>
 											
-											<div class="flex flex-col items-center gap-1 text-orange-600">
+											<div class="flex flex-col items-center gap-1">
 												<div class="flex items-center gap-2">
-													<ClockIcon className="h-5 w-5" />
-													<span class="text-sm font-semibold">
+													<ClockIcon className="h-5 w-5 text-orange-400" />
+													<span class="text-sm font-semibold text-white">
 														{championship.NumberOfPendingMatches || 0}
 													</span>
 												</div>
-												<span class="text-xs text-orange-600">Pending</span>
+												<span class="text-xs text-orange-300">Pending</span>
 											</div>
 										</div>
 
 										<!-- Separator between statistics and progress -->
-										<div class="border-b border-gray-200 mb-4"></div>
+										<div class="border-b border-white/20 mb-4"></div>
 
 										<!-- Progress Bar -->
 										<div class="mb-4">
 											<div class="flex items-center justify-between mb-2">
-												<span class="text-xs font-medium text-gray-600">Tournament Progress</span>
-												<span class="text-xs text-gray-500">
+												<span class="text-xs font-medium text-white/80">Tournament Progress</span>
+												<span class="text-xs text-white/70">
 													65%
 												</span>
 											</div>
-											<div class="w-full bg-gray-200 rounded-full h-2">
+											<div class="w-full bg-white/20 rounded-full h-2">
 												<div 
-													class="bg-green-500 h-2 rounded-full transition-all duration-300"
+													class="bg-green-400 h-2 rounded-full transition-all duration-300"
 													style="width: 65%"
 												></div>
 											</div>
 										</div>
 
 										<!-- Separator between statistics and dates -->
-										<div class="border-b border-gray-200 mb-4"></div>
+										<div class="border-b border-white/20 mb-4"></div>
 
 										<!-- Dates and Next Match Info -->
-										<div class="flex items-center justify-between text-sm text-gray-600">
+										<div class="flex items-center justify-between text-sm text-white/80">
 											<div class="flex items-center gap-2">
-												<CalendarDaysIcon className="h-4 w-4 text-gray-400" />
+												<CalendarDaysIcon className="h-4 w-4 text-white/60" />
 												<span>
 													{getFormattedDate(championship.StartDate, session)} - {getFormattedDate(championship.EndDate, session)}
 												</span>
 											</div>
 											<div class="flex items-center gap-2">
-												<ClockIcon className="h-4 w-4 text-gray-400" />
+												<ClockIcon className="h-4 w-4 text-white/60" />
 												<span>Next match in 3 days</span>
 											</div>
 										</div>
@@ -280,10 +300,56 @@ try {
 							);
 						})
 					}
+						</div>
+					</div>
+				)
+			}
+			{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+		</div>
+
+		<!-- Integrated Footer Section - Full Width -->
+		<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
+			<!-- Features Section -->
+			<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🏆</span>
+					<span class="hidden sm:inline">Professional Tournament Management</span>
+					<span class="sm:hidden">Tournaments</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🎯</span>
+					<span class="hidden sm:inline">Real-time Statistics</span>
+					<span class="sm:hidden">Statistics</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>👥</span>
+					<span class="hidden sm:inline">Community Driven</span>
+					<span class="sm:hidden">Community</span>
+				</div>
+			</div>
+
+			<!-- Divider -->
+			<div class="border-t border-white/20 mb-4 mx-6"></div>
+
+			<!-- Bottom Section -->
+			<div class="flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+				<!-- Copyright -->
+				<div class="flex flex-col items-center md:items-start gap-2">
+					<p class="text-sm text-white/70">
+						© {new Date().getFullYear()} Padel Masters. All rights reserved.
+					</p>
+					<div class="flex items-center gap-4 text-xs text-white/60">
+						<span>Made with ❤️ for padel lovers</span>
 					</div>
 				</div>
-			)
-		}
-		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+
+				<!-- Version Info -->
+				<div class="flex items-center gap-2 text-xs text-white/60">
+					<span>Version 1.0</span>
+					<span>•</span>
+					<span>Built with Astro</span>
+				</div>
+			</div>
+		</div>
 	</section>
 </Layout>
