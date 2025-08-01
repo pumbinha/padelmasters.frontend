@@ -30,6 +30,7 @@ let groupDescription = "";
 
 interface EditFormData {
 	matchDate: string;
+	matchTime: string;
 	startDate: string;
 	endDate: string;
 	displayNameTeam1Player1: string;
@@ -45,6 +46,7 @@ interface EditFormData {
 }
 
 let matchDate = "";
+let matchTime = "";
 let displayNameTeam1Player1 = "";
 let displayNameTeam1Player2 = "";
 let displayNameTeam2Player1 = "";
@@ -90,6 +92,7 @@ if (Astro.request.method === "POST") {
 		const formData = await parseFormData<EditFormData>(Astro.request);
 
 		matchDate = formData["matchDate"] || "";
+		matchTime = formData["matchTime"] || "";
 		endDate = formData["endDate"] || "";
 		startDate = formData["startDate"] || "";
 		// Assign parsed data to your variables
@@ -125,8 +128,14 @@ if (Astro.request.method === "POST") {
 				};
 			}
 
+			// Combine date and time into a proper ISO string
+			let combinedDateTime = matchDate;
+			if (matchTime) {
+				combinedDateTime = `${matchDate}T${matchTime}:00`;
+			}
+			
 			const model: MatchResultModel = {
-				Date: matchDate,
+				Date: combinedDateTime,
 			};
 
 			if (
@@ -195,7 +204,18 @@ if (Astro.request.method === "POST") {
 		if (matchResponse.ok) {
 			const model = matchResponse.data || {};
 
-			matchDate = getFormattedDateForInput(model.Date) || "";
+			// Extract date and time from the Date field
+			if (model.Date) {
+				const dateTime = new Date(model.Date);
+				const isoString = dateTime.toISOString();
+				const timeString = dateTime.toTimeString();
+				
+				matchDate = isoString.split('T')[0] || ""; // YYYY-MM-DD format
+				
+				const timeStringPart = timeString.split(' ')[0];
+				matchTime = timeStringPart ? timeStringPart.substring(0, 5) : ""; // HH:MM format
+			}
+			
 			startDate = getFormattedDateForInput(model.StartDate) || "";
 			endDate = getFormattedDateForInput(model.EndDate) || "";
 			displayNameTeam1Player1 = `${model.Team1?.Team?.Player1?.FirstName} ${model.Team1?.Team?.Player1?.LastName}`;
@@ -322,22 +342,41 @@ if (Astro.request.method === "POST") {
 						</div>
 					</div>
 
-					<!-- Date Section -->
+					<!-- Date and Time Section -->
 					<div class="mb-8">
 						<div class="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4">
-							<label for="matchDate" class="mb-3 block text-sm font-medium text-white">
-								{t(TranslationKey.MatchDate)}
-							</label>
-							<input
-								type="date"
-								id="matchDate"
-								name="matchDate"
-								value={matchDate}
-								min={startDate}
-								max={endDate}
-								required
-								class="w-full rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-3 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 date-input-glass"
-							/>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<!-- Date Input -->
+								<div>
+									<label for="matchDate" class="mb-3 block text-sm font-medium text-white">
+										{t(TranslationKey.MatchDate)}
+									</label>
+									<input
+										type="date"
+										id="matchDate"
+										name="matchDate"
+										value={matchDate}
+										min={startDate}
+										max={endDate}
+										required
+										class="w-full rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-3 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 date-input-glass"
+									/>
+								</div>
+								
+								<!-- Time Input -->
+								<div>
+									<label for="matchTime" class="mb-3 block text-sm font-medium text-white">
+										Hora del partido
+									</label>
+									<input
+										type="time"
+										id="matchTime"
+										name="matchTime"
+										value={matchTime}
+										class="w-full rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-3 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 time-input-glass"
+									/>
+								</div>
+							</div>
 							<input type="hidden" name="startDate" value={startDate} />
 							<input type="hidden" name="endDate" value={endDate} />
 						</div>
@@ -436,6 +475,32 @@ if (Astro.request.method === "POST") {
 	.date-input-glass::-webkit-datetime-edit-year-field {
 		color: white !important;
 		opacity: 1 !important;
+	}
+
+	/* Time input styles */
+	.time-input-glass::-webkit-datetime-edit-text {
+		color: white;
+		opacity: 1;
+	}
+	
+	.time-input-glass::-webkit-datetime-edit-hour-field,
+	.time-input-glass::-webkit-datetime-edit-minute-field {
+		color: white;
+		font-weight: 600;
+	}
+	
+	.time-input-glass::-webkit-datetime-edit-ampm-field {
+		color: white;
+		font-weight: 600;
+	}
+
+	/* Remove spinners for both date and time inputs */
+	.date-input-glass::-webkit-inner-spin-button,
+	.date-input-glass::-webkit-outer-spin-button,
+	.time-input-glass::-webkit-inner-spin-button,
+	.time-input-glass::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
 	}
 </style>
 

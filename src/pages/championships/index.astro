@@ -24,6 +24,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
+// Get the status filter from URL parameters
+const { searchParams } = Astro.url;
+const statusFilter = searchParams.get("status") || "Started"; // Default to Started
+
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
@@ -31,6 +35,13 @@ const api = getApi();
 let errorMessage = "";
 
 let championships: ExtendedChampionshipDto[] = []; // extend using UserProfile
+let championshipCounts = {
+	started: 0,
+	finished: 0,
+	open: 0,
+	created: 0,
+	cancelled: 0
+};
 
 // Function to get championship status icon and text
 const getChampionshipStatusInfo = (status: string) => {
@@ -97,6 +108,17 @@ try {
 		});
 
 		championships = orderChampionshipDtoByDate(championships);
+		
+		// Calculate counts for each status BEFORE filtering
+		championshipCounts = {
+			started: championships.filter(c => c.Status === "Started").length,
+			finished: championships.filter(c => c.Status === "Finished").length,
+			open: championships.filter(c => c.Status === "Open").length,
+			created: championships.filter(c => c.Status === "Created").length,
+			cancelled: championships.filter(c => c.Status === "Cancelled").length
+		};
+		
+		// Don't filter server-side, we'll filter client-side with JavaScript
 	} else {
 		console.error(championshipResponse);
 	}
@@ -133,15 +155,70 @@ try {
 				</div>
 			</div>
 
-			<!-- Championships Grid -->
-			{
-				championships.length === 0 ? (
-					<div class="max-w-7xl mx-auto">
-						<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-center shadow-2xl">
+			<!-- Status Filter Tabs -->
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl mb-6 shadow-2xl">
+				<div class="px-4 py-3 border-b border-white/20">
+					<div class="flex flex-wrap gap-2">
+						<button
+							data-filter="Started"
+							class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+								statusFilter === "Started"
+									? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+									: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+							}`}
+						>
+							<ClockIcon className="w-3 h-3 mr-1" />
+							En Curso ({championshipCounts.started})
+						</button>
+						<button
+							data-filter="Finished"
+							class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+								statusFilter === "Finished"
+									? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+									: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+							}`}
+						>
+							<TrophyIcon className="w-3 h-3 mr-1" />
+							Finalizados ({championshipCounts.finished})
+						</button>
+						<button
+							data-filter="Open"
+							class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+								statusFilter === "Open"
+									? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+									: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+							}`}
+						>
+							<CheckCircleIcon className="w-3 h-3 mr-1" />
+							Abiertos ({championshipCounts.open})
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Championships Container -->
+			<div class="max-w-7xl mx-auto">
+				<!-- No Championships Message (hidden by default, shown by JS when needed) -->
+				<div id="no-championships-message" class="w-full p-8 text-center" style="display: none;">
+					<div class="flex flex-col items-center gap-4">
+						<TrophyIcon className="h-16 w-16 text-white/60" />
+						<div>
+							<h2 class="text-lg font-semibold text-white" id="no-championships-title">
+								No hay campeonatos disponibles
+							</h2>
+							<p class="mt-2 text-sm text-white/70">
+								Actualmente no hay campeonatos con el estado solicitado. Prueba con otro filtro.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Championships Grid -->
+				{
+					championships.length === 0 ? (
+						<div class="w-full p-8 text-center">
 							<div class="flex flex-col items-center gap-4">
-								<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 border border-white/30">
-									<TrophyIcon className="h-8 w-8 text-white/80" />
-								</div>
+								<TrophyIcon className="h-16 w-16 text-white/60" />
 								<div>
 									<h2 class="text-lg font-semibold text-white">
 										{t(TranslationKey.ChampionshipsNoChampionshipstitle)}
@@ -150,10 +227,8 @@ try {
 								</div>
 							</div>
 						</div>
-					</div>
 				) : (
-					<div class="max-w-7xl mx-auto">
-						<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+					<div id="championships-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{
 						championships.map((championship) => {
 							const statusInfo = getChampionshipStatusInfo(championship.Status || "Created");
@@ -161,6 +236,7 @@ try {
 								<a
 									href={`/championships/${championship.Id}`}
 									class="group cursor-pointer overflow-hidden rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-105"
+									data-championship-status={championship.Status || "Created"}
 								>
 									<!-- Header similar to matches -->
 									<div class="px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-xl">
@@ -289,11 +365,11 @@ try {
 							);
 						})
 					}
-						</div>
 					</div>
 				)
 			}
 			{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+			</div>
 		</div>
 
 		<!-- Integrated Footer Section - Full Width -->
@@ -339,4 +415,129 @@ try {
 			</div>
 		</div>
 	</section>
+
+	<script>
+		function initializeFiltering() {
+			const filterButtons = document.querySelectorAll("[data-filter]");
+			const championshipsGrid = document.getElementById("championships-grid");
+			const noChampionshipsMessage = document.getElementById("no-championships-message");
+			const noChampionshipsTitle = document.getElementById("no-championships-title");
+			
+			if (!filterButtons.length || !championshipsGrid) return;
+			
+			// Remove old event listeners by cloning buttons
+			filterButtons.forEach((button) => {
+				const newButton = button.cloneNode(true);
+				button.parentNode?.replaceChild(newButton, button);
+			});
+			
+			// Get fresh references after cloning
+			const freshFilterButtons = document.querySelectorAll("[data-filter]");
+			
+			freshFilterButtons.forEach((button) => {
+				button.addEventListener("click", function (e) {
+					e.preventDefault();
+					const target = e.currentTarget as HTMLElement;
+					if (!target) return;
+					
+					const filter = target.getAttribute("data-filter");
+					if (!filter) return;
+					
+					// Update active button
+					freshFilterButtons.forEach((btn) => {
+						if (btn) {
+							(btn as HTMLElement).classList.remove(
+								"bg-white/60",
+								"text-black", 
+								"border-white/70",
+								"shadow-xl",
+								"font-semibold"
+							);
+							(btn as HTMLElement).classList.add(
+								"bg-white/10",
+								"text-white/80",
+								"hover:bg-white/20",
+								"border-white/20",
+								"shadow-sm"
+							);
+						}
+					});
+					
+					// Set active button
+					target.classList.remove(
+						"bg-white/10",
+						"text-white/80",
+						"hover:bg-white/20", 
+						"border-white/20",
+						"shadow-sm"
+					);
+					target.classList.add(
+						"bg-white/60",
+						"text-black",
+						"border-white/70", 
+						"shadow-xl",
+						"font-semibold"
+					);
+					
+					// Filter championships
+					const championshipElements = championshipsGrid.querySelectorAll("[data-championship-status]");
+					let visibleCount = 0;
+					
+					championshipElements.forEach((championshipElement) => {
+						const championshipStatus = championshipElement.getAttribute("data-championship-status");
+						const isVisible = championshipStatus === filter;
+						const element = championshipElement as HTMLElement;
+						
+						if (isVisible) {
+							element.style.display = "block";
+							visibleCount++;
+						} else {
+							element.style.display = "none";
+						}
+					});
+					
+					// Show/hide no championships message
+					if (visibleCount === 0) {
+						championshipsGrid.style.display = "none";
+						noChampionshipsMessage!.style.display = "block";
+						
+						// Update message based on filter
+						const messages = {
+							"Started": "No hay campeonatos en curso",
+							"Finished": "No hay campeonatos finalizados", 
+							"Open": "No hay campeonatos abiertos"
+						};
+						if (noChampionshipsTitle) {
+							noChampionshipsTitle.textContent = messages[filter as keyof typeof messages] || "No hay campeonatos disponibles";
+						}
+					} else {
+						championshipsGrid.style.display = "grid";
+						noChampionshipsMessage!.style.display = "none";
+					}
+					
+					// Update URL without reloading
+					const url = new URL(window.location.href);
+					url.searchParams.set("status", filter);
+					window.history.pushState({}, "", url);
+				});
+			});
+			
+			// Set initial filter based on URL or default to 'Started'
+			const urlParams = new URLSearchParams(window.location.search);
+			const initialFilter = urlParams.get("status") || "Started";
+			
+			// Find and click the appropriate button
+			const initialButton = Array.from(freshFilterButtons).find(
+				(btn) => btn.getAttribute("data-filter") === initialFilter
+			) as HTMLElement;
+			
+			if (initialButton) {
+				initialButton.click();
+			}
+		}
+		
+		// Initialize filtering on page load and Astro transitions
+		document.addEventListener("DOMContentLoaded", initializeFiltering);
+		document.addEventListener("astro:page-load", initializeFiltering);
+	</script>
 </Layout>

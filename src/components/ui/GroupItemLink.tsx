@@ -347,7 +347,7 @@ const GroupItemLink: React.FC<GroupItemLinkProps> = ({
 								{lastActivity ? (
 									<>
 									
-									{/* Vertical layout like the image */}
+									{/* Vertical layout showing one match result */}
 									<div className="space-y-2">
 										{/* Team 1 */}
 										<div className="flex items-center justify-between py-2">

@@ -1,7 +1,9 @@
 ---
 import SignOutComponent from "@/components/ui/SignOut.tsx";
 import Toast from "@/components/ui/Toast";
-import { getStatusClass } from "@/components/ui/utils";
+import RecentForm from "@/components/ui/RecentForm.tsx";
+import PerformanceStats from "@/components/ui/PerformanceStats.tsx";
+import MyChampionshipCard from "@/components/ui/MyChampionshipCard.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { type SearchMatchesRequest } from "@/services/api";
@@ -46,6 +48,105 @@ try {
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
+
+// Mock data for development - TODO: Replace with real API data
+const mockRecentMatches = [
+	{ id: "1", result: "win" as const, opponent: "Carlos M.", score: "6-4, 6-2", date: "2024-01-28", tournament: "Liga Primavera" },
+	{ id: "2", result: "win" as const, opponent: "Ana L.", score: "6-3, 7-5", date: "2024-01-25", tournament: "Copa Invierno" },
+	{ id: "3", result: "loss" as const, opponent: "Miguel R.", score: "4-6, 3-6", date: "2024-01-22" },
+	{ id: "4", result: "win" as const, opponent: "Laura S.", score: "6-2, 6-4", date: "2024-01-20", tournament: "Liga Primavera" },
+	{ id: "5", result: "win" as const, opponent: "Pedro G.", score: "7-6, 6-3", date: "2024-01-18" },
+	{ id: "6", result: "loss" as const, opponent: "Maria C.", score: "2-6, 4-6", date: "2024-01-15", tournament: "Copa Invierno" },
+	{ id: "7", result: "win" as const, opponent: "Jose A.", score: "6-4, 6-1", date: "2024-01-12" },
+	{ id: "8", result: "win" as const, opponent: "Elena P.", score: "6-3, 6-2", date: "2024-01-10", tournament: "Liga Primavera" },
+	{ id: "9", result: "win" as const, opponent: "Roberto D.", score: "7-5, 6-4", date: "2024-01-08" },
+	{ id: "10", result: "loss" as const, opponent: "Sofia M.", score: "3-6, 5-7", date: "2024-01-05", tournament: "Copa Invierno" }
+];
+
+const mockCurrentStreak = { type: "win" as const, count: 2 };
+const mockPerformanceStats = {
+	winPercentage: 72,
+	matchesThisMonth: 8,
+	bestStreak: 5,
+	currentRanking: 12,
+	totalPlayers: 156
+};
+
+// Enhanced mock data for championships with player statistics
+const mockChampionshipsWithStats = [
+	{
+		id: "1",
+		name: "Liga Primavera 2024",
+		groupId: "A1",
+		groupName: "Grupo A",
+		status: "Started" as const,
+		startDate: "2024-01-15",
+		endDate: "2024-03-15",
+		stats: {
+			played: 8,
+			won: 6,
+			lost: 1,
+			draws: 1,
+			pending: 4,
+			winPercentage: 75,
+			position: 2,
+			totalParticipants: 12
+		}
+	},
+	{
+		id: "2",
+		name: "Copa de Invierno",
+		groupId: "B2",
+		groupName: "Grupo B",
+		status: "Started" as const,
+		startDate: "2024-01-01",
+		endDate: "2024-02-28",
+		stats: {
+			played: 5,
+			won: 3,
+			lost: 2,
+			draws: 0,
+			pending: 3,
+			winPercentage: 60,
+			position: 4,
+			totalParticipants: 10
+		}
+	},
+	{
+		id: "3",
+		name: "Torneo Navideño 2023",
+		groupId: "C1",
+		groupName: "Grupo Élite",
+		status: "Finished" as const,
+		startDate: "2023-12-01",
+		endDate: "2023-12-31",
+		stats: {
+			played: 10,
+			won: 7,
+			lost: 2,
+			draws: 1,
+			pending: 0,
+			winPercentage: 80,
+			position: 1,
+			totalParticipants: 16
+		}
+	}
+];
+
+// Mock data for next match
+const mockNextMatch = {
+	team1Player1: "Carlos M.",
+	team1Player1Flag: "🇪🇸",
+	team1Player2: "Pedro G.",
+	team1Player2Flag: "🇪🇸",
+	team2Player1: "Ana L.",
+	team2Player1Flag: "🇫🇷",
+	team2Player2: "María C.",
+	team2Player2Flag: "🇫🇷",
+	date: "2024-02-05",
+	time: "18:30",
+	tournament: "Liga Primavera 2024"
+};
 ---
 
 <section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
@@ -83,10 +184,72 @@ try {
 			</div>
 		</div>
 
+		<!-- Performance Cards Section -->
+		<div class="max-w-7xl mx-auto mb-6">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<!-- Left Column - Recent Form with Next Match -->
+				<RecentForm 
+					matches={mockRecentMatches} 
+					currentStreak={mockCurrentStreak}
+					nextMatch={mockNextMatch}
+					client:load 
+				/>
+				
+				<!-- Right Column - Performance Stats -->
+				<PerformanceStats 
+					winPercentage={mockPerformanceStats.winPercentage}
+					matchesThisMonth={mockPerformanceStats.matchesThisMonth}
+					bestStreak={mockPerformanceStats.bestStreak}
+					currentRanking={mockPerformanceStats.currentRanking}
+					totalPlayers={mockPerformanceStats.totalPlayers}
+					client:load 
+				/>
+			</div>
+		</div>
+
 		<!-- Championships Section -->
 		<div class="max-w-7xl mx-auto">
+			<!-- Always show the enhanced championships section with mock data for demo -->
+			<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
+				<!-- Header Section -->
+				<div class="p-6">
+					<div class="flex items-center gap-3 mb-4">
+						<TrophyIcon className="h-6 w-6 text-white" />
+						<div class="flex-1">
+							<h3 class="text-base sm:text-lg font-semibold text-white">
+								{t(TranslationKey.MyChampionships)}
+							</h3>
+							<p class="text-sm text-white/80">Estadísticas detalladas de tu participación en torneos</p>
+						</div>
+					</div>
+					
+					<!-- Separator -->
+					<div class="border-b border-white/20 mb-4"></div>
+				</div>
+
+				<!-- Enhanced Championships List -->
+				<div class="px-6 pb-6">
+					<div>
+						{mockChampionshipsWithStats.map((championship) => (
+							<MyChampionshipCard 
+								id={championship.id}
+								name={championship.name}
+								groupId={championship.groupId}
+								groupName={championship.groupName}
+								status={championship.status}
+								startDate={championship.startDate}
+								endDate={championship.endDate}
+								stats={championship.stats}
+								client:load
+							/>
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* Fallback for when no real data and no mock data */}
 			{
-				(!championshipsAndGroups || championshipsAndGroups.length === 0) && (
+				(!championshipsAndGroups || championshipsAndGroups.length === 0) && mockChampionshipsWithStats.length === 0 && (
 					<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-center shadow-2xl">
 						<div class="flex flex-col items-center gap-4">
 							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 border border-white/30">
@@ -107,61 +270,6 @@ try {
 									{t(TranslationKey.FindChampionship)}
 								</a>
 							</div>
-						</div>
-					</div>
-				)
-			}
-
-			{
-				championshipsAndGroups.length > 0 && (
-					<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
-						<!-- Header Section -->
-						<div class="px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-xl">
-							<div class="flex items-center gap-3">
-								<TrophyIcon className="h-6 w-6 text-white" />
-								<div class="flex-1">
-									<div class="flex items-center gap-2 mb-1">
-										<h3 class="text-base sm:text-lg font-semibold text-white">
-											{t(TranslationKey.MyChampionships)}
-										</h3>
-									</div>
-									<p class="text-sm text-white/80">Manage and track your tournament participation</p>
-								</div>
-							</div>
-						</div>
-
-						<!-- Championships List -->
-						<div class="p-6">
-							<ul role="list" class="space-y-4">
-								{championshipsAndGroups.map((championshipsAndGroup) => {
-									return (
-										<li class="rounded-lg bg-white/5 backdrop-blur-sm border border-white/20 p-4 hover:bg-white/10 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
-											<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-												<div class="flex flex-col sm:flex-row sm:items-center gap-2">
-													<a
-														href={`/championships/${championshipsAndGroup.Championship?.Id}`}
-														class="text-sm font-semibold text-blue-300 hover:text-blue-200 transition-colors underline decoration-blue-400/30 hover:decoration-blue-300/50"
-													>
-														{championshipsAndGroup.Championship?.Name}
-													</a>
-													<span class="hidden sm:inline text-white/40">/</span>
-													<a
-														href={`/championships/${championshipsAndGroup.Championship?.Id}/${championshipsAndGroup.Group?.Id}`}
-														class="text-sm font-semibold text-blue-300 hover:text-blue-200 transition-colors underline decoration-blue-400/30 hover:decoration-blue-300/50"
-													>
-														{championshipsAndGroup.Group?.Name}
-													</a>
-												</div>
-												<span
-													class="inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium bg-white/10 border border-white/20 text-white/90"
-												>
-													{t(`Championships.Status.${championshipsAndGroup.Championship?.Status}`)}
-												</span>
-											</div>
-										</li>
-									);
-								})}
-							</ul>
 						</div>
 					</div>
 				)
