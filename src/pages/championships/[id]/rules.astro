@@ -73,12 +73,10 @@ const tabData = [
 ---
 
 <Layout title={`Championship ${championship.Name}`} useTransparentHeader={true}>
-	<section class="relative w-full min-h-screen overflow-hidden">
-		<!-- Fixed Background -->
-		<div class="fixed inset-0 -z-10" style={`background-image: url('${homeNet.src}'); background-size: cover; background-position: center; background-repeat: no-repeat;`}></div>
-		<!-- Fixed Gradient Overlays -->
-		<div class="fixed inset-0 -z-10 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
-		<div class="fixed inset-0 -z-10 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+	<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+		<!-- Gradient Overlay for depth -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
 		<!-- Content -->
 		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">

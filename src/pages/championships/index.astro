@@ -108,22 +108,10 @@ try {
 ---
 
 <Layout title="Championships">
-	<section class="relative w-full min-h-screen overflow-hidden">
-		<!-- Background Image -->
-		<div class="absolute inset-0">
-			<Image
-				src={homeNet}
-				alt="Padel Court Background"
-				width="1920"
-				height="1080"
-				widths={[640, 1024, 1280, 1920, homeNet.width]}
-				sizes={`(max-width: 640px) 640px, (max-width: 1024px) 1024px, (max-width: 1280px) 1280px, (max-width: 1920px) 1920px, ${homeNet.width}px`}
-				class="w-full h-full object-cover"
-			/>
-			<!-- Gradient Overlay -->
-			<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
-			<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-		</div>
+	<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+		<!-- Gradient Overlay for depth -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
 		<!-- Content -->
 		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
