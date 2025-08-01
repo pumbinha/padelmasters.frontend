@@ -29,7 +29,6 @@ export class AuthenticationError extends Error {
  */
 export const redirectToHome = () => {
 	if (typeof window !== 'undefined') {
-		console.warn("Token expired, redirecting to home page");
 		window.location.href = "/";
 	}
 };

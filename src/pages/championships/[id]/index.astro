@@ -54,7 +54,6 @@ try {
 } catch (e) {
 	if (e instanceof AuthenticationError) {
 		// Authentication failed, redirect to home page
-		console.warn("Authentication failed in server-side rendering, redirecting to home");
 		return Astro.redirect("/");
 	}
 	console.error(e);

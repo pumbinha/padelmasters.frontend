@@ -55,7 +55,6 @@ const Popup: React.FC<PopupProps> = ({
 
 			// Handle 401 errors by redirecting to home page
 			if (response.status === 401) {
-				console.warn("Token expired, redirecting to home page");
 				window.location.href = "/";
 				return;
 			}
