@@ -29,101 +29,138 @@ const GroupItemLink: React.FC<GroupItemLinkProps> = ({
 	currentUserIsRegistered,
 }) => {
 
-	// Mock statistics for now - in real implementation, these would come from props
-	const mockStats = {
-		players: Math.floor(Math.random() * 16) + 8,  // 8-24 players
-		maxPlayers: 24,
-		totalMatches: Math.floor(Math.random() * 50) + 20, // 20-70 matches
-		playedMatches: Math.floor(Math.random() * 30) + 5, // 5-35 played
-		pendingMatches: 0,
-		completionPercentage: 0
+	// Create deterministic mock data based on group name to avoid hydration issues
+	const generateMockData = (seed: string) => {
+		// Simple hash function to create consistent random-like data
+		let hash = 0;
+		for (let i = 0; i < seed.length; i++) {
+			hash = ((hash << 5) - hash + seed.charCodeAt(i)) & 0xffffffff;
+		}
+		
+		// Use hash to generate consistent values
+		const rand1 = Math.abs(hash) % 100 / 100;
+		const rand2 = Math.abs(hash >> 8) % 100 / 100;
+		const rand3 = Math.abs(hash >> 16) % 100 / 100;
+		
+		const mockStats = {
+			players: Math.floor(rand1 * 16) + 8,  // 8-24 players
+			maxPlayers: 24,
+			totalMatches: Math.floor(rand2 * 50) + 20, // 20-70 matches
+			playedMatches: Math.floor(rand3 * 30) + 5, // 5-35 played
+			pendingMatches: 0,
+			completionPercentage: 0
+		};
+
+		mockStats.pendingMatches = mockStats.totalMatches - mockStats.playedMatches;
+		mockStats.completionPercentage = Math.round((mockStats.playedMatches / mockStats.totalMatches) * 100);
+		
+		return mockStats;
 	};
 
-	mockStats.pendingMatches = mockStats.totalMatches - mockStats.playedMatches;
-	mockStats.completionPercentage = Math.round((mockStats.playedMatches / mockStats.totalMatches) * 100);
+	const mockStats = generateMockData(name);
 
-	// Mock additional data
-	const mockLeaderNames = ["Carlos M.", "Ana L.", "Miguel R.", "Sofia P.", "David G.", "Laura C.", "Javier S.", "María F."];
-	const mockLeader = mockLeaderNames[Math.floor(Math.random() * mockLeaderNames.length)];
-	
-	// Mock players with countries and rankings
-	const mockPlayers = [
-		{ name: "Carlos M", country: "ES", ranking: 15 },
-		{ name: "Ana L", country: "ES", ranking: 28 },
-		{ name: "Miguel R", country: "ES", ranking: 42 },
-		{ name: "Sofia P", country: "AR", ranking: 8 },
-		{ name: "David G", country: "ES", ranking: 31 },
-		{ name: "Laura C", country: "FR", ranking: 19 },
-		{ name: "Javier S", country: "ES", ranking: 7 },
-		{ name: "María F", country: "US", ranking: 52 },
-		{ name: "Pablo R", country: "AR", ranking: 12 },
-		{ name: "Emma N", country: "US", ranking: 35 }
-	];
+	// Generate deterministic additional data
+	const generateAdditionalMockData = (seed: string) => {
+		// Simple hash function
+		let hash = 0;
+		for (let i = 0; i < seed.length; i++) {
+			hash = ((hash << 5) - hash + seed.charCodeAt(i)) & 0xffffffff;
+		}
+		
+		// Mock additional data
+		const mockLeaderNames = ["Carlos M.", "Ana L.", "Miguel R.", "Sofia P.", "David G.", "Laura C.", "Javier S.", "María F."];
+		const mockLeader = mockLeaderNames[Math.abs(hash) % mockLeaderNames.length];
+		
+		// Mock players with countries and rankings
+		const mockPlayers = [
+			{ name: "Carlos M", country: "ES", ranking: 15 },
+			{ name: "Ana L", country: "ES", ranking: 28 },
+			{ name: "Miguel R", country: "ES", ranking: 42 },
+			{ name: "Sofia P", country: "AR", ranking: 8 },
+			{ name: "David G", country: "ES", ranking: 31 },
+			{ name: "Laura C", country: "FR", ranking: 19 },
+			{ name: "Javier S", country: "ES", ranking: 7 },
+			{ name: "María F", country: "US", ranking: 52 },
+			{ name: "Pablo R", country: "AR", ranking: 12 },
+			{ name: "Emma N", country: "US", ranking: 35 }
+		];
 
-	// Mock next match with players
-	const getNextMatch = () => {
-		const random = Math.random();
-		if (random < 0.3) {
-			return null; // Sin partidos programados
-		} else {
-			const shuffled = [...mockPlayers].sort(() => 0.5 - Math.random());
+		// Deterministic next match
+		const getNextMatch = () => {
+			const rand = Math.abs(hash >> 4) % 100 / 100;
+			if (rand < 0.3) {
+				return null; // Sin partidos programados
+			} else {
+				// Deterministic shuffle based on hash
+				const shuffled = [...mockPlayers].sort((a, b) => {
+					const aHash = a.name.charCodeAt(0) + hash;
+					const bHash = b.name.charCodeAt(0) + hash;
+					return aHash - bHash;
+				});
+				const team1 = shuffled.slice(0, 2);
+				const team2 = shuffled.slice(2, 4);
+				
+				let date, time;
+				if (rand < 0.5) {
+					date = "Hoy, 1 de Agosto";
+					time = "19:30";
+				} else if (rand < 0.7) {
+					date = "Mañana, 2 de Agosto";
+					time = "18:00";
+				} else {
+					const dates = ["Lunes, 5 de Agosto", "Martes, 6 de Agosto", "Miércoles, 7 de Agosto", "Jueves, 8 de Agosto", "Viernes, 9 de Agosto"];
+					date = dates[Math.abs(hash >> 8) % dates.length];
+					const hours = ["17:00", "18:30", "19:00", "20:30"];
+					time = hours[Math.abs(hash >> 12) % hours.length];
+				}
+				
+				return { date, time, team1, team2 };
+			}
+		};
+
+		// Deterministic last activity
+		const getLastActivity = () => {
+			const rand = Math.abs(hash >> 16) % 100 / 100;
+			if (rand < 0.2) {
+				return null; // Sin actividad reciente
+			}
+			
+			// Deterministic shuffle
+			const shuffled = [...mockPlayers].sort((a, b) => {
+				const aHash = a.name.charCodeAt(0) + hash + 1000;
+				const bHash = b.name.charCodeAt(0) + hash + 1000;
+				return aHash - bHash;
+			});
 			const team1 = shuffled.slice(0, 2);
 			const team2 = shuffled.slice(2, 4);
 			
-			let date, time;
-			if (random < 0.5) {
-				date = "Hoy, 1 de Agosto";
-				time = "19:30";
-			} else if (random < 0.7) {
-				date = "Mañana, 2 de Agosto";
-				time = "18:00";
-			} else {
-				const dates = ["Lunes, 5 de Agosto", "Martes, 6 de Agosto", "Miércoles, 7 de Agosto", "Jueves, 8 de Agosto", "Viernes, 9 de Agosto"];
-				date = dates[Math.floor(Math.random() * dates.length)];
-				const hours = ["17:00", "18:30", "19:00", "20:30"];
-				time = hours[Math.floor(Math.random() * hours.length)];
-			}
+			const results = [
+				{ score: "6-4, 6-2", winner: 1, timeAgo: "Ayer, 31 de Julio" },
+				{ score: "7-5, 4-6, 6-3", winner: 1, timeAgo: "Martes, 30 de Julio" },
+				{ score: "6-1, 6-0", winner: 2, timeAgo: "Lunes, 29 de Julio" },
+				{ score: "6-4, 7-6", winner: 1, timeAgo: "Domingo, 28 de Julio" },
+				{ score: "4-6, 6-4, 7-5", winner: 2, timeAgo: "Sábado, 27 de Julio" }
+			];
+			const result = results[Math.abs(hash >> 20) % results.length];
 			
 			return {
-				date,
-				time,
 				team1,
-				team2
+				team2,
+				score: result?.score || "6-4, 6-2",
+				winner: result?.winner || 1,
+				timeAgo: result?.timeAgo || "hace 1 día"
 			};
-		}
-	};
+		};
 
-	// Mock last activity with players and result  
-	const getLastActivity = () => {
-		const random = Math.random();
-		if (random < 0.2) {
-			return null; // Sin actividad reciente
-		}
-		
-		const shuffled = [...mockPlayers].sort(() => 0.5 - Math.random());
-		const team1 = shuffled.slice(0, 2);
-		const team2 = shuffled.slice(2, 4);
-		
-		const results = [
-			{ score: "6-4, 6-2", winner: 1, timeAgo: "Ayer, 31 de Julio" },
-			{ score: "7-5, 4-6, 6-3", winner: 1, timeAgo: "Martes, 30 de Julio" },
-			{ score: "6-1, 6-0", winner: 2, timeAgo: "Lunes, 29 de Julio" },
-			{ score: "6-4, 7-6", winner: 1, timeAgo: "Domingo, 28 de Julio" },
-			{ score: "4-6, 6-4, 7-5", winner: 2, timeAgo: "Sábado, 27 de Julio" }
-		];
-		const result = results[Math.floor(Math.random() * results.length)];
-		
 		return {
-			team1,
-			team2,
-			score: result?.score || "6-4, 6-2",
-			winner: result?.winner || 1,
-			timeAgo: result?.timeAgo || "hace 1 día"
+			mockLeader,
+			nextMatch: getNextMatch(),
+			lastActivity: getLastActivity()
 		};
 	};
 
-	const nextMatch = getNextMatch();
-	const lastActivity = getLastActivity();
+	const additionalData = generateAdditionalMockData(name);
+	const { mockLeader, nextMatch, lastActivity } = additionalData;
 
 	return (
 		<a

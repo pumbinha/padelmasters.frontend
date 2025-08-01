@@ -10,6 +10,7 @@ import {
 	getFormattedDate,
 	getRequestParams,
 	orderChampionshipDtoByDate,
+	AuthenticationError,
 } from "@/services/utils";
 import { 
 	UsersIcon, 
@@ -22,8 +23,6 @@ import {
 	CalendarDateRangeIcon
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-import homeNet from "@/assets/images/home-net.jpg";
-import { Image } from "astro:assets";
 
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
@@ -102,6 +101,11 @@ try {
 		console.error(championshipResponse);
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }

@@ -31,4 +31,14 @@ export default defineConfig({
 			enabled: true,
 		},
 	}),
+	vite: {
+		ssr: {
+			noExternal: ['auth-astro']
+		},
+		build: {
+			rollupOptions: {
+				external: ['node:path', 'node:fs', 'node:url']
+			}
+		}
+	}
 });

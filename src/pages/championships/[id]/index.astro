@@ -12,12 +12,10 @@ import {
 	type GroupDto,
 } from "@/services/api";
 
-import { getApi, getRequestParams, orderGroupsByName } from "@/services/utils";
+import { getApi, getRequestParams, orderGroupsByName, AuthenticationError } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 import { CalendarDateRangeIcon, UsersIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-import { Image } from "astro:assets";
-import homeNet from "@/assets/images/home-net.jpg";
 
 const { id } = Astro.params;
 
@@ -54,6 +52,11 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }

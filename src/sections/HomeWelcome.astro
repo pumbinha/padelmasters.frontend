@@ -62,14 +62,14 @@ const descriptionText = t(TranslationKey.WelcomeDescription);
 						<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
 				</a>					
 				) : (
-					<a
-						href="/sign-in"
+					<button
+						id="sign-in-btn"
 						class="group inline-flex items-center gap-2 rounded-lg border-2 border-white/30 backdrop-blur-md bg-white/10 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105"
 					>
 						<UsersIcon className="h-5 w-5" />
 						{t(TranslationKey.SignIn)}
 						<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-					</a>
+					</button>
 				)}
 				
 			</div>
@@ -150,3 +150,24 @@ const descriptionText = t(TranslationKey.WelcomeDescription);
 		</div>
 	</div>
 </section>
+
+<script>
+	import { signIn } from "auth-astro/client";
+
+	// Function to initialize sign-in button
+	function initializeSignInButton() {
+		const signInBtn = document.getElementById("sign-in-btn");
+		if (signInBtn && !signInBtn.dataset.initialized) {
+			signInBtn.addEventListener("click", () => {
+				signIn("keycloak", { callbackUrl: "/profile" } as any);
+			});
+			signInBtn.dataset.initialized = "true";
+		}
+	}
+
+	// Initialize on DOM ready
+	document.addEventListener("DOMContentLoaded", initializeSignInButton);
+
+	// Reinitialize after Astro navigation
+	document.addEventListener("astro:page-load", initializeSignInButton);
+</script>

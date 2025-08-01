@@ -5,6 +5,8 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/re
 import { XMarkIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { toast, ToastContainer } from "react-toastify";
 import { ClockIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+// Removed fetchWithAuth import to avoid cookie module conflicts
+// import { fetchWithAuth, AuthenticationError } from "@/services/utils";
 
 type PopupProps = {
 	matchAction: string;
@@ -51,6 +53,13 @@ const Popup: React.FC<PopupProps> = ({
 				body: JSON.stringify(data),
 			});
 
+			// Handle 401 errors by redirecting to home page
+			if (response.status === 401) {
+				console.warn("Token expired, redirecting to home page");
+				window.location.href = "/";
+				return;
+			}
+
 			if (response.ok) {
 				toast(successMessage, {
 					type: "success",
@@ -58,13 +67,6 @@ const Popup: React.FC<PopupProps> = ({
 					onClose: () => (window.location.href = url),
 				});
 			} else {
-				// Check for 401 error and redirect to home page
-				if (response.status === 401) {
-					console.warn("Token expired, redirecting to home page");
-					window.location.href = "/";
-					return;
-				}
-
 				console.error("Failed to process data");
 				toast(errorMessage, {
 					type: "error",
@@ -72,13 +74,6 @@ const Popup: React.FC<PopupProps> = ({
 				});
 			}
 		} catch (error: any) {
-			// Handle 401 errors
-			if (error?.status === 401 || error?.error?.status === 401) {
-				console.warn("Token expired, redirecting to home page");
-				window.location.href = "/";
-				return;
-			}
-
 			console.error("Failed to process data", error);
 			toast(errorMessage, {
 				type: "error",

@@ -2,7 +2,7 @@
 import Toast from "@/components/ui/Toast";
 import Popup from "@/components/ui/Popup";
 import ChampionshipGroupHeader from "@/components/ChampionshipGroupHeader.astro";
-import { getPositionTextClass, getStandingRowClass } from "@/components/ui/utils";
+
 import UsersLink from "@/components/UsersLink.astro";
 import CountryFlag from "@/components/CountryFlag.astro";
 import { TranslationKey } from "@/i18n/ui";
@@ -17,7 +17,7 @@ import {
 	type GroupMatchDto,
 	MatchStatus,
 } from "@/services/api";
-import { getApi, getRequestParams } from "@/services/utils";
+import { getApi, getRequestParams, AuthenticationError } from "@/services/utils";
 import { StarIcon } from "@heroicons/react/16/solid";
 import { 
 	CalendarDaysIcon, 
@@ -28,11 +28,10 @@ import {
 	ClockIcon,
 	PlayIcon,
 	XCircleIcon,
-	PencilIcon
+	PencilIcon,
+	XMarkIcon
 } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-import homeNet from "@/assets/images/home-net.jpg";
-import { Image } from "astro:assets";
 
 const { id, groupId } = Astro.params;
 
@@ -202,6 +201,12 @@ try {
 		}
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
+	console.error(e);
 	// Error loading data
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
@@ -373,7 +378,7 @@ try {
 																		textCancelButton={t(TranslationKey.Cancel)}
 																		matchId={match.Id || ""}
 																		url={`${Astro.url.pathname}${statusFilter ? `?status=${statusFilter}` : "?status=Planned"}`}
-																		client:load
+																		client:idle
 																		successMessage={t(TranslationKey.MatchUnplanSuccess)}
 																		errorMessage={t(TranslationKey.MatchUnplanError)}
 																	/>
@@ -387,7 +392,7 @@ try {
 																		textCancelButton={t(TranslationKey.Cancel)}
 																		matchId={match.Id || ""}
 																		url={`${Astro.url.pathname}${statusFilter ? `?status=${statusFilter}` : "?status=Planned"}`}
-																		client:load
+																		client:idle
 																		successMessage={t(TranslationKey.MatchRestartSuccess)}
 																		errorMessage={t(TranslationKey.MatchRestartError)}
 																	/>
@@ -561,7 +566,7 @@ try {
 								<!-- No matches available message for filtered results -->
 								<div id="no-matches-message" class="p-4" style="display: none;">
 									<div class="flex flex-col items-center gap-3 p-6 text-center">
-										<span class="text-3xl">🎾</span>
+										<XMarkIcon className="h-12 w-12 text-white/80" />
 										<div>
 											<h3 class="text-base font-semibold text-white mb-1">
 												No matches available
@@ -575,7 +580,7 @@ try {
 							) : (
 								<div class="py-8">
 									<div class="flex flex-col items-center gap-4 p-8 text-center">
-										<span class="text-4xl">🎾</span>
+										<XMarkIcon className="h-12 w-12 text-white/80" />
 										<div>
 											<h3 class="text-lg font-semibold text-white mb-2">
 												No matches available
@@ -705,19 +710,15 @@ try {
 								</div>
 							) : (
 								<div class="py-8">
-									<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-center shadow-2xl">
-										<div class="flex flex-col items-center gap-4">
-											<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 border border-white/30">
-												<ChartBarIcon className="h-8 w-8 text-white/80" />
-											</div>
-											<div>
-												<h3 class="text-lg font-semibold text-white mb-2">
-													No standings available
-												</h3>
-												<p class="text-sm text-white/70">
-													No standings found for this group. Check back later.
-												</p>
-											</div>
+									<div class="flex flex-col items-center gap-4 p-8 text-center">
+										<ChartBarIcon className="h-12 w-12 text-white/80" />
+										<div>
+											<h3 class="text-lg font-semibold text-white mb-2">
+												No standings available
+											</h3>
+											<p class="text-sm text-white/70">
+												No standings found for this group. Check back later.
+											</p>
 										</div>
 									</div>
 								</div>
@@ -777,13 +778,11 @@ try {
 </Layout>
 
 <script>
-	import { navigate } from 'astro:transitions/client';
-
 	// Function to initialize filtering
 	function initializeFiltering() {
 		const filterButtons = document.querySelectorAll("[data-filter]");
-		const matchesContainer = document.getElementById("matches-container");
-		const noMatchesMessage = document.getElementById("no-matches-message");
+		const matchesContainer = document.getElementById("matches-container") as HTMLElement;
+		const noMatchesMessage = document.getElementById("no-matches-message") as HTMLElement;
 
 		if (!filterButtons.length || !matchesContainer) return;
 
@@ -799,7 +798,7 @@ try {
 		freshFilterButtons.forEach((button) => {
 			button.addEventListener("click", function (e) {
 				e.preventDefault();
-				const target = e.currentTarget;
+				const target = e.currentTarget as HTMLElement;
 				if (!target) return;
 
 				const filter = target.getAttribute("data-filter");
@@ -808,14 +807,14 @@ try {
 				// Update active button
 				freshFilterButtons.forEach((btn) => {
 					if (btn) {
-						btn.classList.remove(
+						(btn as HTMLElement).classList.remove(
 							"bg-white/60",
 							"text-black",
 							"border-white/70",
 							"shadow-xl",
 							"font-semibold"
 						);
-						btn.classList.add(
+						(btn as HTMLElement).classList.add(
 							"bg-white/10",
 							"text-white/80",
 							"hover:bg-white/20",
@@ -846,30 +845,31 @@ try {
 				matchElements.forEach((matchElement) => {
 					const matchStatus = matchElement.getAttribute("data-match-status");
 					const isVisible = filter === "All" || matchStatus === filter;
+					const element = matchElement as HTMLElement;
 
 					if (isVisible) {
-						matchElement.style.opacity = "1";
-						matchElement.style.transform = "scale(1)";
-						matchElement.style.height = "";
-						matchElement.style.maxHeight = "";
-						matchElement.style.marginTop = "";
-						matchElement.style.marginBottom = "";
-						matchElement.style.paddingTop = "";
-						matchElement.style.paddingBottom = "";
-						matchElement.style.pointerEvents = "auto";
-						matchElement.style.overflow = "";
+						element.style.opacity = "1";
+						element.style.transform = "scale(1)";
+						element.style.height = "";
+						element.style.maxHeight = "";
+						element.style.marginTop = "";
+						element.style.marginBottom = "";
+						element.style.paddingTop = "";
+						element.style.paddingBottom = "";
+						element.style.pointerEvents = "auto";
+						element.style.overflow = "";
 						visibleCount++;
 					} else {
-						matchElement.style.opacity = "0";
-						matchElement.style.transform = "scaleY(0)";
-						matchElement.style.height = "0";
-						matchElement.style.maxHeight = "0";
-						matchElement.style.marginTop = "0";
-						matchElement.style.marginBottom = "0";
-						matchElement.style.paddingTop = "0";
-						matchElement.style.paddingBottom = "0";
-						matchElement.style.pointerEvents = "none";
-						matchElement.style.overflow = "hidden";
+						element.style.opacity = "0";
+						element.style.transform = "scaleY(0)";
+						element.style.height = "0";
+						element.style.maxHeight = "0";
+						element.style.marginTop = "0";
+						element.style.marginBottom = "0";
+						element.style.paddingTop = "0";
+						element.style.paddingBottom = "0";
+						element.style.pointerEvents = "none";
+						element.style.overflow = "hidden";
 					}
 				});
 
@@ -939,7 +939,7 @@ try {
 		// Find and click the appropriate button
 		const initialButton = Array.from(freshFilterButtons).find(
 			(btn) => btn.getAttribute("data-filter") === initialFilter
-		);
+		) as HTMLElement;
 
 		if (initialButton) {
 			initialButton.click();

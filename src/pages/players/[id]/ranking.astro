@@ -10,6 +10,7 @@ import {
 	distinctGroupMatchSearchDtos,
 	getApi,
 	getRequestParams,
+	AuthenticationError,
 	type ChampionshipAndGroupDto,
 	type GroupMatchSearchDtoWithPosition,
 } from "@/services/utils";
@@ -51,6 +52,11 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
@@ -106,6 +112,11 @@ try {
 		Astro.redirect("/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }

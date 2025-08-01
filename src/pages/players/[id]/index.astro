@@ -176,7 +176,7 @@ const tabData = [
 												textCancelButton={t(TranslationKey.Cancel)}
 												matchId={match.Id || ""}
 												url={`/players/${id}${statusFilter ? `?status=${statusFilter}` : ""}`}
-												client:load
+												client:idle
 												successMessage={t(TranslationKey.MatchRestartSuccess)}
 												errorMessage={t(TranslationKey.MatchRestartError)}
 											/>
@@ -192,7 +192,7 @@ const tabData = [
 												textCancelButton={t(TranslationKey.Cancel)}
 												matchId={match.Id || ""}
 												url={`/players/${id}${statusFilter ? `?status=${statusFilter}` : ""}`}
-												client:load
+												client:idle
 												successMessage={t(TranslationKey.MatchUnplanSuccess)}
 												errorMessage={t(TranslationKey.MatchUnplanError)}
 											/>
@@ -203,7 +203,7 @@ const tabData = [
 											<MatchEditLink
 												matchId={match.Id || ""}
 												returnUrl={`/players/${id}${statusFilter ? `?status=${statusFilter}` : ""}`}
-												client:load
+												client:idle
 											/>
 										)}
 									</span>
@@ -292,6 +292,6 @@ const tabData = [
 				}
 			</div>
 		</div>
-		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+		{errorMessage && <Toast message={errorMessage} type="error" client:idle />}
 	</section>
 </Layout>

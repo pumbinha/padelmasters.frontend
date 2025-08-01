@@ -32,5 +32,34 @@ const { title, useTransparentHeader = false } = Astro.props;
 		</main>
 		<SpeedInsights />
 		{!useTransparentHeader && Astro.url.pathname !== '/' && Astro.url.pathname !== '/championships' && !(Astro.url.pathname.includes('/championships/') && Astro.url.pathname.split('/').filter(Boolean).length === 3 && !Astro.url.pathname.includes('/rules')) && <Footer />}
+		
+		<script is:inline>
+			// Global 401 error handler for the entire application
+			(function() {
+				// Avoid setting up multiple interceptors
+				if (window.globalFetchInterceptorSetup) return;
+				
+				const originalFetch = window.fetch;
+				window.fetch = async (...args) => {
+					try {
+						const response = await originalFetch(...args);
+						
+						// Handle 401 errors by redirecting to home page
+						if (response.status === 401) {
+							console.warn("Global interceptor: Token expired, redirecting to home page");
+							window.location.href = "/";
+							return response;
+						}
+						
+						return response;
+					} catch (error) {
+						throw error;
+					}
+				};
+				
+				window.globalFetchInterceptorSetup = true;
+				console.log("Global fetch interceptor setup");
+			})();
+		</script>
 	</body>
 </html>
