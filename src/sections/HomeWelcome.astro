@@ -45,34 +45,22 @@ const descriptionText = t(TranslationKey.WelcomeDescription);
 			</h1>
 
 			<!-- Subtitle -->
-			<p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+			<p class="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
 				{descriptionText}
 			</p>
-
-			<!-- Trusted By Section -->
-			<div class="mb-12">
-				<p class="text-sm text-white/60 uppercase tracking-wider mb-6 font-semibold">
-					Trusted by padel clubs
-				</p>
-				<div class="flex justify-center items-center gap-8 opacity-70">
-					<div class="text-white/80 text-sm font-medium">Club Deportivo</div>
-					<div class="text-white/80 text-sm font-medium">Padel Center</div>
-					<div class="text-white/80 text-sm font-medium">Elite Courts</div>
-					<div class="text-white/80 text-sm font-medium">Masters Club</div>
-				</div>
-			</div>
 
 			<!-- Call-to-Action Buttons -->
 			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
 				{isLogged ? (
-					<a
-						href="/championships"
-						class="group inline-flex items-center gap-3 rounded-lg bg-[#1F3851] px-8 py-4 text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:bg-[#152F47] hover:scale-105 hover:shadow-xl"
-					>
+
+				<a
+					href="/championships"
+					class="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 backdrop-blur-md bg-white/10 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105"
+				>
 						<TrophyIcon className="h-5 w-5" />
 						{t(TranslationKey.NavChampionships)}
 						<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-					</a>
+				</a>					
 				) : (
 					<a
 						href="/sign-in"
@@ -84,16 +72,10 @@ const descriptionText = t(TranslationKey.WelcomeDescription);
 					</a>
 				)}
 				
-				<a
-					href="/championships"
-					class="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 backdrop-blur-md bg-white/10 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105"
-				>
-					View Championships
-				</a>
 			</div>
 
 			<!-- Feature Highlights -->
-			<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+			<div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
 				<div class="text-center p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
 					<div class="w-10 h-10 mx-auto mb-3 rounded-full bg-blue-500/20 flex items-center justify-center">
 						<TrophyIcon className="h-5 w-5 text-blue-400" />
@@ -163,9 +145,7 @@ const descriptionText = t(TranslationKey.WelcomeDescription);
 
 			<!-- Version Info -->
 			<div class="flex items-center gap-2 text-xs text-white/60">
-				<span>Version 1.0</span>
-				<span>•</span>
-				<span>Built with Astro</span>
+				<span>Version 2.0</span>
 			</div>
 		</div>
 	</div>
