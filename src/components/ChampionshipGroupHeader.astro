@@ -15,21 +15,19 @@ const { championshipId, championshipName, groupId, groupName, groupDescription }
 <!-- Header Section with Glassmorphism -->
 <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6 shadow-2xl">
 	<div class="flex items-center gap-3">
-		<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20 border border-white/30 shadow-lg">
-			<UserGroupIcon className="h-6 w-6 text-white" />
-		</div>
+		<UserGroupIcon className="h-6 w-6 text-white" />
 		<div class="flex-1">
 			<div class="flex items-center gap-2 mb-1">
 				<a 
 					href={`/championships/${championshipId}`}
-					class="text-lg font-semibold text-white hover:text-blue-200 transition-colors"
+					class="text-base sm:text-lg font-semibold text-white hover:text-blue-200 transition-colors"
 				>
 					{championshipName}
 				</a>
 				<span class="text-white/70">/</span>
 				<a 
 					href={`/championships/${championshipId}/${groupId}`}
-					class="text-lg font-semibold text-white hover:text-blue-200 transition-colors"
+					class="text-base sm:text-lg font-semibold text-white hover:text-blue-200 transition-colors"
 				>
 					{groupName}
 				</a>

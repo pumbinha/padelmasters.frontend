@@ -1,4 +1,8 @@
 ---
+interface Props {
+	useTransparent?: boolean;
+}
+
 import NavLink from "@/components/NavLink.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -8,6 +12,7 @@ import { type NavigationLink } from "@/components/ui/types.tsx";
 import { setLinkActive } from "@/components/ui/utils.tsx";
 import { getSession } from "auth-astro/server";
 
+const { useTransparent = false } = Astro.props;
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
@@ -50,7 +55,7 @@ navigationLinks = navigationLinks.map((group) => ({
 navigationLinks = setLinkActive(navigationLinks, currentPath);
 ---
 
-{currentPath === '/' || currentPath === '/championships' || (currentPath.includes('/championships/') && currentPath.split('/').filter(Boolean).length === 3 && !currentPath.includes('/rules')) ? (
+{useTransparent || currentPath === '/' || currentPath === '/championships' || (currentPath.includes('/championships/') && currentPath.split('/').filter(Boolean).length === 3 && !currentPath.includes('/rules')) ? (
 	<!-- Minimal Header for Homepage -->
 	<header class="absolute top-0 left-0 right-0 z-20 bg-transparent">
 		<div class="px-6 py-6">
