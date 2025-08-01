@@ -30,7 +30,7 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 	};
 
 	const increment = () => {
-		const newValue = Math.min(value + 1, 15); // Max score of 15
+		const newValue = Math.min(value + 1, 7); // Max score of 7
 		setValue(newValue);
 	};
 
@@ -47,7 +47,7 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 			<button
 				type="button"
 				onClick={decrement}
-				className="flex h-8 w-8 items-center justify-center rounded-l-md bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-1"
+				className="flex h-8 w-8 items-center justify-center rounded-l-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30 disabled:opacity-50"
 				disabled={value <= 0}
 			>
 				<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,9 +61,9 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 				required
 				ref={inputRef}
 				min="0"
-				max="15"
+				max="7"
 				value={value}
-				className="h-8 w-12 border-0 bg-white text-center text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-1"
+				className="h-8 w-12 border-0 bg-white/30 backdrop-blur-sm text-center text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-white/50 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
 				onFocus={handleFocusOrClick}
 				onClick={handleFocusOrClick}
 				onChange={handleChange}
@@ -72,8 +72,8 @@ const AutoSelectInputScore: React.FC<InputScoreProps> = ({ id, initialValue }) =
 			<button
 				type="button"
 				onClick={increment}
-				className="flex h-8 w-8 items-center justify-center rounded-r-md bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-1"
-				disabled={value >= 15}
+				className="flex h-8 w-8 items-center justify-center rounded-r-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30 disabled:opacity-50"
+				disabled={value >= 7}
 			>
 				<svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

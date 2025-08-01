@@ -98,7 +98,7 @@ const Popup: React.FC<PopupProps> = ({
 			<button
 				type="button"
 				onClick={showPopup}
-				className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-medium text-white/90 shadow-sm transition-all duration-200 hover:border-white/30 hover:bg-white/20 backdrop-blur-sm"
+				className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
 			>
 				{matchAction === "Unplan" ? (
 					<ClockIcon className="h-3.5 w-3.5" />
