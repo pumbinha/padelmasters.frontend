@@ -35,12 +35,8 @@ if (isLogged) {
 		},
 	];
 } else {
-	navigationLinks = [
-		{
-			group: 1,
-			links: [{ name: t(TranslationKey.SignIn), href: "/sign-in", isActive: false }],
-		},
-	];
+	// No navigation links for non-logged users (sign-in is on homepage)
+	navigationLinks = [];
 }
 
 const currentPath = Astro.url.pathname;

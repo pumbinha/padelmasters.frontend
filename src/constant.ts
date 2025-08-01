@@ -1,7 +1,5 @@
 export const PUBLIC_ROUTES: string[] = [
 	"/",
-
-	"/sign-in",
 	"/api/auth/signin/keycloak",
 	"/api/auth/callback/keycloak",
 	"/api/auth/csrf",
