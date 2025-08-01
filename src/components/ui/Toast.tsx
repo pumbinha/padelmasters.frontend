@@ -14,7 +14,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, urlRedirect }) => {
 			if (urlRedirect) {
 				toast(message, {
 					type,
-					autoClose: 2000,
+					autoClose: 750,
 					onClose: () => (window.location.href = urlRedirect),
 				});
 			} else {

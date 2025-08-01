@@ -10,9 +10,9 @@ import {
 	getApi,
 	getRequestParams,
 	type ChampionshipAndGroupDto,
+	AuthenticationError,
 } from "@/services/utils";
-import { Cog8ToothIcon, PlusIcon, QueueListIcon, TrophyIcon } from "@heroicons/react/24/outline";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { Cog8ToothIcon, PlusIcon, QueueListIcon, TrophyIcon, UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 const session = await getSession(Astro.request);
 
@@ -38,117 +38,179 @@ try {
 		// 404
 		Astro.redirect("/not-found");
 	}
-	} catch (e) {
+} catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
 ---
 
-<div class="w-full bg-[hsl(var(--page-background))] min-h-screen">
-	<!-- Profile Header Card -->
-	<div class="bg-primary-200 p-6 mb-6 border-b border-primary-800">
-		<div class="flex flex-col md:flex-row items-center justify-between gap-6">
-			<!-- User Info Section -->
-			<div class="flex items-center gap-4">
-				<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-200">
-					<UserCircleIcon className="h-8 w-8 text-primary-600" />
-				</div>
-				<div class="flex flex-col">
-					<h2 class="text-2xl font-bold text-primary-800">{session?.user?.name}</h2>
-					<span class="text-sm text-primary-600">#Welcome back to Padel Masters</span>
-				</div>
-			</div>
+<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+	<!-- Gradient Overlay for depth -->
+	<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+	<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
-			<!-- Action Buttons Section -->
-			<div class="flex flex-col sm:flex-row items-center gap-4">
-				<a
-					href="/profile/edit"
-					class="flex items-center gap-2 rounded-lg bg-white border border-primary-600 px-4 py-2 text-sm font-medium text-primary-700 transition-all duration-200 hover:bg-primary-50 hover:border-primary-700 hover:scale-105 shadow-lg"
-				>
-					<Cog8ToothIcon className="h-4 w-4" />
-					{t(TranslationKey.AccounSettings)}
-				</a>
-				<div>
-					<SignOutComponent client:load text={t(TranslationKey.SignOut)} />
+	<!-- Content -->
+	<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
+		<!-- Profile Header with Glassmorphism -->
+		<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6 shadow-2xl">
+			<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+				<!-- User Info Section -->
+				<div class="flex items-center gap-4">
+					<UserIcon className="h-6 w-6 text-white" />
+					<div class="flex flex-col">
+						<h2 class="text-2xl font-bold text-white">{session?.user?.name}</h2>
+						<span class="text-sm text-white/70">Welcome back to Padel Masters</span>
+					</div>
+				</div>
+
+				<!-- Action Buttons Section -->
+				<div class="flex flex-col sm:flex-row items-center gap-4">
+					<a
+						href="/profile/edit"
+						class="flex items-center gap-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 text-sm font-medium text-white/90 transition-all duration-300 hover:bg-white/20 hover:border-white/30 hover:scale-105 shadow-lg"
+					>
+						<Cog8ToothIcon className="h-4 w-4" />
+						{t(TranslationKey.AccounSettings)}
+					</a>
+					<div>
+						<SignOutComponent client:load text={t(TranslationKey.SignOut)} />
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</div>
 
-<!-- Championships Section -->
-<div class="w-full rounded-lg bg-white border border-gray-200">
-	{
-		(!championshipsAndGroups || championshipsAndGroups.length === 0) && (
-			<div class="p-8 text-center">
-				<div class="flex flex-col items-center gap-4">
-					<div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-						<QueueListIcon className="h-8 w-8 text-neutral-400" />
-					</div>
-					<div>
-						<h3 class="text-lg font-semibold text-gray-900">
-							{t(TranslationKey.NoChampionshipsTitle)}
-						</h3>
-						<p class="mt-2 text-sm text-gray-500">{t(TranslationKey.NoChampionshipsDescription)}</p>
-					</div>
-					<div class="mt-4">
-						<a
-							href="/championships"
-							class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105"
-						>
-							<PlusIcon className="h-4 w-4" />
-							{t(TranslationKey.FindChampionship)}
-						</a>
-					</div>
-				</div>
-			</div>
-		)
-	}
-
-	{
-		championshipsAndGroups.length > 0 && (
-			<div class="p-6">
-				<div class="mb-6">
-					<div class="flex items-center gap-3 mb-2">
-						<div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100">
-							<TrophyIcon className="h-5 w-5 text-primary-600" />
+		<!-- Championships Section -->
+		<div class="max-w-7xl mx-auto">
+			{
+				(!championshipsAndGroups || championshipsAndGroups.length === 0) && (
+					<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-center shadow-2xl">
+						<div class="flex flex-col items-center gap-4">
+							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 border border-white/30">
+								<QueueListIcon className="h-8 w-8 text-white/80" />
+							</div>
+							<div>
+								<h3 class="text-lg font-semibold text-white">
+									{t(TranslationKey.NoChampionshipsTitle)}
+								</h3>
+								<p class="mt-2 text-sm text-white/70">{t(TranslationKey.NoChampionshipsDescription)}</p>
+							</div>
+							<div class="mt-4">
+								<a
+									href="/championships"
+									class="inline-flex items-center gap-2 rounded-lg bg-[#1F3851] text-white px-4 py-2 text-sm font-semibold shadow-lg transition-all duration-300 hover:bg-[#152F47] hover:scale-105"
+								>
+									<PlusIcon className="h-4 w-4" />
+									{t(TranslationKey.FindChampionship)}
+								</a>
+							</div>
 						</div>
-						<h3 class="text-xl font-bold text-gray-900">{t(TranslationKey.MyChampionships)}</h3>
 					</div>
-					<p class="text-sm text-gray-500 ml-11">Manage and track your tournament participation</p>
-				</div>
-				<ul role="list" class="space-y-4">
-					{championshipsAndGroups.map((championshipsAndGroup) => {
-						return (
-							<li class="rounded-lg border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-colors duration-200">
-								<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-									<div class="flex flex-col sm:flex-row sm:items-center gap-2">
-										<a
-											href={`/championships/${championshipsAndGroup.Championship?.Id}`}
-											class="text-sm font-semibold text-primary-600 hover:text-primary-800 transition-colors underline decoration-primary-300 hover:decoration-primary-500"
-										>
-											{championshipsAndGroup.Championship?.Name}
-										</a>
-										<span class="hidden sm:inline text-gray-400">/</span>
-										<a
-											href={`/championships/${championshipsAndGroup.Championship?.Id}/${championshipsAndGroup.Group?.Id}/matches`}
-											class="text-sm font-semibold text-primary-600 hover:text-primary-800 transition-colors underline decoration-primary-300 hover:decoration-primary-500"
-										>
-											{championshipsAndGroup.Group?.Name}
-										</a>
+				)
+			}
+
+			{
+				championshipsAndGroups.length > 0 && (
+					<div class="w-full rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
+						<!-- Header Section -->
+						<div class="px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-xl">
+							<div class="flex items-center gap-3">
+								<TrophyIcon className="h-6 w-6 text-white" />
+								<div class="flex-1">
+									<div class="flex items-center gap-2 mb-1">
+										<h3 class="text-base sm:text-lg font-semibold text-white">
+											{t(TranslationKey.MyChampionships)}
+										</h3>
 									</div>
-									<span
-										class={`inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium ${getStatusClass(championshipsAndGroup.Championship?.Status)}`}
-									>
-										{t(`Championships.Status.${championshipsAndGroup.Championship?.Status}`)}
-									</span>
+									<p class="text-sm text-white/80">Manage and track your tournament participation</p>
 								</div>
-							</li>
-						);
-					})}
-				</ul>
+							</div>
+						</div>
+
+						<!-- Championships List -->
+						<div class="p-6">
+							<ul role="list" class="space-y-4">
+								{championshipsAndGroups.map((championshipsAndGroup) => {
+									return (
+										<li class="rounded-lg bg-white/5 backdrop-blur-sm border border-white/20 p-4 hover:bg-white/10 hover:border-white/30 transition-all duration-300 hover:scale-[1.02]">
+											<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+												<div class="flex flex-col sm:flex-row sm:items-center gap-2">
+													<a
+														href={`/championships/${championshipsAndGroup.Championship?.Id}`}
+														class="text-sm font-semibold text-blue-300 hover:text-blue-200 transition-colors underline decoration-blue-400/30 hover:decoration-blue-300/50"
+													>
+														{championshipsAndGroup.Championship?.Name}
+													</a>
+													<span class="hidden sm:inline text-white/40">/</span>
+													<a
+														href={`/championships/${championshipsAndGroup.Championship?.Id}/${championshipsAndGroup.Group?.Id}`}
+														class="text-sm font-semibold text-blue-300 hover:text-blue-200 transition-colors underline decoration-blue-400/30 hover:decoration-blue-300/50"
+													>
+														{championshipsAndGroup.Group?.Name}
+													</a>
+												</div>
+												<span
+													class="inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium bg-white/10 border border-white/20 text-white/90"
+												>
+													{t(`Championships.Status.${championshipsAndGroup.Championship?.Status}`)}
+												</span>
+											</div>
+										</li>
+									);
+								})}
+							</ul>
+						</div>
+					</div>
+				)
+			}
+		</div>
+	</div>
+
+	<!-- Integrated Footer Section - Full Width -->
+	<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
+		<!-- Features Section -->
+		<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>👤</span>
+				<span class="hidden sm:inline">Personal Statistics</span>
+				<span class="sm:hidden">Statistics</span>
 			</div>
-		)
-	}
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>🏆</span>
+				<span class="hidden sm:inline">Tournament Progress</span>
+				<span class="sm:hidden">Progress</span>
+			</div>
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>📊</span>
+				<span class="hidden sm:inline">Match History</span>
+				<span class="sm:hidden">History</span>
+			</div>
+		</div>
+
+		<!-- Divider -->
+		<div class="border-t border-white/20 mb-4 mx-6"></div>
+
+		<!-- Bottom Section -->
+		<div class="flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+			<!-- Copyright -->
+			<div class="flex flex-col items-center md:items-start gap-2">
+				<p class="text-sm text-white/70">
+					© {new Date().getFullYear()} Padel Masters. All rights reserved.
+				</p>
+				<div class="flex items-center gap-4 text-xs text-white/60">
+					<span>Made with ❤️ for padel lovers</span>
+				</div>
+			</div>
+
+			<!-- Version Info -->
+			<div class="flex items-center gap-2 text-xs text-white/60">
+				<span>Version 2.0</span>
+			</div>
+		</div>
+	</div>
+
 	{errorMessage && <Toast message={errorMessage} type="error" client:load />}
-</div>
+</section>
