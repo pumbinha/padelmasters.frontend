@@ -1,5 +1,9 @@
 import type { Session } from "@auth/core/types";
 import { ui, defaultLang, type SupportedLanguages, TranslationKey } from "./ui";
+import type { Country } from "./countries/en";
+import { countries as enCountries } from "./countries/en";
+import { countries as esCountries } from "./countries/es";
+import { countries as deCountries } from "./countries/de";
 
 export const getDefaultLang = (session: Session | null): SupportedLanguages => {
 	const isSupportedLanguage = (locale: string): locale is SupportedLanguages => {
@@ -30,4 +34,18 @@ export const useTranslations = (session: Session | null) => {
 		// If the key isn't found in either language, return the key itself as a fallback
 		return key;
 	};
+};
+
+export const getCountries = (session: Session | null): Country[] => {
+	const lang = getDefaultLang(session);
+	
+	switch (lang) {
+		case "es":
+			return esCountries;
+		case "de":
+			return deCountries;
+		case "en":
+		default:
+			return enCountries;
+	}
 };

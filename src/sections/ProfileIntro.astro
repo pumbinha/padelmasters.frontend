@@ -6,7 +6,7 @@ import PerformanceStats from "@/components/ui/PerformanceStats.tsx";
 import MyChampionshipCard from "@/components/ui/MyChampionshipCard.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { type SearchMatchesRequest } from "@/services/api";
+import { type SearchMatchesRequest, type UserProfileDto } from "@/services/api";
 import {
 	distinctGroupMatchSearchDtos,
 	getApi,
@@ -24,8 +24,26 @@ const api = getApi();
 let errorMessage = "";
 
 let championshipsAndGroups: ChampionshipAndGroupDto[] = [];
+let userProfile: UserProfileDto | null = null;
+let displayName = session?.user?.name || "";
 
 try {
+	// Fetch user profile data
+	try {
+		const userProfileResponse = await api.api.padelmastersApiDomainEndpointsUsersGetUserProfile(
+			getRequestParams(session)
+		);
+		if (userProfileResponse.ok && userProfileResponse.data) {
+			userProfile = userProfileResponse.data;
+			// Use the profile name if available, fallback to session name
+			const profileName = `${userProfile.FirstName || ""} ${userProfile.LastName || ""}`.trim();
+			displayName = profileName || session?.user?.name || "";
+		}
+	} catch (profileError) {
+		console.warn("Could not fetch user profile, using session data:", profileError);
+	}
+
+	// Fetch championships data
 	const searchMatchesRequest: SearchMatchesRequest = {
 		UserId: session?.user?.id || "",
 	};
@@ -163,8 +181,10 @@ const mockNextMatch = {
 				<div class="flex items-center gap-4">
 					<UserIcon className="h-6 w-6 text-white" />
 					<div class="flex flex-col">
-						<h2 class="text-2xl font-bold text-white">{session?.user?.name}</h2>
-						<span class="text-sm text-white/70">Welcome back to Padel Masters</span>
+						<h2 class="text-2xl font-bold text-white">{displayName}</h2>
+						<span class="text-sm text-white/70">
+							{userProfile?.Email ? `${userProfile.Email} • ` : ""}Welcome back to Padel Masters
+						</span>
 					</div>
 				</div>
 
