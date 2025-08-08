@@ -1,0 +1,15 @@
+---
+export interface CountryFlagProps {
+	countryCode: string;
+	class?: string;
+}
+
+const props = Astro.props as CountryFlagProps;
+const { countryCode, class: className = "" } = props;
+
+// Use ISO 3166-1 alpha-2 country codes directly with flag-icons
+// flag-icons uses lowercase codes, so we convert the input
+const flagCode = countryCode.toLowerCase();
+---
+
+<span class={`fi fi-${flagCode} ${className}`} title={countryCode}></span> 

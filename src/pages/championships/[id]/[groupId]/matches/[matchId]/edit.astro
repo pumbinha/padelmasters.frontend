@@ -1,20 +1,19 @@
 ---
 import AutoSelectInputScore from "@/components/ui/AutoSelectInputScore";
-import ReturnButton from "@/components/ui/ReturnButton ";
 import Toast from "@/components/ui/Toast";
+import ChampionshipGroupHeader from "@/components/ChampionshipGroupHeader.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Layout from "@/layouts/Layout.astro";
 import { isAPIError, type APIError } from "@/services/types.ts";
-
 import {
 	getApi,
 	getFormattedDateForInput,
 	getRequestParams,
 	parseFormData,
 } from "@/services/utils";
-
 import { getSession } from "auth-astro/server";
+
 const session = await getSession(Astro.request);
 
 const t = useTranslations(session);
@@ -25,8 +24,13 @@ const customReturnUrl = searchParams.get("returnUrl");
 
 let errorMessage = "";
 let successMessage = "";
+let championshipName = "";
+let groupName = "";
+let groupDescription = "";
+
 interface EditFormData {
 	matchDate: string;
+	matchTime: string;
 	startDate: string;
 	endDate: string;
 	displayNameTeam1Player1: string;
@@ -42,6 +46,7 @@ interface EditFormData {
 }
 
 let matchDate = "";
+let matchTime = "";
 let displayNameTeam1Player1 = "";
 let displayNameTeam1Player2 = "";
 let displayNameTeam2Player1 = "";
@@ -55,16 +60,39 @@ let team2set3 = 0;
 let startDate = "";
 let endDate = "";
 
-// Use custom return URL if provided, otherwise default to the championship matches page
-const returnUrl = customReturnUrl || `/championships/${id}/${groupId}/matches`;
+// Use custom return URL if provided, otherwise default to the championship group page
+const returnUrl = customReturnUrl || `/championships/${id}/${groupId}`;
 
 const api = getApi();
+
+// Fetch championship and group data for the header
+try {
+	const championshipResponse = await api.api.padelmastersApiDomainEndpointsChampionshipsGetChampionship(
+		id || "",
+		getRequestParams(session)
+	);
+	if (championshipResponse.ok) {
+		championshipName = championshipResponse.data?.Championship?.Championship?.Name || "";
+	}
+
+	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
+		groupId || "",
+		getRequestParams(session)
+	);
+	if (groupResponse.ok) {
+		groupName = groupResponse.data?.Group?.Group?.Name || "";
+		groupDescription = groupResponse.data?.Group?.Group?.Description || "";
+	}
+} catch (e) {
+	console.error("Error fetching championship/group data:", e);
+}
 
 if (Astro.request.method === "POST") {
 	try {
 		const formData = await parseFormData<EditFormData>(Astro.request);
 
 		matchDate = formData["matchDate"] || "";
+		matchTime = formData["matchTime"] || "";
 		endDate = formData["endDate"] || "";
 		startDate = formData["startDate"] || "";
 		// Assign parsed data to your variables
@@ -100,8 +128,14 @@ if (Astro.request.method === "POST") {
 				};
 			}
 
+			// Combine date and time into a proper ISO string
+			let combinedDateTime = matchDate;
+			if (matchTime) {
+				combinedDateTime = `${matchDate}T${matchTime}:00`;
+			}
+			
 			const model: MatchResultModel = {
-				Date: matchDate,
+				Date: combinedDateTime,
 			};
 
 			if (
@@ -170,7 +204,18 @@ if (Astro.request.method === "POST") {
 		if (matchResponse.ok) {
 			const model = matchResponse.data || {};
 
-			matchDate = getFormattedDateForInput(model.Date) || "";
+			// Extract date and time from the Date field
+			if (model.Date) {
+				const dateTime = new Date(model.Date);
+				const isoString = dateTime.toISOString();
+				const timeString = dateTime.toTimeString();
+				
+				matchDate = isoString.split('T')[0] || ""; // YYYY-MM-DD format
+				
+				const timeStringPart = timeString.split(' ')[0];
+				matchTime = timeStringPart ? timeStringPart.substring(0, 5) : ""; // HH:MM format
+			}
+			
 			startDate = getFormattedDateForInput(model.StartDate) || "";
 			endDate = getFormattedDateForInput(model.EndDate) || "";
 			displayNameTeam1Player1 = `${model.Team1?.Team?.Player1?.FirstName} ${model.Team1?.Team?.Player1?.LastName}`;
@@ -195,131 +240,275 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<Layout title="Match Edit">
-	<div class="flex h-full items-center justify-center py-12">
-		<form method="POST">
-			<div class="overflow-hidden bg-white shadow sm:rounded-md">
-				<div class="mt-4 w-full max-w-lg divide-y-2 rounded-lg bg-white p-6 shadow-md">
-					<div class="mb-4 grid grid-cols-3 items-center gap-4 text-center">
-						<div class="flex flex-col items-end">
-							<div class="text-sm font-semibold text-supporting-cyan-700">
-								{displayNameTeam1Player1}
+<Layout title="Match Edit" useTransparentHeader={true}>
+	<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+		<!-- Gradient Overlay for depth -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
-								<input
-									type="hidden"
-									name="displayNameTeam1Player1"
-									value={displayNameTeam1Player1}
-								/>
+		<!-- Content -->
+		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
+			<ChampionshipGroupHeader
+				championshipId={id || ""}
+				championshipName={championshipName}
+				groupId={groupId || ""}
+				groupName={groupName}
+				groupDescription={groupDescription}
+			/>
+		
+			<div class="mx-auto max-w-2xl">
+				<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl">
+					<form method="POST" class="p-6">
+					<!-- Teams Section -->
+					<div class="mb-8">
+						<div class="flex items-center justify-between gap-4">
+							<!-- Team 1 -->
+							<div class="flex flex-col items-center space-y-3">
+								<div class="text-center">
+									<div class="text-sm font-semibold text-blue-300 mb-1">
+										{displayNameTeam1Player1}
+										<input type="hidden" name="displayNameTeam1Player1" value={displayNameTeam1Player1} />
+									</div>
+									<div class="text-sm font-semibold text-blue-300">
+										{displayNameTeam1Player2}
+										<input type="hidden" name="displayNameTeam1Player2" value={displayNameTeam1Player2} />
+									</div>
+								</div>
+								<div class="h-1 w-16 rounded-full bg-blue-400/60"></div>
 							</div>
-							<div class="text-sm font-semibold text-supporting-cyan-700">
-								{displayNameTeam1Player2}
-								<input
-									type="hidden"
-									name="displayNameTeam1Player2"
-									value={displayNameTeam1Player2}
-								/>
-							</div>
-						</div>
 
-						<div class="flex items-center justify-center">
-							<div class="text-lg font-bold text-neutral-600">VS</div>
-						</div>
-
-						<div class="flex flex-col items-start">
-							<div class="text-sm font-semibold text-supporting-red-700">
-								{displayNameTeam2Player1}
-								<input
-									type="hidden"
-									name="displayNameTeam2Player1"
-									value={displayNameTeam2Player1}
-								/>
+							<!-- VS -->
+							<div class="flex flex-col items-center">
+								<div class="rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2">
+									<span class="text-lg font-bold text-white">VS</span>
+								</div>
 							</div>
-							<div class="text-sm font-semibold text-supporting-red-700">
-								{displayNameTeam2Player2}
-								<input
-									type="hidden"
-									name="displayNameTeam2Player2"
-									value={displayNameTeam2Player2}
-								/>
+
+							<!-- Team 2 -->
+							<div class="flex flex-col items-center space-y-3">
+								<div class="text-center">
+									<div class="text-sm font-semibold text-red-300 mb-1">
+										{displayNameTeam2Player1}
+										<input type="hidden" name="displayNameTeam2Player1" value={displayNameTeam2Player1} />
+									</div>
+									<div class="text-sm font-semibold text-red-300">
+										{displayNameTeam2Player2}
+										<input type="hidden" name="displayNameTeam2Player2" value={displayNameTeam2Player2} />
+									</div>
+								</div>
+								<div class="h-1 w-16 rounded-full bg-red-400/60"></div>
 							</div>
 						</div>
 					</div>
 
-					<div class="grid grid-cols-3 items-center gap-4 py-8 text-center">
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team1set1" initialValue={team1set1} client:load />
-						</div>
-						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 1</div>
-						</div>
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team2set1" initialValue={team2set1} client:load />
-						</div>
+					<!-- Sets Section -->
+					<div class="mb-8">
+						<div class="space-y-4">
+							<!-- Set 1 -->
+							<div class="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4">
+								<div class="mb-3 text-center">
+									<span class="text-sm font-medium text-white">{t(TranslationKey.Set)} 1</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<AutoSelectInputScore id="team1set1" initialValue={team1set1} client:load />
+									<div class="text-2xl font-bold text-white/80">:</div>
+									<AutoSelectInputScore id="team2set1" initialValue={team2set1} client:load />
+								</div>
+							</div>
 
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team1set2" initialValue={team1set2} client:load />
-						</div>
-						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 2</div>
-						</div>
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team2set2" initialValue={team2set2} client:load />
-						</div>
+							<!-- Set 2 -->
+							<div class="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4">
+								<div class="mb-3 text-center">
+									<span class="text-sm font-medium text-white">{t(TranslationKey.Set)} 2</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<AutoSelectInputScore id="team1set2" initialValue={team1set2} client:load />
+									<div class="text-2xl font-bold text-white/80">:</div>
+									<AutoSelectInputScore id="team2set2" initialValue={team2set2} client:load />
+								</div>
+							</div>
 
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team1set3" initialValue={team1set3} client:load />
-						</div>
-						<div class="flex flex-col items-center justify-center">
-							<div class="text-xs text-gray-400 md:text-sm">{t(TranslationKey.Set)} - 3</div>
-						</div>
-						<div class="flex flex-col items-center">
-							<AutoSelectInputScore id="team2set3" initialValue={team2set3} client:load />
+							<!-- Set 3 -->
+							<div class="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4">
+								<div class="mb-3 text-center">
+									<span class="text-sm font-medium text-white">{t(TranslationKey.Set)} 3</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<AutoSelectInputScore id="team1set3" initialValue={team1set3} client:load />
+									<div class="text-2xl font-bold text-white/80">:</div>
+									<AutoSelectInputScore id="team2set3" initialValue={team2set3} client:load />
+								</div>
+							</div>
 						</div>
 					</div>
 
-					<div class="py-6">
-						<label for="matchDate" class="block text-sm font-medium text-gray-400">
-							{t(TranslationKey.MatchDate)}
-						</label>
-						<input
-							type="date"
-							id="matchDate"
-							name="matchDate"
-							value={matchDate}
-							min={startDate}
-							max={endDate}
-							required
-							class="mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-						/>
-						<input type="hidden" name="startDate" value={startDate} />
-						<input type="hidden" name="endDate" value={endDate} />
+					<!-- Date and Time Section -->
+					<div class="mb-8">
+						<div class="rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<!-- Date Input -->
+								<div>
+									<label for="matchDate" class="mb-3 block text-sm font-medium text-white">
+										{t(TranslationKey.MatchDate)}
+									</label>
+									<input
+										type="date"
+										id="matchDate"
+										name="matchDate"
+										value={matchDate}
+										min={startDate}
+										max={endDate}
+										required
+										class="w-full rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-3 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 date-input-glass"
+									/>
+								</div>
+								
+								<!-- Time Input -->
+								<div>
+									<label for="matchTime" class="mb-3 block text-sm font-medium text-white">
+										Hora del partido
+									</label>
+									<input
+										type="time"
+										id="matchTime"
+										name="matchTime"
+										value={matchTime}
+										class="w-full rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-3 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 time-input-glass"
+									/>
+								</div>
+							</div>
+							<input type="hidden" name="startDate" value={startDate} />
+							<input type="hidden" name="endDate" value={endDate} />
+						</div>
 					</div>
-				</div>
+
+					<!-- Buttons -->
+					<div class="flex flex-col gap-4 sm:flex-row">
+						<button
+							type="submit"
+							class="flex-1 px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+						>
+							{t(TranslationKey.Save)}
+						</button>
+						<a
+							href={`/championships/${id}/${groupId}`}
+							class="flex-1 px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30 text-center"
+						>
+							{t(TranslationKey.Cancel)}
+						</a>
+					</div>
+				</form>
 			</div>
-			<div class="mr-4 mt-6 flex items-center justify-end gap-x-6">
-				<ReturnButton returnUrl={returnUrl} text={t(TranslationKey.Cancel)} client:load />
-				<button
-					type="submit"
-					class="rounded-md bg-primary-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-				>
-					{t(TranslationKey.Save)}
-				</button>
-			</div>
-		</form>
+		</div>
+		</div>
+
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 		{
 			successMessage && (
 				<Toast message={successMessage} type="success" client:load urlRedirect={returnUrl} />
 			)
 		}
-	</div>
+
+		<!-- Integrated Footer Section - Full Width -->
+		<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
+			<!-- Features Section -->
+			<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🏆</span>
+					<span class="hidden sm:inline">Professional Tournament Management</span>
+					<span class="sm:hidden">Tournaments</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🎯</span>
+					<span class="hidden sm:inline">Real-time Statistics</span>
+					<span class="sm:hidden">Statistics</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>👥</span>
+					<span class="hidden sm:inline">Community Driven</span>
+					<span class="sm:hidden">Community</span>
+				</div>
+			</div>
+
+			<!-- Divider -->
+			<div class="border-t border-white/20 mb-4 mx-6"></div>
+
+			<!-- Bottom Section -->
+			<div class="flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+				<!-- Copyright -->
+				<div class="flex flex-col items-center md:items-start gap-2">
+					<p class="text-sm text-white/70">
+						© {new Date().getFullYear()} Padel Masters. All rights reserved.
+					</p>
+					<div class="flex items-center gap-4 text-xs text-white/60">
+						<span>Made with ❤️ for padel lovers</span>
+					</div>
+				</div>
+
+				<!-- Version Info -->
+				<div class="flex items-center gap-2 text-xs text-white/60">
+					<span>Version 2.0</span>
+				</div>
+			</div>
+		</div>
+	</section>
 </Layout>
+
+<style>
+	.date-input-glass::-webkit-calendar-picker-indicator {
+		filter: invert(1);
+		opacity: 0.8;
+	}
+	
+	.date-input-glass::-webkit-datetime-edit-text {
+		color: white;
+		opacity: 1;
+	}
+	
+	.date-input-glass::-webkit-datetime-edit-month-field,
+	.date-input-glass::-webkit-datetime-edit-day-field,
+	.date-input-glass::-webkit-datetime-edit-year-field {
+		color: white;
+		font-weight: 600;
+	}
+	
+	.date-input-glass::-webkit-datetime-edit-year-field {
+		color: white !important;
+		opacity: 1 !important;
+	}
+
+	/* Time input styles */
+	.time-input-glass::-webkit-datetime-edit-text {
+		color: white;
+		opacity: 1;
+	}
+	
+	.time-input-glass::-webkit-datetime-edit-hour-field,
+	.time-input-glass::-webkit-datetime-edit-minute-field {
+		color: white;
+		font-weight: 600;
+	}
+	
+	.time-input-glass::-webkit-datetime-edit-ampm-field {
+		color: white;
+		font-weight: 600;
+	}
+
+	/* Remove spinners for both date and time inputs */
+	.date-input-glass::-webkit-inner-spin-button,
+	.date-input-glass::-webkit-outer-spin-button,
+	.time-input-glass::-webkit-inner-spin-button,
+	.time-input-glass::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+</style>
 
 {
 	successMessage && (
 		<script
 			is:inline
-			set:html={`setTimeout(function () { window.location.href = "${returnUrl}"; }, 500);`}
+			set:html={`setTimeout(function () { window.location.href = "${returnUrl}"; }, 2000);`}
 		/>
 	)
 }

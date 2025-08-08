@@ -1,6 +1,9 @@
 ---
+interface Props {
+	useTransparent?: boolean;
+}
+
 import NavLink from "@/components/NavLink.astro";
-import MobileNav from "@/components/ui/MobileNav.tsx";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { isUserLoggedIn } from "@/services/utils";
@@ -9,6 +12,7 @@ import { type NavigationLink } from "@/components/ui/types.tsx";
 import { setLinkActive } from "@/components/ui/utils.tsx";
 import { getSession } from "auth-astro/server";
 
+const { useTransparent = false } = Astro.props;
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 
@@ -31,12 +35,8 @@ if (isLogged) {
 		},
 	];
 } else {
-	navigationLinks = [
-		{
-			group: 1,
-			links: [{ name: t(TranslationKey.SignIn), href: "/sign-in", isActive: false }],
-		},
-	];
+	// No navigation links for non-logged users (sign-in is on homepage)
+	navigationLinks = [];
 }
 
 const currentPath = Astro.url.pathname;
@@ -51,21 +51,65 @@ navigationLinks = navigationLinks.map((group) => ({
 navigationLinks = setLinkActive(navigationLinks, currentPath);
 ---
 
-<header class="flex items-center justify-between bg-primary-600 px-6 py-4 text-primary-foreground">
-	<div class="flex items-center gap-4">
-		<a href="/" class="logo text-2xl font-bold">Padel Masters</a>
-	</div>
-	<nav class="ml-auto hidden items-center gap-6 md:flex">
-		<div>
-			{
-				navigationLinks.map((group) => {
-					return group.links.map((element) => {
-						return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
-					});
-				})
-			}
-		</div>
-	</nav>
+{useTransparent || currentPath === '/' || currentPath === '/championships' || (currentPath.includes('/championships/') && currentPath.split('/').filter(Boolean).length === 3 && !currentPath.includes('/rules')) ? (
+	<!-- Minimal Header for Homepage -->
+	<header class="absolute top-0 left-0 right-0 z-20 bg-transparent">
+		<div class="px-6 py-6">
+			<div class="flex items-center justify-between">
+				<!-- Logo section -->
+				<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+					<span class="text-2xl">🎾</span>
+					<div class="flex flex-col">
+						<span class="text-lg font-bold text-white">Padel Masters</span>
+						<span class="text-xs text-white/70">Championship Management System</span>
+					</div>
+				</a>
 
-	<MobileNav client:load {navigationLinks} />
-</header>
+				<!-- Navigation section -->
+				<nav class="flex items-center gap-4 text-sm">
+					{
+						navigationLinks.map((group) => {
+							return group.links.map((element) => {
+								return (
+									<a
+										href={element.href}
+										class="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+									>
+										{element.name}
+									</a>
+								);
+							});
+						})
+					}
+				</nav>
+			</div>
+		</div>
+	</header>
+) : (
+	<!-- Regular Header for Other Pages -->
+	<header class="relative overflow-hidden bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-b border-neutral-600">
+		<div class="relative px-6 py-8">
+			<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+				<!-- Logo and brand section -->
+				<a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+					<span class="text-2xl">🎾</span>
+					<div class="flex flex-col">
+						<span class="text-lg font-bold text-white">Padel Masters</span>
+						<span class="text-xs text-neutral-300">Championship Management System</span>
+					</div>
+				</a>
+
+				<!-- Navigation section -->
+				<nav class="flex items-center gap-6 text-sm">
+					{
+						navigationLinks.map((group) => {
+							return group.links.map((element) => {
+								return <NavLink text={element.name} href={element.href} isActive={element.isActive} />;
+							});
+						})
+					}
+				</nav>
+			</div>
+		</div>
+	</header>
+)}

@@ -25,3 +25,7 @@ pnpm-debug.log*
 
 
 .vercel
+
+# Claude Code configuration
+CLAUDE.md
+.claude/

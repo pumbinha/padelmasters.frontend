@@ -1,5 +1,4 @@
 ---
-import ChampionshipHeader from "@/components/ChampionshipHeader.astro";
 import Tabs from "@/components/Tabs.astro";
 import GroupItemLink from "@/components/ui/GroupItemLink";
 import Toast from "@/components/ui/Toast";
@@ -13,8 +12,9 @@ import {
 	type GroupDto,
 } from "@/services/api";
 
-import { getApi, getRequestParams, orderGroupsByName } from "@/services/utils";
+import { getApi, getRequestParams, orderGroupsByName, AuthenticationError } from "@/services/utils";
 import { BookOpenIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { CalendarDateRangeIcon, UsersIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
 
 const { id } = Astro.params;
@@ -52,6 +52,10 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
@@ -72,32 +76,140 @@ const tabData = [
 ];
 ---
 
-<Layout title=`Championship ${championship.Name} `>
-	<section class="w-full pt-2 md:pt-2 lg:pt-2">
-		<ChampionshipHeader
-			id={id}
-			championship={championship}
-			userProfile={userProfile}
-			championshipDetail={championshipDetail}
-			session={session}
-		/>
-		<Tabs tabData={tabData} />
-		<div class="container mx-auto px-4 py-4 md:px-6 lg:px-8">
-			<ol class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">
-				{
-					groups.map((group) => (
-						<GroupItemLink
-							url={`/championships/${id}/${group.Id}/matches`}
-							name={group.Name || ""}
-							description={group.Description || ""}
-							currentUserIsRegistered={group.Id === userProfile.CurrentGroupId}
-							client:load
-						/>
-					))
-				}
-				{groups.length === 0 && t(TranslationKey.NoGroupsMessage)}
-			</ol>
+<Layout title={`Championship ${championship.Name}`} useTransparentHeader={true}>
+	<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+		<!-- Gradient Overlay for depth -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+
+		<!-- Content -->
+		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
+			<!-- Header Section with Glassmorphism -->
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6 shadow-2xl">
+				<div class="flex items-center gap-3">
+					<CalendarDateRangeIcon className="h-6 w-6 text-white" />
+					<div class="flex-1">
+						<div class="flex items-center gap-2 mb-1">
+							<h1 class="text-base sm:text-lg font-semibold text-white">
+								{championship.Name}
+							</h1>
+						</div>
+						{championship.Description && (
+							<p class="text-sm text-white/80">{championship.Description}</p>
+						)}
+					</div>
+				</div>
+			</div>
+
+			<!-- Statistics Cards (Full Width) -->
+			<div class="mb-6">
+				<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<UsersIcon className="h-5 w-5 text-blue-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-blue-300">
+								Players
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{championshipDetail.NumberEnrolledPlayers || 0}/{championshipDetail.NumberTotalPlayers || 0}</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<CalendarDateRangeIcon className="h-5 w-5 text-green-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-green-300">
+								Matches
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{championshipDetail.NumberOfPlayedMatches || 0}/{championshipDetail.NumberMatches || 0}</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<CheckCircleIcon className="h-5 w-5 text-purple-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-purple-300">
+								Played
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{championshipDetail.NumberOfPlayedMatches || 0}</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<ClockIcon className="h-5 w-5 text-orange-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-orange-300">
+								Pending
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{(championshipDetail.NumberMatches || 0) - (championshipDetail.NumberOfPlayedMatches || 0)}</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabs Section (Full Width) -->
+			<div class="mb-6">
+				<Tabs tabData={tabData} />
+			</div>
+
+			<!-- Groups Grid (Full Width) -->
+			{groups.length === 0 ? (
+				<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 text-center shadow-2xl">
+					<p class="text-white/80">{t(TranslationKey.NoGroupsMessage)}</p>
+				</div>
+			) : (
+				<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+					{
+						groups.map((group) => (
+							<GroupItemLink
+								url={`/championships/${id}/${group.Id}`}
+								name={group.Name || ""}
+								description={group.Description || ""}
+								currentUserIsRegistered={group.Id === userProfile.CurrentGroupId}
+								client:load
+							/>
+						))
+					}
+				</div>
+			)}
 		</div>
+
+		<!-- Integrated Footer -->
+		<footer class="absolute bottom-0 left-0 right-0 z-10 w-full">
+			<div class="px-6 py-8">
+				<div class="flex flex-col items-center gap-6">
+					<!-- Features highlight -->
+					<div class="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
+						<div class="flex items-center gap-2 text-white/70">
+							<span>🏆</span>
+							<span class="text-sm">Professional Tournament Management</span>
+						</div>
+						<div class="hidden md:block w-px h-4 bg-white/30"></div>
+						<div class="flex items-center gap-2 text-white/70">
+							<span>🎯</span>
+							<span class="text-sm">Real-time Statistics</span>
+						</div>
+						<div class="hidden md:block w-px h-4 bg-white/30"></div>
+						<div class="flex items-center gap-2 text-white/70">
+							<span>👥</span>
+							<span class="text-sm">Community Driven</span>
+						</div>
+					</div>
+
+					<!-- Divider -->
+					<div class="w-full max-w-md h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+
+					<!-- Copyright -->
+					<div class="flex flex-col items-center gap-2">
+						<p class="text-sm text-white/60">
+							© {new Date().getFullYear()} Padel Masters. All rights reserved.
+						</p>
+						<div class="flex items-center gap-4 text-xs text-white/50">
+							<span>Made with ❤️ for padel lovers</span>
+							<span>•</span>
+							<span>Version 2.0</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+
 		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
 	</section>
 </Layout>

@@ -10,18 +10,8 @@ export default {
 	useTabs: true,
 	endOfLine: "lf",
 	arrowParens: "always",
-	plugins: [
-		"prettier-plugin-astro",
-		"prettier-plugin-tailwindcss",
-		"prettier-plugin-astro-organize-imports",
-	],
+	plugins: ["prettier-plugin-tailwindcss"],
 	overrides: [
-		{
-			files: "*.astro",
-			options: {
-				parser: "astro",
-			},
-		},
 		{
 			files: "*.ts",
 			options: {

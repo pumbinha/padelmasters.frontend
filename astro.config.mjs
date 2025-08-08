@@ -22,9 +22,23 @@ export default defineConfig({
 		}),
 	],
 	output: "server",
+	server: {
+		host: true,
+		port: 4321,
+	},
 	adapter: vercel({
 		webAnalytics: {
 			enabled: true,
 		},
 	}),
+	vite: {
+		ssr: {
+			noExternal: ['auth-astro']
+		},
+		build: {
+			rollupOptions: {
+				external: ['node:path', 'node:fs', 'node:url']
+			}
+		}
+	}
 });

@@ -1,5 +1,6 @@
 import { UserMinusIcon } from "@heroicons/react/24/outline";
 import { toast, ToastContainer } from "react-toastify";
+import { fetchWithAuth, AuthenticationError } from "@/services/utils";
 type LeaveProps = {
 	championshipId: string;
 	text: string;
@@ -9,24 +10,35 @@ const Leave: React.FC<LeaveProps> = ({ championshipId, text }) => {
 	const handleClick = async () => {
 		const data = { championshipId };
 
-		const response = await fetch("/api/championships/leave", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-
-		if (response.ok) {
-			const message = await response.json();
-
-			toast(message, {
-				type: "success",
-				onClose: () => (window.location.href = `/championships/${championshipId}`),
+		try {
+			const response = await fetchWithAuth("/api/championships/leave", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
 			});
-			//window.location.href = `/championships/${championshipId}`;
-		} else {
-			console.error("Failed to process data");
+
+			if (response.ok) {
+				const message = await response.json();
+
+				toast(message, {
+					type: "success",
+					onClose: () => (window.location.href = `/championships/${championshipId}`),
+				});
+			} else {
+				console.error("Failed to process data");
+				toast("Oops! Something went wrong. Please try again later.", {
+					type: "error",
+				});
+			}
+		} catch (error: any) {
+			// Check if this is our authentication error (user being redirected)
+			if (error instanceof AuthenticationError) {
+				return; // User is being redirected, don't show error toast
+			}
+
+			console.error("Failed to process data", error);
 			toast("Oops! Something went wrong. Please try again later.", {
 				type: "error",
 			});

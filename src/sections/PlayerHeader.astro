@@ -1,36 +1,116 @@
 ---
-import BigHeaderCard from "@/components/BigHeaderCard.astro";
-import SmallHeaderCard from "@/components/SmallHeaderCard.astro";
 import { TranslationKey } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { getSession } from "auth-astro/server";
+import CountryFlag from "@/components/CountryFlag.astro";
 
 const { user, userStatistics } = Astro.props;
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 ---
 
-<div class="overflow-hidden rounded-lg bg-background shadow-md">
-	<div class="p-4">
-		<div class="mb-2 flex items-center">
-			<h2 class="mb-2 text-xl font-bold">{user.FirstName} {user.LastName}</h2>
+<!-- Player Header -->
+<div class="bg-white border-b border-gray-200">
+	<div class="p-6">
+		<div class="flex items-center gap-3">
+			{user.Country ? (
+				<CountryFlag 
+					countryCode={user.Country} 
+					class="w-8 h-6" 
+				/>
+			) : (
+				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--page-background))]">
+					<span class="text-lg">👤</span>
+				</div>
+			)}
+			<div>
+				<h2 class="text-xl font-bold text-[#1F3851]">
+					{user.FirstName} {user.LastName}
+				</h2>
+			</div>
 		</div>
 	</div>
-	<div class="mb-6 rounded-lg bg-white px-4">
-		<div class="grid grid-cols-2">
-			<BigHeaderCard title={t(TranslationKey.MatchesWon)} value={userStatistics.MatchesWon} />
-			<BigHeaderCard title={t(TranslationKey.MatchesLost)} value={userStatistics.MatchesLost} />
-			<BigHeaderCard title={t(TranslationKey.MatchesPlayed)} value={userStatistics.MatchesPlayed} />
-			<BigHeaderCard title={t(TranslationKey.WinRate)} value={userStatistics.WinRate + "%"} />
+</div>
+
+<!-- Statistics Cards -->
+<div class="p-2">
+	<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+		<div class="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4 border border-green-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">🏆</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+					{t(TranslationKey.MatchesWon)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-green-800">{userStatistics.MatchesWon}</p>
 		</div>
-		<div class="grid grid-cols-1 sm:grid-cols-2">
-			<SmallHeaderCard title={t(TranslationKey.SetsWon)} value={userStatistics.SetsWon} />
+		<div class="rounded-lg bg-gradient-to-br from-red-50 to-red-100 p-4 border border-red-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">❌</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-red-700">
+					{t(TranslationKey.MatchesLost)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-red-800">{userStatistics.MatchesLost}</p>
+		</div>
+		<div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4 border border-blue-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">🎾</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+					{t(TranslationKey.MatchesPlayed)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-blue-800">{userStatistics.MatchesPlayed}</p>
+		</div>
+		<div class="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4 border border-purple-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">📊</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-purple-700">
+					{t(TranslationKey.WinRate)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-purple-800">{userStatistics.WinRate}%</p>
+		</div>
+	</div>
+</div>
 
-			<SmallHeaderCard title={t(TranslationKey.SetsLost)} value={userStatistics.SetsLost} />
-
-			<SmallHeaderCard title={t(TranslationKey.PointsWon)} value={userStatistics.PointsWon} />
-
-			<SmallHeaderCard title={t(TranslationKey.PointsLost)} value={userStatistics.PointsLost} />
+<div class="p-2">
+	<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+		<div class="rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 border border-emerald-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">✅</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+					{t(TranslationKey.SetsWon)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-emerald-800">{userStatistics.SetsWon}</p>
+		</div>
+		<div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4 border border-orange-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">⚠️</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-orange-700">
+					{t(TranslationKey.SetsLost)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-orange-800">{userStatistics.SetsLost}</p>
+		</div>
+		<div class="rounded-lg bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 border border-cyan-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">🎯</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-cyan-700">
+					{t(TranslationKey.PointsWon)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-cyan-800">{userStatistics.PointsWon}</p>
+		</div>
+		<div class="rounded-lg bg-gradient-to-br from-pink-50 to-pink-100 p-4 border border-pink-200 shadow-sm">
+			<div class="mb-2 flex items-center gap-2">
+				<span class="text-lg">💔</span>
+				<p class="text-xs font-semibold uppercase tracking-wide text-pink-700">
+					{t(TranslationKey.PointsLost)}
+				</p>
+			</div>
+			<p class="text-2xl font-bold text-pink-800">{userStatistics.PointsLost}</p>
 		</div>
 	</div>
 </div>

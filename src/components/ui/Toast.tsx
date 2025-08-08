@@ -7,6 +7,7 @@ type ToastProps = {
 	type: "success" | "error" | "info" | "warning";
 	urlRedirect?: string;
 };
+
 const Toast: React.FC<ToastProps> = ({ message, type, urlRedirect }) => {
 	useEffect(() => {
 		if (message) {
@@ -33,8 +34,12 @@ const Toast: React.FC<ToastProps> = ({ message, type, urlRedirect }) => {
 			pauseOnFocusLoss
 			draggable
 			pauseOnHover
-			theme="colored"
+			theme="light"
 			draggablePercent={60}
+			toastStyle={{
+				backgroundColor: type === "success" ? "#15803d" : undefined,
+				color: type === "success" ? "white" : undefined,
+			}}
 		/>
 	);
 };

@@ -22,33 +22,32 @@ export const setLinkActive = (
 export const getStatusClass = (status: ChampionshipStatus | null | undefined) => {
 	switch (status) {
 		case ChampionshipStatus.Created:
-			return "bg-gray-200 text-black-800";
+			return "bg-neutral-200 text-neutral-800 border border-neutral-600";
 		case ChampionshipStatus.Open:
-			return "bg-orange-200 text-orange-800";
+			return "bg-emerald-200 text-emerald-800 border border-emerald-600";
 		case ChampionshipStatus.Started:
-			return "bg-green-200 text-green-800";
-
+			return "bg-primary-200 text-primary-800 border border-primary-600";
 		case ChampionshipStatus.Cancelled:
-			return "bg-red-200 text-red-800";
+			return "bg-red-200 text-red-800 border border-red-600";
 		case ChampionshipStatus.Finished:
-			return "bg-blue-200 text-blue-800";
+			return "bg-vivid-200 text-vivid-800 border border-vivid-600";
 		default:
-			return "";
+			return "bg-gray-200 text-gray-800 border border-gray-600";
 	}
 };
 
 export const getMatchStatusClass = (status: MatchStatus | null | undefined) => {
 	switch (status) {
 		case MatchStatus.Created:
-			return "bg-gray-50 text-neutral-600 ring-gray-600/20";
+			return "bg-neutral-200 text-neutral-800 border border-neutral-600";
 		case MatchStatus.Planned:
-			return "bg-orange-50 text-orange-800 ring-gray-600/20 ";
+			return "bg-yellow-200 text-yellow-800 border border-yellow-600";
 		case MatchStatus.Played:
-			return "bg-green-50 text-green-600 ring-gray-600/20";
+			return "bg-green-200 text-green-800 border border-green-600";
 		case MatchStatus.Cancelled:
-			return "bg-red-50 text-red-800 ring-gray-600/20";
+			return "bg-red-200 text-red-800 border border-red-600";
 		default:
-			return "";
+			return "bg-gray-200 text-gray-800 border border-gray-600";
 	}
 };
 
@@ -62,9 +61,11 @@ export const getStandingRowClass = (
 	numberOfFinalists?: number
 ) => {
 	if (groupType === GroupType.League) {
-		return index < (numberOfFinalists || 0)
-			? `bg-supporting-red-100 ${getSelectedItemHoverClass()}`
-			: `bg-white ${getSelectedItemHoverClass()}`;
+		// Top 4 finalists get the same highlighting
+		if (index < (numberOfFinalists || 0)) {
+			return `bg-yellow-50 border-l-2 border-vivid-500 ${getSelectedItemHoverClass()}`;
+		}
+		return `bg-white ${getSelectedItemHoverClass()}`;
 	}
 	return "";
 };
@@ -91,4 +92,15 @@ export const getWinnerLoserSetClass = (
 	}
 
 	return loserSet;
+};
+
+export const getPositionTextClass = (index: number, numberOfFinalists?: number) => {
+	if (index < (numberOfFinalists || 0)) {
+		return "font-bold text-vivid-700";
+	}
+	return "text-gray-900";
+};
+
+export const getPositionIcon = () => {
+	return "🏆";
 };

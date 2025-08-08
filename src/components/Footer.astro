@@ -2,10 +2,32 @@
 
 ---
 
-<footer
-	class="flex items-center justify-between bg-neutral-400 px-4 py-6 text-primary-foreground md:px-6"
->
-	<p>
-		© {new Date().getFullYear()} Padel Masters
-	</p>
+<footer class="relative overflow-hidden bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 border-t border-neutral-600">
+	<div class="relative px-6 py-8">
+		<div class="flex flex-col items-center gap-6">
+			<!-- Copyright section -->
+			<div class="flex flex-col items-center gap-2">
+				<p class="text-sm text-neutral-400">
+					© {new Date().getFullYear()} Padel Masters. All rights reserved.
+				</p>
+				<div class="flex items-center gap-4 text-xs text-neutral-500">
+					<span>Made with ❤️ for padel lovers</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bottom accent line -->
+		<div class="mt-6 pt-6 border-t border-neutral-600">
+			<div class="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+				<div class="flex items-center gap-4">
+					<span>🏆 Professional Tournament Management</span>
+					<span>🎯 Real-time Statistics</span>
+					<span>👥 Community Driven</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<span>Version 2.0</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </footer>

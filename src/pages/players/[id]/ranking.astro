@@ -10,6 +10,7 @@ import {
 	distinctGroupMatchSearchDtos,
 	getApi,
 	getRequestParams,
+	AuthenticationError,
 	type ChampionshipAndGroupDto,
 	type GroupMatchSearchDtoWithPosition,
 } from "@/services/utils";
@@ -51,6 +52,11 @@ try {
 		Astro.redirect("/championships/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
@@ -82,9 +88,9 @@ try {
 				if (standingsResponse.ok) {
 					let allPlayerStandings = standingsResponse.data.PlayerStandings || [];
 					const position =
-						allPlayerStandings.findIndex((playerStanding) => playerStanding.UserId === id) + 1;
+						allPlayerStandings.findIndex((playerStanding) => playerStanding.User?.Id === id) + 1;
 					const thisPlayerStanding = allPlayerStandings.find(
-						(playerStanding) => playerStanding.UserId === id
+						(playerStanding) => playerStanding.User?.Id === id
 					);
 
 					const one: GroupMatchSearchDtoWithPosition = {
@@ -106,6 +112,11 @@ try {
 		Astro.redirect("/not-found");
 	}
 } catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		console.warn("Authentication failed in server-side rendering, redirecting to home");
+		return Astro.redirect("/");
+	}
 	console.error(e);
 	errorMessage = t(TranslationKey.ErrorLoadingData);
 }
@@ -133,96 +144,110 @@ const tabData = [
 ---
 
 <Layout title=`Player - ${user.FirstName} ${user.LastName} `>
-	<section class="w-full pt-2 md:pt-2 lg:pt-2">
+	<section class="w-full bg-[hsl(var(--page-background))] min-h-screen pt-2 md:pt-2 lg:pt-2">
 		<PlayerHeader user={user} userStatistics={userStatistics} />
 		<Tabs tabData={tabData} />
 
-		<div class="w-full rounded-md bg-white shadow">
+		<div class="w-full rounded-lg border border-gray-200 bg-white shadow-lg">
 			<ul role="list" class="divide-y divide-gray-200">
 				{
 					playerStandingsInGroups.map((playerStandingsInGroup) => {
 						return (
-							<li class="px-6 py-4">
-								<a
-									href={`/championships/${playerStandingsInGroup.Championship?.Id}`}
-									class="bg-primary-50 block rounded-md px-2.5 py-1.5 text-lg font-semibold text-primary-600 hover:text-primary-400"
-								>
-									{playerStandingsInGroup.Championship?.Name}
-								</a>
+							<li class="px-6 py-6">
+								<div class="mb-4">
+									<a
+										href={`/championships/${playerStandingsInGroup.Championship?.Id}`}
+										class="from-primary-50 block rounded-lg bg-gradient-to-r to-primary-100 px-4 py-3 text-lg font-bold text-primary-700 shadow-sm transition-all duration-200 hover:from-primary-100 hover:to-primary-200 hover:text-primary-800"
+									>
+										<div class="flex items-center gap-2">
+											<span class="text-xl">🏆</span>
+											{playerStandingsInGroup.Championship?.Name}
+										</div>
+									</a>
+								</div>
 
-								<a
-									href={`/championships/${playerStandingsInGroup.Championship?.Id}/${playerStandingsInGroup.Group?.Id}/standings`}
-									class="bg-primary-50 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-600 hover:text-primary-400"
-								>
-									{playerStandingsInGroup.Group?.Name}
-								</a>
+								<div class="mb-4">
+									<a
+										href={`/championships/${playerStandingsInGroup.Championship?.Id}/${playerStandingsInGroup.Group?.Id}/standings`}
+										class="from-vivid-50 inline-block rounded-lg bg-gradient-to-r to-vivid-100 px-4 py-2 text-sm font-semibold text-vivid-700 shadow-sm transition-all duration-200 hover:from-vivid-100 hover:to-vivid-200 hover:text-vivid-800"
+									>
+										<div class="flex items-center gap-2">
+											<span class="text-lg">👥</span>
+											{playerStandingsInGroup.Group?.Name}
+										</div>
+									</a>
+								</div>
 
 								<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-									<table class="min-w-full divide-y divide-gray-300">
-										<thead>
-											<tr>
-												<th
-													scope="col"
-													class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-0"
+									<div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+										<table class="min-w-full divide-y divide-gray-200">
+											<thead>
+												<tr>
+													<th
+														scope="col"
+														class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-gray-900 sm:pl-0"
+													>
+														<div>{t(TranslationKey.StandingsName)}</div>
+													</th>
+													<th
+														scope="col"
+														class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+													>
+														<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+														<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
+													</th>
+													<th
+														scope="col"
+														class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+													>
+														<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+														<div class="max-lg:hidden">
+															{t(TranslationKey.StandingsVictoryLong)}
+														</div>
+													</th>
+													<th
+														scope="col"
+														class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+													>
+														<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+														<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
+													</th>
+													<th
+														scope="col"
+														class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
+													>
+														<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+														<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
+													</th>
+												</tr>
+											</thead>
+											<tbody class="divide-y">
+												<tr
+													class={`hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-700`}
 												>
-													<div>{t(TranslationKey.StandingsName)}</div>
-												</th>
-												<th
-													scope="col"
-													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
-												>
-													<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
-													<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
-												</th>
-												<th
-													scope="col"
-													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
-												>
-													<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
-													<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
-												</th>
-												<th
-													scope="col"
-													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
-												>
-													<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
-													<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
-												</th>
-												<th
-													scope="col"
-													class="px-3 py-3.5 text-right text-xs font-semibold text-gray-900"
-												>
-													<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
-													<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
-												</th>
-											</tr>
-										</thead>
-										<tbody class="divide-y">
-											<tr
-												class={`hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-700`}
-											>
-												<td
-													class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
-												>
-													<span class="inline-block align-middle">
-														{`${playerStandingsInGroup.Position}. ${user.FirstName} ${user.LastName}`}
-													</span>
-												</td>
-												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-													{playerStandingsInGroup.PlayedMatches}
-												</td>
-												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-													{playerStandingsInGroup.WonMatches}
-												</td>
-												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
-													{playerStandingsInGroup.LostMatches}
-												</td>
-												<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
-													{playerStandingsInGroup.Points}
-												</td>
-											</tr>
-										</tbody>
-									</table>
+													<td
+														class={`font-base whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0`}
+													>
+														<span class="inline-block align-middle">
+															{`${playerStandingsInGroup.Position}. ${user.FirstName} ${user.LastName}`}
+														</span>
+													</td>
+													<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+														{playerStandingsInGroup.PlayedMatches}
+													</td>
+													<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+														{playerStandingsInGroup.WonMatches}
+													</td>
+													<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm text-gray-500">
+														{playerStandingsInGroup.LostMatches}
+													</td>
+													<td class="whitespace-nowrap px-3 py-4 text-right align-middle text-sm font-semibold text-gray-500">
+														{playerStandingsInGroup.Points}
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
 								</div>
 							</li>
 						);

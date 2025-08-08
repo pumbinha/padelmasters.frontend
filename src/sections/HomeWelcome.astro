@@ -5,6 +5,7 @@ import { useTranslations } from "@/i18n/utils";
 import { isUserLoggedIn } from "@/services/utils";
 import { Image } from "astro:assets";
 import { getSession } from "auth-astro/server";
+import { TrophyIcon, UsersIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 const session = await getSession(Astro.request);
 
@@ -12,41 +13,161 @@ const t = useTranslations(session);
 
 const isLogged = await isUserLoggedIn(session);
 
-const link = isLogged ? "/championships" : "/sign-in";
-const titleText = isLogged ? t(TranslationKey.WelcomeTitle) : t(TranslationKey.WelcomeJoin);
 const descriptionText = t(TranslationKey.WelcomeDescription);
-const buttonText = isLogged ? t(TranslationKey.NavChampionships) : t(TranslationKey.WelcomeJoin);
 ---
 
-<section class="w-full pt-12 md:pt-24 lg:pt-32">
-	<div class="container space-y-10 xl:space-y-16">
-		<div class="grid gap-4 px-10 md:grid-cols-2 md:gap-16">
-			<div>
-				<Image
-					src={homeNet}
-					alt="Welcome to Padel Masters"
-					width="800"
-					height="600"
-					widths={[240, 540, 720, homeNet.width]}
-					sizes={`(max-width: 360px) 240px, (max-width: 720px) 540px, (max-width: 1600px) 720px, ${homeNet.width}px`}
-				/>
-			</div>
-			<div class="flex flex-col items-start space-y-4">
-				<h1
-					class="lg:leading-tighter text-4xl font-bold tracking-tighter sm:text-3xl md:text-5xl xl:text-[1.4rem] 2xl:text-[1.75rem]"
-				>
-					{titleText}
-				</h1>
-				<p class="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-					{descriptionText}
-				</p>
+<section class="relative w-full min-h-screen overflow-hidden">
+	<!-- Background Image -->
+	<div class="absolute inset-0">
+		<Image
+			src={homeNet}
+			alt="Padel Court Background"
+			width="1920"
+			height="1080"
+			widths={[640, 1024, 1280, 1920, homeNet.width]}
+			sizes={`(max-width: 640px) 640px, (max-width: 1024px) 1024px, (max-width: 1280px) 1280px, (max-width: 1920px) 1920px, ${homeNet.width}px`}
+			class="w-full h-full object-cover"
+		/>
+		<!-- Gradient Overlay -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+	</div>
+
+	<!-- Content -->
+	<div class="relative z-10 flex flex-col items-center justify-center pt-32 px-6 text-center pb-[26rem] md:pb-40">
+		<div class="max-w-4xl mx-auto">
+			<!-- Main Heading -->
+			<h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+				The ultimate platform to manage,
+				<span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+					compete, and excel in padel
+				</span>
+			</h1>
+
+			<!-- Subtitle -->
+			<p class="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+				{descriptionText}
+			</p>
+
+			<!-- Call-to-Action Buttons -->
+			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+				{isLogged ? (
+
 				<a
-					href={link}
-					class="inline-flex h-9 items-center justify-center rounded-md bg-primary-800 px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+					href="/championships"
+					class="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 backdrop-blur-md bg-white/10 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105"
 				>
-					{buttonText}
-				</a>
+						<TrophyIcon className="h-5 w-5" />
+						{t(TranslationKey.NavChampionships)}
+						<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+				</a>					
+				) : (
+					<button
+						id="sign-in-btn"
+						class="group inline-flex items-center gap-2 rounded-lg border-2 border-white/30 backdrop-blur-md bg-white/10 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-white/20 hover:scale-105"
+					>
+						<UsersIcon className="h-5 w-5" />
+						{t(TranslationKey.SignIn)}
+						<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+					</button>
+				)}
+				
+			</div>
+
+			<!-- Feature Highlights -->
+			<div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+				<div class="text-center p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
+					<div class="w-10 h-10 mx-auto mb-3 rounded-full bg-blue-500/20 flex items-center justify-center">
+						<TrophyIcon className="h-5 w-5 text-blue-400" />
+					</div>
+					<h3 class="text-base font-semibold text-white mb-1">Tournament Management</h3>
+					<p class="text-white/70 text-xs">Organize and manage padel tournaments with ease</p>
+				</div>
+				
+				<div class="text-center p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
+					<div class="w-10 h-10 mx-auto mb-3 rounded-full bg-emerald-500/20 flex items-center justify-center">
+						<UsersIcon className="h-5 w-5 text-emerald-400" />
+					</div>
+					<h3 class="text-base font-semibold text-white mb-1">Player Rankings</h3>
+					<p class="text-white/70 text-xs">Track performance and maintain updated rankings</p>
+				</div>
+				
+				<div class="text-center p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
+					<div class="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-500/20 flex items-center justify-center">
+						<svg class="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+						</svg>
+					</div>
+					<h3 class="text-base font-semibold text-white mb-1">Match Analytics</h3>
+					<p class="text-white/70 text-xs">Detailed statistics and match analysis</p>
+				</div>
+			</div>
+		</div>
+
+		</div>
+	</div>
+
+	<!-- Integrated Footer Section - Full Width -->
+	<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
+		<!-- Features Section -->
+		<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>🏆</span>
+				<span class="hidden sm:inline">Professional Tournament Management</span>
+				<span class="sm:hidden">Tournaments</span>
+			</div>
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>🎯</span>
+				<span class="hidden sm:inline">Real-time Statistics</span>
+				<span class="sm:hidden">Statistics</span>
+			</div>
+			<div class="flex items-center gap-2 text-sm text-white/70">
+				<span>👥</span>
+				<span class="hidden sm:inline">Community Driven</span>
+				<span class="sm:hidden">Community</span>
+			</div>
+		</div>
+
+		<!-- Divider -->
+		<div class="border-t border-white/20 mb-4 mx-6"></div>
+
+		<!-- Bottom Section -->
+		<div class="flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+			<!-- Copyright -->
+			<div class="flex flex-col items-center md:items-start gap-2">
+				<p class="text-sm text-white/70">
+					© {new Date().getFullYear()} Padel Masters. All rights reserved.
+				</p>
+				<div class="flex items-center gap-4 text-xs text-white/60">
+					<span>Made with ❤️ for padel lovers</span>
+				</div>
+			</div>
+
+			<!-- Version Info -->
+			<div class="flex items-center gap-2 text-xs text-white/60">
+				<span>Version 2.0</span>
 			</div>
 		</div>
 	</div>
 </section>
+
+<script>
+	import { signIn } from "auth-astro/client";
+
+	// Function to initialize sign-in button
+	function initializeSignInButton() {
+		const signInBtn = document.getElementById("sign-in-btn");
+		if (signInBtn && !signInBtn.dataset.initialized) {
+			signInBtn.addEventListener("click", () => {
+				signIn("keycloak", { callbackUrl: "/profile" } as any);
+			});
+			signInBtn.dataset.initialized = "true";
+		}
+	}
+
+	// Initialize on DOM ready
+	document.addEventListener("DOMContentLoaded", initializeSignInButton);
+
+	// Reinitialize after Astro navigation
+	document.addEventListener("astro:page-load", initializeSignInButton);
+</script>

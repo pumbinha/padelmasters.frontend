@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PencilIcon } from "@heroicons/react/20/solid";
+import { fetchWithAuth, AuthenticationError } from "@/services/utils";
 
 interface MatchEditLinkProps {
 	matchId: string;
@@ -14,7 +15,7 @@ export default function MatchEditLink({ matchId, returnUrl }: MatchEditLinkProps
 		const fetchMatchDetails = async () => {
 			try {
 				// First, try to get the match via the dedicated API
-				const response = await fetch(`/api/matches/details?matchId=${matchId}`);
+				const response = await fetchWithAuth(`/api/matches/details?matchId=${matchId}`);
 
 				if (response.ok) {
 					const data = await response.json();
@@ -39,6 +40,11 @@ export default function MatchEditLink({ matchId, returnUrl }: MatchEditLinkProps
 					);
 				}
 			} catch (err) {
+				// Check if this is our authentication error (user being redirected)
+				if (err instanceof AuthenticationError) {
+					return; // User is being redirected, don't set fallback URL
+				}
+
 				console.error("Error fetching match details:", err);
 				// Fallback to our redirect endpoint
 				setEditUrl(`/matches/${matchId}/edit`);

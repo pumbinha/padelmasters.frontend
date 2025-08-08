@@ -1,0 +1,40 @@
+---
+import { UserGroupIcon } from "@heroicons/react/24/outline";
+
+interface Props {
+	championshipId: string;
+	championshipName: string;
+	groupId: string;
+	groupName: string;
+	groupDescription?: string;
+}
+
+const { championshipId, championshipName, groupId, groupName, groupDescription } = Astro.props;
+---
+
+<!-- Header Section with Glassmorphism -->
+<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6 shadow-2xl">
+	<div class="flex items-center gap-3">
+		<UserGroupIcon className="h-6 w-6 text-white" />
+		<div class="flex-1">
+			<div class="flex items-center gap-2 mb-1">
+				<a 
+					href={`/championships/${championshipId}`}
+					class="text-base sm:text-lg font-semibold text-white hover:text-blue-200 transition-colors"
+				>
+					{championshipName}
+				</a>
+				<span class="text-white/70">/</span>
+				<a 
+					href={`/championships/${championshipId}/${groupId}`}
+					class="text-base sm:text-lg font-semibold text-white hover:text-blue-200 transition-colors"
+				>
+					{groupName}
+				</a>
+			</div>
+			{groupDescription && (
+				<p class="text-sm text-white/80">{groupDescription}</p>
+			)}
+		</div>
+	</div>
+</div> 

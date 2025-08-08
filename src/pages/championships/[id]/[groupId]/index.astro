@@ -1,0 +1,957 @@
+---
+import Toast from "@/components/ui/Toast";
+import Popup from "@/components/ui/Popup";
+import ChampionshipGroupHeader from "@/components/ChampionshipGroupHeader.astro";
+
+import UsersLink from "@/components/UsersLink.astro";
+import CountryFlag from "@/components/CountryFlag.astro";
+import { TranslationKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Layout from "@/layouts/Layout.astro";
+import {
+	GroupType,
+	type ChampionshipDto,
+	type GroupDetailDto,
+	type GroupDto,
+	type PlayerStandingDto,
+	type GroupMatchDto,
+	MatchStatus,
+} from "@/services/api";
+import { getApi, getRequestParams, AuthenticationError } from "@/services/utils";
+import { StarIcon } from "@heroicons/react/16/solid";
+import { 
+	CalendarDaysIcon, 
+	ChartBarIcon, 
+	UsersIcon, 
+	CalendarDateRangeIcon, 
+	CheckCircleIcon, 
+	ClockIcon,
+	PlayIcon,
+	XCircleIcon,
+	PencilIcon,
+	XMarkIcon
+} from "@heroicons/react/24/outline";
+import { getSession } from "auth-astro/server";
+
+const { id, groupId } = Astro.params;
+
+// Get the status filter from URL parameters
+const { searchParams } = Astro.url;
+const statusFilter = searchParams.get("status");
+
+const session = await getSession(Astro.request);
+const t = useTranslations(session);
+
+const api = getApi();
+let errorMessage = "";
+
+let group: GroupDto = {};
+let championship: ChampionshipDto = {};
+let groupDetail: GroupDetailDto = {};
+let playerStandings: PlayerStandingDto[] = [];
+
+let matches: GroupMatchDto[] = [];
+let matchCounts = {
+	all: 0,
+	created: 0,
+	planned: 0,
+	played: 0,
+};
+
+// Function to get status info
+const getStatusInfo = (status: MatchStatus) => {
+	switch (status) {
+		case MatchStatus.Created:
+			return {
+				icon: PlayIcon,
+				text: t("Match.Status.Created"),
+				textColor: "text-gray-600",
+				iconColor: "text-gray-500"
+			};
+		case MatchStatus.Planned:
+			return {
+				icon: ClockIcon,
+				text: t("Match.Status.Planned"),
+				textColor: "text-orange-600",
+				iconColor: "text-orange-500"
+			};
+		case MatchStatus.Played:
+			return {
+				icon: CheckCircleIcon,
+				text: t("Match.Status.Played"),
+				textColor: "text-green-600",
+				iconColor: "text-green-500"
+			};
+		case MatchStatus.Cancelled:
+			return {
+				icon: XCircleIcon,
+				text: t("Match.Status.Cancelled"),
+				textColor: "text-red-600",
+				iconColor: "text-red-500"
+			};
+		default:
+			return {
+				icon: PlayIcon,
+				text: t("Match.Status.Created"),
+				textColor: "text-gray-600",
+				iconColor: "text-gray-500"
+			};
+	}
+};
+
+// Function to get formatted date
+const getFormattedDate = (dateString: string | undefined) => {
+	if (!dateString) return "No date set";
+	const date = new Date(dateString);
+	return date.toLocaleDateString("en", {
+		year: "numeric",
+		month: "short",
+		day: "numeric"
+	});
+};
+
+try {
+	if (!id) {
+		Astro.redirect("/championships/not-found");
+	}
+
+	// ========= get group
+	const groupResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroup(
+		groupId || "",
+		getRequestParams(session)
+	);
+
+	if (groupResponse.ok) {
+		group = groupResponse.data.Group?.Group || {};
+		championship = groupResponse.data.Group?.Championship || {};
+		groupDetail = groupResponse.data.Group?.GroupDetail || {};
+	} else {
+		// 404
+		Astro.redirect("/group/not-found");
+	}
+
+	// ========= get matches
+	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+		const SearchMatchesRequest = {
+			GroupId: groupId || "",
+		};
+		const matchesResponse = await api.api.padelmastersApiDomainEndpointsMatchesSearchMatches(
+			SearchMatchesRequest,
+			getRequestParams(session)
+		);
+		if (matchesResponse.ok) {
+			const searchData = matchesResponse.data || [];
+			matches = searchData.flatMap((group) => {
+				return group.Match || [];
+			});
+
+			// Calculate match counts for each status
+			const allMatches = [...matches];
+			matchCounts = {
+				all: allMatches.length,
+				created: allMatches.filter(match => match.Status === MatchStatus.Created).length,
+				planned: allMatches.filter(match => match.Status === MatchStatus.Planned).length,
+				played: allMatches.filter(match => match.Status === MatchStatus.Played).length,
+			};
+
+			// Sort matches according to the specified order:
+			// 1. Cancelados - at the bottom
+			// 2. Creados - after cancelled
+			// 3. Planificados and Jugados - by date descending (most recent first)
+			matches.sort((a, b) => {
+				// First, sort by status priority
+				const statusPriority = {
+					[MatchStatus.Cancelled]: 3, // Lowest priority (bottom)
+					[MatchStatus.Created]: 2,    // Medium priority
+					[MatchStatus.Planned]: 1,    // High priority
+					[MatchStatus.Played]: 1,     // High priority
+				};
+
+				const aPriority = statusPriority[a.Status || MatchStatus.Created] || 2;
+				const bPriority = statusPriority[b.Status || MatchStatus.Created] || 2;
+
+				// If different status priorities, sort by priority
+				if (aPriority !== bPriority) {
+					return aPriority - bPriority;
+				}
+
+				// If same status priority, sort by date (descending for Planned/Played)
+				if (aPriority === 1) { // Planned or Played
+					const aDate = new Date(a.Date || 0);
+					const bDate = new Date(b.Date || 0);
+					return bDate.getTime() - aDate.getTime(); // Descending order
+				}
+
+				// For Created and Cancelled, maintain original order
+				return 0;
+			});
+		}
+	}
+
+	// ========= get standings
+	if (groupDetail.NumberPlayers && groupDetail.NumberPlayers > 0) {
+		const standingsResponse = await api.api.padelmastersApiDomainEndpointsGroupsGetGroupStandings(
+			groupId || "",
+			getRequestParams(session)
+		);
+		if (standingsResponse.ok) {
+			playerStandings = standingsResponse.data.PlayerStandings || [];
+		} else {
+			// Error fetching standings
+		}
+	}
+} catch (e) {
+	if (e instanceof AuthenticationError) {
+		// Authentication failed, redirect to home page
+		return Astro.redirect("/");
+	}
+	console.error(e);
+	// Error loading data
+	errorMessage = t(TranslationKey.ErrorLoadingData);
+}
+---
+
+<Layout title={`Group ${group.Name}`}>
+	<section class="relative w-full min-h-screen bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900">
+		<!-- Gradient Overlay for depth -->
+		<div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+		<div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+
+		<!-- Content -->
+		<div class="relative z-10 pt-32 md:pt-24 px-6 pb-[26rem] md:pb-40">
+			<ChampionshipGroupHeader
+				championshipId={id || ""}
+				championshipName={championship.Name || ""}
+				groupId={groupId || ""}
+				groupName={group.Name || ""}
+				groupDescription={group.Description || undefined}
+			/>
+
+			<!-- Statistics Cards -->
+			<div class="mb-6">
+				<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<UsersIcon className="h-5 w-5 text-blue-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-blue-300">
+								{t(TranslationKey.NumberOfPlayers)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{groupDetail.NumberPlayers}</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<CalendarDateRangeIcon className="h-5 w-5 text-green-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-green-300">
+								{t(TranslationKey.NumberMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">{groupDetail.NumberMatches}</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<CheckCircleIcon className="h-5 w-5 text-purple-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-purple-300">
+								{t(TranslationKey.PlayedMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">
+							{groupDetail.NumberOfPlayedMatches}
+						</p>
+					</div>
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-4 shadow-2xl">
+						<div class="mb-2 flex items-center gap-2">
+							<ClockIcon className="h-5 w-5 text-orange-400" />
+							<p class="text-xs font-semibold uppercase tracking-wide text-orange-300">
+								{t(TranslationKey.PendingMatches)}
+							</p>
+						</div>
+						<p class="text-2xl font-bold text-white">
+							{groupDetail.NumberOfPendingMatches}
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Main Content Grid -->
+			<div class="max-w-7xl mx-auto">
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+					<!-- Matches Section -->
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl h-auto">
+						<div class="px-6 py-4 border-b border-white/20 bg-white/5 rounded-t-xl">
+							<div class="flex items-center gap-3">
+								<CalendarDaysIcon className="h-5 w-5 text-blue-400" />
+								<h2 class="text-lg font-semibold text-white">{t(TranslationKey.MatchesTitle)}</h2>
+							</div>
+						</div>
+						<!-- Filter Buttons -->
+						<div class="px-4 py-3 border-b border-white/20">
+							<div class="flex flex-wrap gap-2">
+								<button
+									data-filter={MatchStatus.Planned}
+									class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+										statusFilter === MatchStatus.Planned || !statusFilter
+											? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+											: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+									}`}
+								>
+									{t("Match.Status.Planned")} ({matchCounts.planned})
+								</button>
+								<button
+									data-filter={MatchStatus.Played}
+									class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+										statusFilter === MatchStatus.Played
+											? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+											: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+									}`}
+								>
+									{t("Match.Status.Played")} ({matchCounts.played})
+								</button>
+								<button
+									data-filter={MatchStatus.Created}
+									class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+										statusFilter === MatchStatus.Created
+											? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+											: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+									}`}
+								>
+									{t("Match.Status.Created")} ({matchCounts.created})
+								</button>
+								<button
+									data-filter="All"
+									class={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 backdrop-blur-sm ${
+										statusFilter === "All"
+											? "bg-white/60 text-black border-white/70 shadow-xl font-semibold"
+											: "bg-white/10 text-white/80 hover:bg-white/20 border-white/20 shadow-sm"
+									}`}
+								>
+									{t(TranslationKey.All)} ({matchCounts.all})
+								</button>
+							</div>
+						</div>
+
+						<!-- Matches Content -->
+						<div class="p-4 h-auto">
+							{
+							matches.length > 0 ? (
+								<div id="matches-container" class="space-y-3" style="transition: height 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;">
+									{
+										matches.map((match) => {
+											const statusInfo = getStatusInfo(match.Status || MatchStatus.Created);
+											return (
+												<div 
+													data-match={match.Id}
+													data-match-status={match.Status}
+													class="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg shadow-xl hover:bg-white/15 hover:border-white/30 transition-all duration-300"
+													style="transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;"
+												>
+													<!-- Match Header -->
+													<div class="px-4 py-3 border-b border-white/20 bg-white/5 rounded-t-lg">
+														<div class="flex items-center justify-between">
+															<!-- Left side: Status -->
+															<div class="flex items-center gap-2">
+																<statusInfo.icon className="h-4 w-4 text-white/90" />
+																<span class="text-sm font-medium text-white/90">
+																	{statusInfo.text}
+																</span>
+															</div>
+
+															<!-- Right side: Actions -->
+															<div class="flex items-center gap-2">
+																{match.CurrentUserCanEdit && (
+																	<a 
+																		href={`/championships/${id}/${groupId}/matches/${match.Id}/edit`}
+																		class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+																		title="Edit match"
+																	>
+																		<PencilIcon className="h-3.5 w-3.5" />
+																		<span class="hidden sm:inline">Edit</span>
+																	</a>
+																)}
+																{match.CurrentUserCanUnplan && (
+																	<Popup
+																		matchAction="Unplan"
+																		title={t(TranslationKey.MatchUnplanTitle)}
+																		text={t(TranslationKey.MatchUnplanMessage)}
+																		textActionButton={t(TranslationKey.Unplan)}
+																		textCancelButton={t(TranslationKey.Cancel)}
+																		matchId={match.Id || ""}
+																		url={`${Astro.url.pathname}${statusFilter ? `?status=${statusFilter}` : "?status=Planned"}`}
+																		client:idle
+																		successMessage={t(TranslationKey.MatchUnplanSuccess)}
+																		errorMessage={t(TranslationKey.MatchUnplanError)}
+																	/>
+																)}
+																{match.CurrentUserCanDelete && (
+																	<Popup
+																		matchAction="Delete"
+																		title={t(TranslationKey.MatchRestartTitle)}
+																		text={t(TranslationKey.MatchRestartMessage)}
+																		textActionButton={t(TranslationKey.Restart)}
+																		textCancelButton={t(TranslationKey.Cancel)}
+																		matchId={match.Id || ""}
+																		url={`${Astro.url.pathname}${statusFilter ? `?status=${statusFilter}` : "?status=Planned"}`}
+																		client:idle
+																		successMessage={t(TranslationKey.MatchRestartSuccess)}
+																		errorMessage={t(TranslationKey.MatchRestartError)}
+																	/>
+																)}
+															</div>
+														</div>
+													</div>
+
+													<!-- Match Content - Compact Layout -->
+													<div class="p-4 border-t border-white/20">
+														<!-- Date with Icon -->
+														<div class="flex items-center gap-2 mb-3 text-sm text-white/70">
+															<CalendarDaysIcon className="h-4 w-4 text-white/60" />
+															{match.Date ? (
+																<span class="text-white/80">
+																	{getFormattedDate(match.Date)}
+																</span>
+															) : (
+																<span class="text-white/60 italic">
+																	No date set
+																</span>
+															)}
+														</div>
+														
+														<div class="space-y-3">
+															<!-- Team 1 Row -->
+															<div class={`flex items-center justify-between p-3 rounded-lg ${match.Team1?.IsWinner ? 'bg-green-500/20 border border-green-400/30' : 'bg-white/10 border border-white/20'}`}>
+																<!-- Team 1 Players -->
+																<div class="flex items-center gap-3 flex-1">
+																	<div class="flex flex-col gap-1">
+																		<CountryFlag countryCode={match.Team1?.Team?.Player1?.Country || "ES"} class="w-4 h-3" />
+																		<CountryFlag countryCode={match.Team1?.Team?.Player2?.Country || "ES"} class="w-4 h-3" />
+																	</div>
+																	<div class="flex-1 min-w-0">
+																		<div class={`text-sm ${match.Team1?.IsWinner ? 'text-green-200' : 'text-white'}`}>
+																			<div class="flex items-center gap-2">
+																				<UsersLink
+																					userId={match.Team1?.Team?.Player1?.Id || ""}
+																					displayName={`${match.Team1?.Team?.Player1?.FirstName} ${match.Team1?.Team?.Player1?.LastName}`}
+																					class={`${match.Team1?.IsWinner ? 'text-green-200 hover:text-green-100' : 'text-white hover:text-white/80'}`}
+																				/>
+																				<span class="text-xs text-white/60">({match.Team1?.Team?.Player1?.Ranking || '-'})</span>
+																			</div>
+																		</div>
+																		<div class={`text-sm ${match.Team1?.IsWinner ? 'text-green-300' : 'text-white/80'}`}>
+																			<div class="flex items-center gap-2">
+																				<UsersLink
+																					userId={match.Team1?.Team?.Player2?.Id || ""}
+																					displayName={`${match.Team1?.Team?.Player2?.FirstName} ${match.Team1?.Team?.Player2?.LastName}`}
+																					class={`${match.Team1?.IsWinner ? 'text-green-300 hover:text-green-200' : 'text-white/80 hover:text-white/60'}`}
+																				/>
+																				<span class="text-xs text-white/60">({match.Team1?.Team?.Player2?.Ranking || '-'})</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+
+																<!-- Team 1 Results -->
+																<div class="flex items-center gap-4">
+																	<!-- Overall Score -->
+																	<div class="text-center">
+																		<span class={`text-lg font-bold ${match.Team1?.IsWinner ? 'text-green-300' : 'text-white/80'}`}>
+																			{match.MatchResults && match.MatchResults.length > 0 
+																				? match.MatchResults.filter((r: any) => r && (r.ResultTeam1 || 0) > (r.ResultTeam2 || 0)).length
+																				: '-'
+																			}
+																		</span>
+																	</div>
+
+																	<!-- Vertical Separator -->
+																	<div class="w-px h-8 bg-white/30"></div>
+
+																	<!-- Set Scores -->
+																	<div class="flex gap-3">
+																		{match.MatchResults && match.MatchResults.length > 0 ? (
+																			match.MatchResults.map((result: any, _index: number) => (
+																				<div class="text-center">
+																					<span class={`text-sm font-medium ${result && (result.ResultTeam1 || 0) > (result.ResultTeam2 || 0) ? 'text-green-300' : 'text-white/80'}`}>
+																						{result ? (result.ResultTeam1 || 0) : '-'}
+																					</span>
+																				</div>
+																			))
+																		) : (
+																			// Show 3 sets with "-" for non-played matches
+																			Array.from({ length: 3 }, (_, _index: number) => (
+																				<div class="text-center">
+																					<span class="text-sm font-medium text-white/60">-</span>
+																				</div>
+																			))
+																		)}
+																	</div>
+																</div>
+															</div>
+
+															<!-- Team 2 Row -->
+															<div class={`flex items-center justify-between p-3 rounded-lg ${match.Team2?.IsWinner ? 'bg-green-500/20 border border-green-400/30' : 'bg-white/10 border border-white/20'}`}>
+																<!-- Team 2 Players -->
+																<div class="flex items-center gap-3 flex-1">
+																	<div class="flex flex-col gap-1">
+																		<CountryFlag countryCode={match.Team2?.Team?.Player1?.Country || "ES"} class="w-4 h-3" />
+																		<CountryFlag countryCode={match.Team2?.Team?.Player2?.Country || "ES"} class="w-4 h-3" />
+																	</div>
+																	<div class="flex-1 min-w-0">
+																		<div class={`text-sm ${match.Team2?.IsWinner ? 'text-green-200' : 'text-white'}`}>
+																			<div class="flex items-center gap-2">
+																				<UsersLink
+																					userId={match.Team2?.Team?.Player1?.Id || ""}
+																					displayName={`${match.Team2?.Team?.Player1?.FirstName} ${match.Team2?.Team?.Player1?.LastName}`}
+																					class={`${match.Team2?.IsWinner ? 'text-green-200 hover:text-green-100' : 'text-white hover:text-white/80'}`}
+																				/>
+																				<span class="text-xs text-white/60">({match.Team2?.Team?.Player1?.Ranking || '-'})</span>
+																			</div>
+																		</div>
+																		<div class={`text-sm ${match.Team2?.IsWinner ? 'text-green-300' : 'text-white/80'}`}>
+																			<div class="flex items-center gap-2">
+																				<UsersLink
+																					userId={match.Team2?.Team?.Player2?.Id || ""}
+																					displayName={`${match.Team2?.Team?.Player2?.FirstName} ${match.Team2?.Team?.Player2?.LastName}`}
+																					class={`${match.Team2?.IsWinner ? 'text-green-300 hover:text-green-200' : 'text-white/80 hover:text-white/60'}`}
+																				/>
+																				<span class="text-xs text-white/60">({match.Team2?.Team?.Player2?.Ranking || '-'})</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+
+																<!-- Team 2 Results -->
+																<div class="flex items-center gap-4">
+																	<!-- Overall Score -->
+																	<div class="text-center">
+																		<span class={`text-lg font-bold ${match.Team2?.IsWinner ? 'text-green-300' : 'text-white/80'}`}>
+																			{match.MatchResults && match.MatchResults.length > 0 
+																				? match.MatchResults.filter((r: any) => r && (r.ResultTeam2 || 0) > (r.ResultTeam1 || 0)).length
+																				: '-'
+																			}
+																		</span>
+																	</div>
+
+																	<!-- Vertical Separator -->
+																	<div class="w-px h-8 bg-white/30"></div>
+
+																	<!-- Set Scores -->
+																	<div class="flex gap-3">
+																		{match.MatchResults && match.MatchResults.length > 0 ? (
+																			match.MatchResults.map((result: any, _index: number) => (
+																				<div class="text-center">
+																					<span class={`text-sm font-medium ${result && (result.ResultTeam2 || 0) > (result.ResultTeam1 || 0) ? 'text-green-600' : 'text-gray-600'}`}>
+																						{result ? (result.ResultTeam2 || 0) : '-'}
+																					</span>
+																				</div>
+																			))
+																		) : (
+																			// Show 3 sets with "-" for non-played matches
+																			Array.from({ length: 3 }, (_, _index: number) => (
+																				<div class="text-center">
+																					<span class="text-sm font-medium text-gray-400">-</span>
+																				</div>
+																			))
+																		)}
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											);
+										})
+									}
+								</div>
+								
+								<!-- No matches available message for filtered results -->
+								<div id="no-matches-message" class="p-4" style="display: none;">
+									<div class="flex flex-col items-center gap-3 p-6 text-center">
+										<XMarkIcon className="h-12 w-12 text-white/80" />
+										<div>
+											<h3 class="text-base font-semibold text-white mb-1">
+												No matches available
+											</h3>
+											<p class="text-sm text-white/70">
+												No matches found with the selected filter. Try changing the filter or check back later.
+											</p>
+										</div>
+									</div>
+								</div>
+							) : (
+								<div class="py-8">
+									<div class="flex flex-col items-center gap-4 p-8 text-center">
+										<XMarkIcon className="h-12 w-12 text-white/80" />
+										<div>
+											<h3 class="text-lg font-semibold text-white mb-2">
+												No matches available
+											</h3>
+											<p class="text-sm text-white/70">
+												No matches found for this group. Check back later.
+											</p>
+										</div>
+									</div>
+								</div>
+							)
+						}
+					</div>
+				</div>
+
+					<!-- Standings Section -->
+					<div class="rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl h-fit">
+						<div class="px-6 py-4 border-b border-white/20 bg-white/5 rounded-t-xl">
+							<div class="flex items-center gap-3">
+								<ChartBarIcon className="h-5 w-5 text-purple-400" />
+								<h2 class="text-lg font-semibold text-white">{t(TranslationKey.StandingsTitle)}</h2>
+							</div>
+						</div>
+					<div id="standings-content" class="p-4">
+						{
+							playerStandings.length > 0 ? (
+								<div class="w-full">
+									<div class="py-2 align-middle">
+										<div class="overflow-hidden rounded-lg border border-white/20 shadow-sm bg-white/5">
+											<table class="w-full divide-y divide-white/20">
+												<thead>
+													<tr class="bg-white/10">
+														<th
+															scope="col"
+															class="py-3 pl-3 pr-2 text-left text-sm font-bold text-white/90 sm:pl-4 sm:pr-3"
+														>
+															{t(TranslationKey.StandingsName)}
+														</th>
+														<th scope="col" class="px-1 py-3 text-center text-xs font-bold text-white/90 sm:px-2 sm:text-sm">
+															<div class="lg:hidden">{t(TranslationKey.StandingsPlayedShort)}</div>
+															<div class="max-lg:hidden">{t(TranslationKey.StandingsPlayedLong)}</div>
+														</th>
+														<th scope="col" class="px-1 py-3 text-center text-xs font-bold text-white/90 sm:px-2 sm:text-sm">
+															<div class="lg:hidden">{t(TranslationKey.StandingsVictoryShort)}</div>
+															<div class="max-lg:hidden">{t(TranslationKey.StandingsVictoryLong)}</div>
+														</th>
+														<th scope="col" class="px-1 py-3 text-center text-xs font-bold text-white/90 sm:px-2 sm:text-sm">
+															<div class="lg:hidden">{t(TranslationKey.StandingsLostShort)}</div>
+															<div class="max-lg:hidden">{t(TranslationKey.StandingsLostLong)}</div>
+														</th>
+														<th scope="col" class="px-1 py-3 text-center text-xs font-bold text-white/90 sm:px-2 sm:text-sm">
+															<div class="lg:hidden">{t(TranslationKey.StandingsPointShort)}</div>
+															<div class="max-lg:hidden">{t(TranslationKey.StandingsPointLong)}</div>
+														</th>
+													</tr>
+												</thead>
+												<tbody class="divide-y divide-white/20">
+													{
+														playerStandings.map((player, index) => (
+															<tr
+																class={`${index < (groupDetail.NumberOfFinalists || 0) ? 'bg-yellow-500/20 border-l-2 border-yellow-400' : 'bg-white/5'} hover:bg-white/10 transition-all duration-200`}
+															>
+																<td
+																	class={`font-base py-3 pl-3 pr-2 text-sm sm:pl-4 sm:pr-3 ${index < (groupDetail.NumberOfFinalists || 0) ? 'font-bold text-yellow-300' : 'text-white'}`}
+																>
+																	<div class="flex items-center gap-1 sm:gap-2 min-w-0">
+																		<!-- Position -->
+																		<span class="text-xs font-medium text-white/80 flex-shrink-0 sm:text-sm">{index + 1}.</span>
+																		
+																		<!-- Country Flag -->
+																		<CountryFlag 
+																			countryCode={player.User?.Country || "ES"} 
+																			class="w-3 h-2 flex-shrink-0 sm:w-4 sm:h-3" 
+																		/>
+																		
+																		<!-- Player Name -->
+																		<UsersLink
+																			userId={player.User?.Id || ""}
+																			displayName={`${player.User?.FirstName || ''} ${player.User?.LastName || ''}`}
+																			class="text-blue-300 hover:text-blue-200 transition-colors font-medium text-xs sm:text-sm truncate min-w-0"
+																		/>
+																		
+																		<!-- Ranking -->
+																		<span class="text-xs text-white/60 flex-shrink-0 hidden sm:inline">({player.User?.Ranking || '-'})</span>
+																		
+																		<!-- Americano Stars -->
+																		{(group.GroupType || GroupType.League) === GroupType.Americano &&
+																			((index === 0 && (
+																				<StarIcon
+																					aria-hidden="true"
+																					className="ml-auto h-4 w-4 text-yellow-400"
+																				/>
+																			)) ||
+																				(index === 1 && (
+																				<StarIcon
+																					aria-hidden="true"
+																					className="ml-auto h-4 w-4 text-gray-300"
+																				/>
+																			)) ||
+																				(index === 2 && (
+																				<StarIcon
+																					aria-hidden="true"
+																					className="ml-auto h-4 w-4 text-orange-700"
+																				/>
+																			)))}
+																	</div>
+																</td>
+																<td class="px-1 py-3 text-center align-middle text-xs font-medium text-white/80 sm:px-2 sm:text-sm">
+																	{player.PlayedMatches}
+																</td>
+																<td class="px-1 py-3 text-center align-middle text-xs font-medium text-green-300 sm:px-2 sm:text-sm">
+																	{player.WonMatches}
+																</td>
+																<td class="px-1 py-3 text-center align-middle text-xs font-medium text-red-300 sm:px-2 sm:text-sm">
+																	{player.LostMatches}
+																</td>
+																<td class="px-1 py-3 text-center align-middle text-xs font-bold text-blue-300 sm:px-2 sm:text-sm">
+																	{player.Points}
+																</td>
+															</tr>
+														))
+													}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							) : (
+								<div class="py-8">
+									<div class="flex flex-col items-center gap-4 p-8 text-center">
+										<ChartBarIcon className="h-12 w-12 text-white/80" />
+										<div>
+											<h3 class="text-lg font-semibold text-white mb-2">
+												No standings available
+											</h3>
+											<p class="text-sm text-white/70">
+												No standings found for this group. Check back later.
+											</p>
+										</div>
+									</div>
+								</div>
+							)
+						}
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{errorMessage && <Toast message={errorMessage} type="error" client:load />}
+
+		<!-- Integrated Footer Section - Full Width -->
+		<div class="absolute bottom-0 left-0 right-0 z-10 w-full py-6">
+			<!-- Features Section -->
+			<div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-6 px-6">
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🏆</span>
+					<span class="hidden sm:inline">Professional Tournament Management</span>
+					<span class="sm:hidden">Tournaments</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>🎯</span>
+					<span class="hidden sm:inline">Real-time Statistics</span>
+					<span class="sm:hidden">Statistics</span>
+				</div>
+				<div class="flex items-center gap-2 text-sm text-white/70">
+					<span>👥</span>
+					<span class="hidden sm:inline">Community Driven</span>
+					<span class="sm:hidden">Community</span>
+				</div>
+			</div>
+
+			<!-- Divider -->
+			<div class="border-t border-white/20 mb-4 mx-6"></div>
+
+			<!-- Bottom Section -->
+			<div class="flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+				<!-- Copyright -->
+				<div class="flex flex-col items-center md:items-start gap-2">
+					<p class="text-sm text-white/70">
+						© {new Date().getFullYear()} Padel Masters. All rights reserved.
+					</p>
+					<div class="flex items-center gap-4 text-xs text-white/60">
+						<span>Made with ❤️ for padel lovers</span>
+					</div>
+				</div>
+
+				<!-- Version Info -->
+				<div class="flex items-center gap-2 text-xs text-white/60">
+					<span>Version 2.0</span>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<script>
+	// Function to initialize filtering
+	function initializeFiltering() {
+		const filterButtons = document.querySelectorAll("[data-filter]");
+		const matchesContainer = document.getElementById("matches-container") as HTMLElement;
+		const noMatchesMessage = document.getElementById("no-matches-message") as HTMLElement;
+
+		if (!filterButtons.length || !matchesContainer) return;
+
+		// Remove old event listeners by cloning buttons
+		filterButtons.forEach((button) => {
+			const newButton = button.cloneNode(true);
+			button.parentNode?.replaceChild(newButton, button);
+		});
+
+		// Get fresh references after cloning
+		const freshFilterButtons = document.querySelectorAll("[data-filter]");
+
+		freshFilterButtons.forEach((button) => {
+			button.addEventListener("click", function (e) {
+				e.preventDefault();
+				const target = e.currentTarget as HTMLElement;
+				if (!target) return;
+
+				const filter = target.getAttribute("data-filter");
+				if (!filter) return;
+
+				// Update active button
+				freshFilterButtons.forEach((btn) => {
+					if (btn) {
+						(btn as HTMLElement).classList.remove(
+							"bg-white/60",
+							"text-black",
+							"border-white/70",
+							"shadow-xl",
+							"font-semibold"
+						);
+						(btn as HTMLElement).classList.add(
+							"bg-white/10",
+							"text-white/80",
+							"hover:bg-white/20",
+							"border-white/20",
+							"shadow-sm"
+						);
+					}
+				});
+				target.classList.remove(
+					"bg-white/10",
+					"text-white/80",
+					"hover:bg-white/20",
+					"border-white/20",
+					"shadow-sm"
+				);
+				target.classList.add(
+					"bg-white/60",
+					"text-black",
+					"border-white/70",
+					"shadow-xl",
+					"font-semibold"
+				);
+
+				// Show/hide matches based on filter
+				const matchElements = matchesContainer.querySelectorAll("[data-match]");
+				let visibleCount = 0;
+
+				matchElements.forEach((matchElement) => {
+					const matchStatus = matchElement.getAttribute("data-match-status");
+					const isVisible = filter === "All" || matchStatus === filter;
+					const element = matchElement as HTMLElement;
+
+					if (isVisible) {
+						element.style.opacity = "1";
+						element.style.transform = "scale(1)";
+						element.style.height = "";
+						element.style.maxHeight = "";
+						element.style.marginTop = "";
+						element.style.marginBottom = "";
+						element.style.paddingTop = "";
+						element.style.paddingBottom = "";
+						element.style.pointerEvents = "auto";
+						element.style.overflow = "";
+						visibleCount++;
+					} else {
+						element.style.opacity = "0";
+						element.style.transform = "scaleY(0)";
+						element.style.height = "0";
+						element.style.maxHeight = "0";
+						element.style.marginTop = "0";
+						element.style.marginBottom = "0";
+						element.style.paddingTop = "0";
+						element.style.paddingBottom = "0";
+						element.style.pointerEvents = "none";
+						element.style.overflow = "hidden";
+					}
+				});
+
+				// Collapse/expand matches container based on visible count
+				if (visibleCount === 0) {
+					matchesContainer.style.height = "0";
+					matchesContainer.style.maxHeight = "0";
+					matchesContainer.style.overflow = "hidden";
+					matchesContainer.style.marginTop = "0";
+					matchesContainer.style.marginBottom = "0";
+					matchesContainer.style.paddingTop = "0";
+					matchesContainer.style.paddingBottom = "0";
+				} else {
+					matchesContainer.style.height = "";
+					matchesContainer.style.maxHeight = "";
+					matchesContainer.style.overflow = "";
+					matchesContainer.style.marginTop = "";
+					matchesContainer.style.marginBottom = "";
+					matchesContainer.style.paddingTop = "";
+					matchesContainer.style.paddingBottom = "";
+				}
+
+				// Show/hide no matches message
+				if (noMatchesMessage) {
+					if (visibleCount === 0) {
+						noMatchesMessage.style.display = "";
+						noMatchesMessage.style.opacity = "1";
+						noMatchesMessage.style.transform = "scale(1)";
+						noMatchesMessage.style.height = "";
+						noMatchesMessage.style.maxHeight = "";
+						noMatchesMessage.style.marginTop = "";
+						noMatchesMessage.style.marginBottom = "";
+						noMatchesMessage.style.paddingTop = "";
+						noMatchesMessage.style.paddingBottom = "";
+						noMatchesMessage.style.pointerEvents = "auto";
+						noMatchesMessage.style.overflow = "";
+					} else {
+						noMatchesMessage.style.display = "none";
+						noMatchesMessage.style.opacity = "0";
+						noMatchesMessage.style.transform = "scaleY(0)";
+						noMatchesMessage.style.height = "0";
+						noMatchesMessage.style.maxHeight = "0";
+						noMatchesMessage.style.marginTop = "0";
+						noMatchesMessage.style.marginBottom = "0";
+						noMatchesMessage.style.paddingTop = "0";
+						noMatchesMessage.style.paddingBottom = "0";
+						noMatchesMessage.style.pointerEvents = "none";
+						noMatchesMessage.style.overflow = "hidden";
+					}
+				}
+
+				// Update URL without page reload
+				const url = new URL(window.location.href);
+				if (filter === "All") {
+					url.searchParams.delete("status");
+				} else {
+					url.searchParams.set("status", filter);
+				}
+				window.history.pushState({}, "", url);
+			});
+		});
+
+		// Set initial filter based on URL or default to 'Planned'
+		const urlParams = new URLSearchParams(window.location.search);
+		const initialFilter = urlParams.get("status") || "Planned";
+
+		// Find and click the appropriate button
+		const initialButton = Array.from(freshFilterButtons).find(
+			(btn) => btn.getAttribute("data-filter") === initialFilter
+		) as HTMLElement;
+
+		if (initialButton) {
+			initialButton.click();
+		}
+	}
+
+	// Initialize filtering on page load and Astro transitions
+	document.addEventListener("DOMContentLoaded", initializeFiltering);
+	document.addEventListener("astro:page-load", initializeFiltering);
+	
+	// Additional fallback for when content is swapped
+	document.addEventListener("astro:after-swap", () => {
+		setTimeout(initializeFiltering, 50);
+	});
+</script> 
+

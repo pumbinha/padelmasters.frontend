@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { NavigationLink } from "./types";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { getSelectedItemHoverClass } from "./utils";
 
 type NavigationProps = {
 	navigationLinks: NavigationLink[];
@@ -25,15 +24,21 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 			</div>
 			<Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
 				<div className="fixed inset-0 z-50" />
-				<DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white py-4 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+				<DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 py-4 shadow-2xl sm:max-w-sm">
 					<div className="flex items-center justify-between px-6">
-						<a href="/" className="logo text-2xl font-bold text-primary-800">
-							Padel Masters
+						<a href="/" className="flex items-center gap-3">
+							<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500/20 backdrop-blur-sm">
+								<span className="text-lg">🎾</span>
+							</div>
+							<div className="flex flex-col">
+								<span className="text-lg font-bold text-white">Padel Masters</span>
+								<span className="text-xs text-neutral-300">Championship Management System</span>
+							</div>
 						</a>
 						<button
 							type="button"
 							onClick={() => setMobileMenuOpen(false)}
-							className="-m-2.5 rounded-md p-2.5 text-gray-700"
+							className="-m-2.5 rounded-md p-2.5 text-neutral-300 transition-colors hover:bg-white/10 hover:text-white"
 						>
 							<span className="sr-only">Close menu</span>
 							<XMarkIcon aria-hidden="true" className="h-6 w-6" />
@@ -49,7 +54,11 @@ const MobileNav: React.FC<NavigationProps> = ({ navigationLinks }) => {
 												<a
 													key={link.href}
 													href={link.href}
-													className={`block cursor-pointer border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 ${getSelectedItemHoverClass()} ${link.isActive ? "border-vivid-700 bg-vivid-200 text-vivid-700" : ""}`}
+													className={`block cursor-pointer py-3 pl-4 pr-4 text-sm transition-colors duration-200 ${
+														link.isActive
+															? "font-medium text-white"
+															: "text-neutral-300 hover:text-white"
+													}`}
 												>
 													{link.name}
 												</a>
