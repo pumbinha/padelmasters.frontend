@@ -6,13 +6,12 @@ import Layout from "@/layouts/Layout.astro";
 import { parseFormData, getApi, getRequestParams, AuthenticationError } from "@/services/utils";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { getSession } from "auth-astro/server";
-import type { UserProfileDto } from "@/services/api";
+import type { UserProfileDto, UpdateUserProfileRequest } from "@/services/api";
 
 const session = await getSession(Astro.request);
 const t = useTranslations(session);
 const countries = getCountries(session);
 const issuerUrl = import.meta.env.KEYCLOAK_ISSUER;
-const accountUrl = `${issuerUrl}/account`;
 const api = getApi();
 
 const errors = { firstName: "", lastName: "" };
@@ -22,7 +21,7 @@ interface EditFormData {
 	email: string;
 	locale: string;
 	country: string;
-	enableEmailNotifications: boolean;
+	enableEmailNotifications: string | undefined; // HTML checkbox sends "on" or undefined
 }
 
 let firstName: string = "";
@@ -48,7 +47,8 @@ if (Astro.request.method === "POST") {
 		email = formData.email || "";
 		locale = formData.locale || "";
 		country = formData.country || "";
-		enableEmailNotifications = formData.enableEmailNotifications || false;
+		// Convert checkbox value: "on" -> true, undefined/null -> false
+		enableEmailNotifications = formData.enableEmailNotifications === "on";
 
 		// validation
 		if (typeof firstName !== "string" || firstName.length < 1) {
@@ -78,33 +78,42 @@ if (Astro.request.method === "POST") {
 			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
 
-		const data = {
-			firstName: firstName,
-			lastName: lastName,
-			email: email,
-			attributes: {
-				locale: [locale],
-				country: [country],
-				enableEmailNotifications: [enableEmailNotifications.toString()],
-			},
+		// Prepare data for new API endpoint
+		const requestData: UpdateUserProfileRequest = {
+			FirstName: firstName,
+			LastName: lastName,
+			Alias: null, // Not used in current form
+			EnableEmailNotifications: enableEmailNotifications,
+			Locale: locale,
+			Country: country,
 		};
-		// Note: Currently updating profile via Keycloak as there's no PUT/PATCH endpoint for user profile in the API
-		// TODO: Update to use API endpoint when backend implements profile update functionality
-		try {
-			const response = await fetch(`${accountUrl}`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${session?.access_token}`,
-				},
-				body: JSON.stringify(data),
-			});
 
-			if (response.ok) {
+		try {
+			const updateResponse = await api.api.padelmastersApiDomainEndpointsUsersUpdateUserProfile(
+				requestData,
+				getRequestParams(session)
+			);
+
+			if (updateResponse.ok) {
+				console.log("✅ Profile update successful");
 				successMessage = t(TranslationKey.ProfileUpdatedSuccessfully);
+			} else {
+				console.error("❌ Profile update failed:");
+				console.error("Status:", updateResponse.status);
+				console.error("Response:", updateResponse);
+				errorMessage = t(TranslationKey.ErrorLoadingData);
 			}
 		} catch (e) {
-			// Error loading data
+			if (e instanceof AuthenticationError) {
+				return Astro.redirect("/");
+			}
+			console.error("❌ Profile update exception:");
+			console.error("Error object:", e);
+			console.error("Error type:", typeof e);
+			console.error("Error message:", e instanceof Error ? e.message : String(e));
+			if (e && typeof e === 'object' && 'data' in e) {
+				console.error("Error data:", (e as any).data);
+			}
 			errorMessage = t(TranslationKey.ErrorLoadingData);
 		}
 	} catch (error) {
@@ -379,6 +388,7 @@ if (Astro.request.method === "POST") {
 							<button
 								type="submit"
 								class="flex-1 px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+								id="profile-save-btn"
 							>
 								{t(TranslationKey.Save)}
 							</button>
@@ -442,6 +452,36 @@ if (Astro.request.method === "POST") {
 					}
 				});
 			}
+
+			// Add form submit logging
+			const form = document.querySelector('form') as HTMLFormElement;
+			if (form) {
+				form.addEventListener('submit', function(e) {
+					console.log('=== CLIENT-SIDE FORM SUBMIT DEBUG ===');
+					
+					const formData = new FormData(form);
+					const formObject: any = {};
+					
+					for (const [key, value] of formData.entries()) {
+						formObject[key] = value;
+					}
+					
+					console.log('Form Data Object:', formObject);
+					
+					// Simulate the API request data structure
+					const apiRequestData = {
+						FirstName: formData.get('firstName'),
+						LastName: formData.get('lastName'),
+						Alias: null,
+						EnableEmailNotifications: formData.get('enableEmailNotifications') === 'on',
+						Locale: formData.get('locale'),
+						Country: formData.get('country')
+					};
+					
+					console.log('API Request Data (what will be sent):', JSON.stringify(apiRequestData, null, 2));
+					console.log('=====================================');
+				});
+			}
 		});
 
 		// Reinitialize script after ViewTransitions navigation
@@ -460,6 +500,35 @@ if (Astro.request.method === "POST") {
 						flagContainer.className = 'w-4 h-3 inline-block text-white/50';
 						flagContainer.textContent = '🌍';
 					}
+				});
+			}
+
+			// Re-add form submit logging after navigation
+			const form = document.querySelector('form') as HTMLFormElement;
+			if (form) {
+				form.addEventListener('submit', function(e) {
+					console.log('=== CLIENT-SIDE FORM SUBMIT DEBUG (after navigation) ===');
+					
+					const formData = new FormData(form);
+					const formObject: any = {};
+					
+					for (const [key, value] of formData.entries()) {
+						formObject[key] = value;
+					}
+					
+					console.log('Form Data Object:', formObject);
+					
+					const apiRequestData = {
+						FirstName: formData.get('firstName'),
+						LastName: formData.get('lastName'),
+						Alias: null,
+						EnableEmailNotifications: formData.get('enableEmailNotifications') === 'on',
+						Locale: formData.get('locale'),
+						Country: formData.get('country')
+					};
+					
+					console.log('API Request Data (what will be sent):', JSON.stringify(apiRequestData, null, 2));
+					console.log('========================================================');
 				});
 			}
 		});

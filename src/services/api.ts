@@ -105,6 +105,15 @@ export interface UserProfileDto {
   HasExternalAccount?: boolean | null;
 }
 
+export interface UpdateUserProfileRequest {
+  FirstName?: string;
+  LastName?: string;
+  Alias?: string | null;
+  EnableEmailNotifications?: boolean;
+  Locale?: string;
+  Country?: string | null;
+}
+
 export interface PlanMatchRequest {
   /** @format date-time */
   Date?: string;
@@ -568,6 +577,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/api/users/profile`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Api
+     * @name PadelmastersApiDomainEndpointsUsersUpdateUserProfile
+     * @request PUT:/api/users/profile
+     * @secure
+     */
+    padelmastersApiDomainEndpointsUsersUpdateUserProfile: (
+      data: UpdateUserProfileRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserProfileDto, void>({
+        path: `/api/users/profile`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
